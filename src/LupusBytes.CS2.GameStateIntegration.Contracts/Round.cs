@@ -1,4 +1,5 @@
 using System.Text.Json.Serialization;
+using LupusBytes.CS2.GameStateIntegration.Contracts.Enums;
 
 namespace LupusBytes.CS2.GameStateIntegration.Contracts;
 

@@ -1,3 +1,5 @@
+using LupusBytes.CS2.GameStateIntegration.Contracts.Enums;
+
 namespace LupusBytes.CS2.GameStateIntegration.Contracts;
 
 // Omitted:
@@ -12,10 +14,10 @@ public record Player(
 {
     public override string ToString()
     {
-        string output = $"SteamID64: {SteamId}{Environment.NewLine}" +
-               $"Name: {Name}{Environment.NewLine}" +
-               $"Team: {Team}{Environment.NewLine}" +
-               $"Activity: {Activity}{Environment.NewLine}";
+        var output = $"SteamID64: {SteamId}{Environment.NewLine}" +
+                     $"Name: {Name}{Environment.NewLine}" +
+                     $"Team: {Team}{Environment.NewLine}" +
+                     $"Activity: {Activity}{Environment.NewLine}";
 
         if (State is not null)
         {
