@@ -1,0 +1,28 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LupusBytes.CS2.GameStateIntegration.Api", "src\LupusBytes.CS2.GameStateIntegration.Api\LupusBytes.CS2.GameStateIntegration.Api.csproj", "{805EDDA1-F961-4B51-AB07-3F4F3A0D20D4}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{36655383-D743-4AC6-9E7D-3BFF9BDD69B6}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LupusBytes.CS2.GameStateIntegration.Contracts", "src\LupusBytes.CS2.GameStateIntegration.Contracts\LupusBytes.CS2.GameStateIntegration.Contracts.csproj", "{9DAD871B-BAB2-4267-9B44-38C5D67A0B8D}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{805EDDA1-F961-4B51-AB07-3F4F3A0D20D4}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{805EDDA1-F961-4B51-AB07-3F4F3A0D20D4}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{805EDDA1-F961-4B51-AB07-3F4F3A0D20D4}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{805EDDA1-F961-4B51-AB07-3F4F3A0D20D4}.Release|Any CPU.Build.0 = Release|Any CPU
+		{9DAD871B-BAB2-4267-9B44-38C5D67A0B8D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{9DAD871B-BAB2-4267-9B44-38C5D67A0B8D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{9DAD871B-BAB2-4267-9B44-38C5D67A0B8D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{9DAD871B-BAB2-4267-9B44-38C5D67A0B8D}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{805EDDA1-F961-4B51-AB07-3F4F3A0D20D4} = {36655383-D743-4AC6-9E7D-3BFF9BDD69B6}
+		{9DAD871B-BAB2-4267-9B44-38C5D67A0B8D} = {36655383-D743-4AC6-9E7D-3BFF9BDD69B6}
+	EndGlobalSection
+EndGlobal
