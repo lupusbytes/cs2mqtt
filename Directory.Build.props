@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+
+  <PropertyGroup Label="Metadata configuration">
+    <OrganizationName>lupusbytes</OrganizationName>
+    <RepositoryName>cs2-gamestate-integration</RepositoryName>
+  </PropertyGroup>
+
+  <!-- Solution wide properties -->
+  <PropertyGroup Label="Assembly Naming">
+    <Company>$(OrganizationName)</Company>
+    <Authors>$(OrganizationName)</Authors>
+    <NeutralLanguage>en</NeutralLanguage>
+    <DefaultLanguage>en-US</DefaultLanguage>
+  </PropertyGroup>
+
+  <PropertyGroup Label="Compile settings">
+    <Nullable>enable</Nullable>
+    <LangVersion>12.0</LangVersion>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <TargetFramework>net8.0</TargetFramework>
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
+    <NoWarn>1573,1591,1712,CA1014</NoWarn>
+
+    <!-- Used by code coverage -->
+    <DebugType>full</DebugType>
+    <DebugSymbols>true</DebugSymbols>
+  </PropertyGroup>
+
+  <PropertyGroup Label="Analyzer settings">
+    <AnalysisMode>AllEnabledByDefault</AnalysisMode>
+    <EnableNETAnalyzers>true</EnableNETAnalyzers>
+    <AnalysisLevel>latest</AnalysisLevel>
+    <EnforceCodeStyleInBuild>true</EnforceCodeStyleInBuild>
+  </PropertyGroup>
+
+  <!-- Treat warnings as errors are always on when building in release -->
+  <PropertyGroup Condition="'$(Configuration)' == 'Release'">
+    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+  </PropertyGroup>
+
+  <!-- Shared code analyzers used for all projects in the solution -->
+  <ItemGroup Label="Code Analyzers">
+    <PackageReference Include="AsyncFixer" Version="1.6.0" PrivateAssets="All" />
+    <PackageReference Include="Meziantou.Analyzer" Version="2.0.139" PrivateAssets="All" />
+    <PackageReference Include="SecurityCodeScan.VS2019" Version="5.6.7" PrivateAssets="All" />
+    <PackageReference Include="StyleCop.Analyzers" Version="1.2.0-beta.556" PrivateAssets="All" />
+    <PackageReference Include="SonarAnalyzer.CSharp" Version="9.19.0.84025" PrivateAssets="All" />
+  </ItemGroup>
+
+</Project>
