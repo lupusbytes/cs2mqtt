@@ -7,5 +7,5 @@ public enum BombState
 {
     Planted,
     Exploded,
-    Defused
+    Defused,
 }
