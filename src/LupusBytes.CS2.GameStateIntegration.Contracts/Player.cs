@@ -9,7 +9,7 @@ namespace LupusBytes.CS2.GameStateIntegration.Contracts;
 public record Player(
     [property: JsonPropertyName("steamid")] string SteamId,
     [property: JsonPropertyName("name")] string Name,
-    [property: JsonPropertyName("team")] Team Team,
+    [property: JsonPropertyName("team")] Team? Team,
     [property: JsonPropertyName("activity")] Activity? Activity,
     [property: JsonPropertyName("state")] PlayerState? State)
 {
