@@ -10,7 +10,7 @@ public record Player(
     [property: JsonPropertyName("steamid")] string SteamId,
     [property: JsonPropertyName("name")] string Name,
     [property: JsonPropertyName("team")] Team? Team,
-    [property: JsonPropertyName("activity")] Activity? Activity,
+    [property: JsonPropertyName("activity")] Activity Activity,
     [property: JsonPropertyName("state")] PlayerState? State)
 {
     public override string ToString()
