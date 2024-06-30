@@ -1,4 +1,3 @@
-using System.Diagnostics.CodeAnalysis;
 using System.Text.Json.Serialization;
 
 namespace LupusBytes.CS2.GameStateIntegration.Contracts;
