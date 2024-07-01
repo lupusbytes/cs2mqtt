@@ -6,6 +6,10 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{36655383-D74
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LupusBytes.CS2.GameStateIntegration.Contracts", "src\LupusBytes.CS2.GameStateIntegration.Contracts\LupusBytes.CS2.GameStateIntegration.Contracts.csproj", "{9DAD871B-BAB2-4267-9B44-38C5D67A0B8D}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "test", "test", "{E8A90952-2F60-4324-9046-7CDCF150268E}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LupusBytes.CS2.GameStateIntegration.Api.Tests", "test\LupusBytes.CS2.GameStateIntegration.Api.Tests\LupusBytes.CS2.GameStateIntegration.Api.Tests.csproj", "{DAF06728-EB61-425D-B50A-732FA97FDF9F}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -20,9 +24,14 @@ Global
 		{9DAD871B-BAB2-4267-9B44-38C5D67A0B8D}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{9DAD871B-BAB2-4267-9B44-38C5D67A0B8D}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{9DAD871B-BAB2-4267-9B44-38C5D67A0B8D}.Release|Any CPU.Build.0 = Release|Any CPU
+		{DAF06728-EB61-425D-B50A-732FA97FDF9F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{DAF06728-EB61-425D-B50A-732FA97FDF9F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{DAF06728-EB61-425D-B50A-732FA97FDF9F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{DAF06728-EB61-425D-B50A-732FA97FDF9F}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
 		{805EDDA1-F961-4B51-AB07-3F4F3A0D20D4} = {36655383-D743-4AC6-9E7D-3BFF9BDD69B6}
 		{9DAD871B-BAB2-4267-9B44-38C5D67A0B8D} = {36655383-D743-4AC6-9E7D-3BFF9BDD69B6}
+		{DAF06728-EB61-425D-B50A-732FA97FDF9F} = {E8A90952-2F60-4324-9046-7CDCF150268E}
 	EndGlobalSection
 EndGlobal
