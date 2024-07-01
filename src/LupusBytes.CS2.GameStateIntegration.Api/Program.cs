@@ -8,6 +8,7 @@ public class Program
         builder.Services.AddSingleton(new GameState());
         var app = builder.Build();
         app.MapIngestionEndpoint();
+        app.MapGetEndpoints();
         app.Run();
     }
 }
