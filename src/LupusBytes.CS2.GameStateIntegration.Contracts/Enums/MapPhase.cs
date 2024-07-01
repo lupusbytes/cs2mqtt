@@ -24,4 +24,9 @@ public enum MapPhase
     /// The game is in intermission.
     /// </summary>
     Intermission,
+
+    /// <summary>
+    /// The game is over.
+    /// </summary>
+    Gameover,
 }
