@@ -5,7 +5,7 @@ namespace LupusBytes.CS2.GameStateIntegration.Api;
 
 public static class Endpoints
 {
-    public static void MapGetEndpoints(this WebApplication app)
+    public static void MapGetEndpoints(this IEndpointRouteBuilder app)
     {
         app.MapGet("/map", ([FromServices] GameState gameState)
             => gameState.Map is null
@@ -28,7 +28,7 @@ public static class Endpoints
                 : Results.Ok(gameState.Provider));
     }
 
-    public static void MapIngestionEndpoint(this WebApplication app)
+    public static void MapIngestionEndpoint(this IEndpointRouteBuilder app)
         => app.MapPost("/", (
             [FromServices] GameState gameState,
             [FromBody] Data data) =>
@@ -37,7 +37,7 @@ public static class Endpoints
             return Results.NoContent();
         });
 
-    public static void MapIngestionDebugEndpoint(this WebApplication app)
+    public static void MapIngestionDebugEndpoint(this IEndpointRouteBuilder app)
         => app.MapPost("/debug", async (HttpRequest request) =>
         {
             string body;
