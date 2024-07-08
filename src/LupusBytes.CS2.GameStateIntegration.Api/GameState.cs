@@ -87,7 +87,7 @@ public class GameState
     {
     }
 
-    public void ProcessEvent(Data @event)
+    internal void ProcessEvent(Data @event)
     {
         if (@event.Player is not null)
         {
