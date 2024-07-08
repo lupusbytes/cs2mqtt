@@ -1,8 +1,5 @@
 using System.Net;
-using System.Net.Http.Headers;
-using System.Net.Http.Json;
 using System.Text;
-using AutoFixture.Xunit2;
 using FluentAssertions;
 
 namespace LupusBytes.CS2.GameStateIntegration.Api.Tests;

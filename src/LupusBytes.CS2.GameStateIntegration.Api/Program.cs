@@ -1,5 +1,4 @@
 using LupusBytes.CS2.GameStateIntegration.Api.Middleware;
-using Microsoft.AspNetCore.Diagnostics;
 
 namespace LupusBytes.CS2.GameStateIntegration.Api;
 
