@@ -1,0 +1,14 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <TargetFramework>net8.0</TargetFramework>
+        <ImplicitUsings>enable</ImplicitUsings>
+        <Nullable>enable</Nullable>
+        <RootNamespace>LupusBytes.CS2.GameStateIntegration</RootNamespace>
+    </PropertyGroup>
+
+    <ItemGroup>
+      <ProjectReference Include="..\LupusBytes.CS2.GameStateIntegration.Contracts\LupusBytes.CS2.GameStateIntegration.Contracts.csproj" />
+    </ItemGroup>
+
+</Project>

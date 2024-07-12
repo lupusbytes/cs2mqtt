@@ -1,7 +1,7 @@
 using LupusBytes.CS2.GameStateIntegration.Contracts;
 using Microsoft.AspNetCore.Mvc;
 
-namespace LupusBytes.CS2.GameStateIntegration.Api;
+namespace LupusBytes.CS2.GameStateIntegration.Api.Extensions;
 
 public static class Endpoints
 {

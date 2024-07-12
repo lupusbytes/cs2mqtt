@@ -1,4 +1,4 @@
-namespace LupusBytes.CS2.GameStateIntegration.Api.Middleware;
+namespace LupusBytes.CS2.GameStateIntegration.Api.Extensions;
 
 public class LogRequestBodyOnException(RequestDelegate next)
 {

@@ -1,6 +1,6 @@
-using LupusBytes.CS2.GameStateIntegration.Api.Events;
+using LupusBytes.CS2.GameStateIntegration.Events;
 
-namespace LupusBytes.CS2.GameStateIntegration.Api;
+namespace LupusBytes.CS2.GameStateIntegration;
 
 public abstract class ObservableGameState :
     IObservable<MapEvent>,

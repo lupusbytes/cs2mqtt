@@ -1,5 +1,5 @@
-using LupusBytes.CS2.GameStateIntegration.Api.Events;
-using LupusBytes.CS2.GameStateIntegration.Api.Middleware;
+using LupusBytes.CS2.GameStateIntegration.Api.Extensions;
+using LupusBytes.CS2.GameStateIntegration.Events;
 
 namespace LupusBytes.CS2.GameStateIntegration.Api;
 

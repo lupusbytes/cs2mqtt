@@ -1,9 +1,9 @@
 using System.Collections.Concurrent;
 using System.Diagnostics.CodeAnalysis;
-using LupusBytes.CS2.GameStateIntegration.Api.Events;
 using LupusBytes.CS2.GameStateIntegration.Contracts;
+using LupusBytes.CS2.GameStateIntegration.Events;
 
-namespace LupusBytes.CS2.GameStateIntegration.Api;
+namespace LupusBytes.CS2.GameStateIntegration;
 
 [SuppressMessage("Reliability", "CA2000:Dispose objects before losing scope", Justification = "TODO")]
 public sealed class GameStateService :
@@ -95,7 +95,7 @@ public sealed class GameStateService :
         }
     }
 
-    internal void ProcessEvent(GameStateData @event)
+    public void ProcessEvent(GameStateData @event)
     {
         if (@event.Player is null && @event.Provider is null)
         {

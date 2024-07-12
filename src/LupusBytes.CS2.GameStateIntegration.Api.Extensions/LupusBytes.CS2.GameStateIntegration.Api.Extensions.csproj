@@ -4,11 +4,10 @@
         <TargetFramework>net8.0</TargetFramework>
         <Nullable>enable</Nullable>
         <ImplicitUsings>enable</ImplicitUsings>
+        <OutputType>Library</OutputType>
     </PropertyGroup>
 
     <ItemGroup>
-      <ProjectReference Include="..\LupusBytes.CS2.GameStateIntegration.Api.Extensions\LupusBytes.CS2.GameStateIntegration.Api.Extensions.csproj" />
-      <ProjectReference Include="..\LupusBytes.CS2.GameStateIntegration.Contracts\LupusBytes.CS2.GameStateIntegration.Contracts.csproj" />
       <ProjectReference Include="..\LupusBytes.CS2.GameStateIntegration\LupusBytes.CS2.GameStateIntegration.csproj" />
     </ItemGroup>
 
