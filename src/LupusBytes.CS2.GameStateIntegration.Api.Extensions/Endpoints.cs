@@ -40,10 +40,10 @@ public static class Endpoints
 
     public static void MapIngestionEndpoint(this IEndpointRouteBuilder app)
         => app.MapPost("/", (
-            [FromServices] GameStateService gameState,
+            [FromServices] GameStateService gameStateService,
             [FromBody] GameStateData data) =>
         {
-            gameState.ProcessEvent(data);
+            gameStateService.ProcessEvent(data);
             return Results.NoContent();
         });
 
