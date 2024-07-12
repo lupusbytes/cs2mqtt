@@ -11,7 +11,7 @@ public static class Endpoints
             [FromServices] GameStateService gameStateService,
             string steamId) =>
         {
-            var map = gameStateService.GetRound(steamId);
+            var map = gameStateService.GetMap(steamId);
             return map is null
                 ? Results.NotFound()
                 : Results.Ok(map);
