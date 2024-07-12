@@ -1,6 +1,4 @@
-﻿using System.Runtime.CompilerServices;
-using System.Text.Json;
-using System.Threading.Channels;
+﻿using System.Threading.Channels;
 using LupusBytes.CS2.GameStateIntegration.Events;
 using Microsoft.Extensions.Hosting;
 using MQTTnet;
@@ -13,7 +11,7 @@ public sealed class GameStateMqttPublisher(
     MqttOptions options)
     : BackgroundService, IGameStateObserver
 {
-    private const string BaseTopic = "cs2mqtt";
+    public const string BaseTopic = "cs2mqtt";
 
     private readonly Channel<BaseEvent> channel = Channel.CreateBounded<BaseEvent>(new BoundedChannelOptions(1000)
     {
@@ -46,36 +44,9 @@ public sealed class GameStateMqttPublisher(
         {
             while (channel.Reader.TryRead(out var @event))
             {
-                await mqttClient.PublishAsync(CreateEventMessage(@event), stoppingToken);
+                await mqttClient.PublishAsync(@event.ToMqttMessage(), stoppingToken);
             }
         }
-    }
-
-    private static MqttApplicationMessage CreateEventMessage(BaseEvent @event)
-    {
-        string topic;
-        string payload;
-        switch (@event)
-        {
-            case MapEvent m:
-                topic = $"{BaseTopic}/{@event.SteamId}/map";
-                payload = JsonSerializer.Serialize(m.Map);
-                break;
-            case PlayerEvent p:
-                topic = $"{BaseTopic}/{@event.SteamId}/player";
-                payload = JsonSerializer.Serialize(p.Player);
-                break;
-            case RoundEvent r:
-                topic = $"{BaseTopic}/{@event.SteamId}/round";
-                payload = JsonSerializer.Serialize(r.Round);
-                break;
-            default: throw new SwitchExpressionException();
-        }
-
-        return new MqttApplicationMessageBuilder()
-            .WithTopic(topic)
-            .WithPayload(payload)
-            .Build();
     }
 
     void IObserver<MapEvent>.OnCompleted()
