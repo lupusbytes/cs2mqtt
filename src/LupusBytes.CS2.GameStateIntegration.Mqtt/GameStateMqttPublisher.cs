@@ -1,5 +1,6 @@
 ﻿using System.Threading.Channels;
 using LupusBytes.CS2.GameStateIntegration.Events;
+using LupusBytes.CS2.GameStateIntegration.Mqtt.Extensions;
 using Microsoft.Extensions.Hosting;
 using MQTTnet;
 using MQTTnet.Client;

@@ -3,9 +3,9 @@ using System.Text.Json;
 using LupusBytes.CS2.GameStateIntegration.Events;
 using MQTTnet;
 
-namespace LupusBytes.CS2.GameStateIntegration.Mqtt;
+namespace LupusBytes.CS2.GameStateIntegration.Mqtt.Extensions;
 
-public static class BaseEventExtensions
+public static class EventExtensions
 {
     public static MqttApplicationMessage ToMqttMessage(this BaseEvent @event)
     {
