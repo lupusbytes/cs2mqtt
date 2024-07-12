@@ -1,5 +1,9 @@
+using System.Diagnostics.CodeAnalysis;
+
 namespace LupusBytes.CS2.GameStateIntegration.Api.Extensions;
 
+[SuppressMessage("Naming", "CA1711:Identifiers should not have incorrect suffix", Justification = "It's fine.")]
+[SuppressMessage("Major Code Smell", "S2166:Classes named like \"Exception\" should extend \"Exception\" or a subclass", Justification = "It's fine")]
 public class LogRequestBodyOnException(RequestDelegate next)
 {
     public async Task Invoke(HttpContext httpContext)
