@@ -58,11 +58,11 @@ public sealed class GameStateMqttPublisher(
         switch (@event)
         {
             case MapEvent m:
-                topic = $"{BaseTopic}/{@event.SteamId}/round";
+                topic = $"{BaseTopic}/{@event.SteamId}/map";
                 payload = JsonSerializer.Serialize(m.Map);
                 break;
             case PlayerEvent p:
-                topic = $"{BaseTopic}/{@event.SteamId}/round";
+                topic = $"{BaseTopic}/{@event.SteamId}/player";
                 payload = JsonSerializer.Serialize(p.Player);
                 break;
             case RoundEvent r:
