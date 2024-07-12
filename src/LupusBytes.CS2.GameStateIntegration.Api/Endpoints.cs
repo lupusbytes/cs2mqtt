@@ -7,31 +7,41 @@ public static class Endpoints
 {
     public static void MapGetEndpoints(this IEndpointRouteBuilder app)
     {
-        app.MapGet("/map", ([FromServices] GameState gameState)
-            => gameState.Map is null
+        app.MapGet("{steamId}/map", (
+            [FromServices] GameStateService gameStateService,
+            string steamId) =>
+        {
+            var map = gameStateService.GetRound(steamId);
+            return map is null
                 ? Results.NotFound()
-                : Results.Ok(gameState.Map));
+                : Results.Ok(map);
+        });
 
-        app.MapGet("/round", ([FromServices] GameState gameState)
-            => gameState.Round is null
+        app.MapGet("{steamId}/round", (
+            [FromServices] GameStateService gameStateService,
+            string steamId) =>
+        {
+            var round = gameStateService.GetRound(steamId);
+            return round is null
                 ? Results.NotFound()
-                : Results.Ok(gameState.Round));
+                : Results.Ok(round);
+        });
 
-        app.MapGet("/player", ([FromServices] GameState gameState)
-            => gameState.Player is null
+        app.MapGet("{steamId}/player", (
+            [FromServices] GameStateService gameStateService,
+            string steamId) =>
+        {
+            var player = gameStateService.GetPlayer(steamId);
+            return player is null
                 ? Results.NotFound()
-                : Results.Ok(gameState.Player));
-
-        app.MapGet("/provider", ([FromServices] GameState gameState)
-            => gameState.Provider is null
-                ? Results.NotFound()
-                : Results.Ok(gameState.Provider));
+                : Results.Ok(player);
+        });
     }
 
     public static void MapIngestionEndpoint(this IEndpointRouteBuilder app)
         => app.MapPost("/", (
-            [FromServices] GameState gameState,
-            [FromBody] Data data) =>
+            [FromServices] GameStateService gameState,
+            [FromBody] GameStateData data) =>
         {
             gameState.ProcessEvent(data);
             return Results.NoContent();

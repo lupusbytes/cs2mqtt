@@ -6,5 +6,5 @@ public record Provider(
     [property: JsonPropertyName("name")] string Name,
     [property: JsonPropertyName("appid")] int AppId,
     [property: JsonPropertyName("version")] int Version,
-    [property: JsonPropertyName("steamid")] string SteamId,
+    [property: JsonPropertyName("steamid")] string SteamId64,
     [property: JsonPropertyName("timestamp")] int Timestamp);

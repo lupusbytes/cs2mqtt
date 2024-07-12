@@ -7,7 +7,7 @@ namespace LupusBytes.CS2.GameStateIntegration.Contracts;
 // observer_slot: int
 // clan: string
 public record Player(
-    [property: JsonPropertyName("steamid")] string SteamId,
+    [property: JsonPropertyName("steamid")] string SteamId64,
     [property: JsonPropertyName("name")] string Name,
     [property: JsonPropertyName("team")] Team? Team,
     [property: JsonPropertyName("activity")] Activity Activity,
@@ -15,7 +15,7 @@ public record Player(
 {
     public override string ToString()
     {
-        var output = $"SteamID64: {SteamId}{Environment.NewLine}" +
+        var output = $"SteamID64: {SteamId64}{Environment.NewLine}" +
                      $"Name: {Name}{Environment.NewLine}" +
                      $"Team: {Team}{Environment.NewLine}" +
                      $"Activity: {Activity}{Environment.NewLine}";

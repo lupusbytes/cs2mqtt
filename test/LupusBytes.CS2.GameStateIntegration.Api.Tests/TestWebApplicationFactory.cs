@@ -17,7 +17,7 @@ public class TestWebApplicationFactory<TProgram> : WebApplicationFactory<TProgra
 
         builder.ConfigureServices((_, services) =>
         {
-            services.AddSingleton<GameState>();
+            services.AddSingleton<GameStateService>();
         });
 
         return base.CreateHost(builder);

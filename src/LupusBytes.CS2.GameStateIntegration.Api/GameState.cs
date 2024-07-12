@@ -4,11 +4,10 @@ using LupusBytes.CS2.GameStateIntegration.Contracts.Enums;
 
 namespace LupusBytes.CS2.GameStateIntegration.Api;
 
-public class GameState
+internal sealed class GameState : ObservableGameState
 {
     private Map? map;
     private Player? player;
-    private Provider? provider;
     private Round? round;
 
     public Round? Round
@@ -22,7 +21,7 @@ public class GameState
             }
 
             round = value;
-            OnRoundChanged(new RoundEventArgs(round));
+            PushEvent(RoundObservers, CreateRoundEvent());
         }
     }
 
@@ -38,7 +37,7 @@ public class GameState
             }
 
             player = value;
-            OnPlayerChanged(new PlayerEventArgs(player));
+            PushEvent(PlayerObservers, CreatePlayerEvent());
         }
     }
 
@@ -53,41 +52,11 @@ public class GameState
             }
 
             map = value;
-            OnMapStateChanged(new MapEventArgs(map));
+            PushEvent(MapObservers, CreateMapEvent());
         }
     }
 
-    public Provider? Provider
-    {
-        get => provider;
-        private set
-        {
-            ArgumentNullException.ThrowIfNull(value);
-            if (provider == value)
-            {
-                return;
-            }
-
-            provider = value;
-            OnProviderStateChanged(new ProviderEventArgs(value));
-        }
-    }
-
-    public event EventHandler<MapEventArgs> MapEvent;
-    public event EventHandler<PlayerEventArgs> PlayerEvent;
-    public event EventHandler<RoundEventArgs> RoundEvent;
-    public event EventHandler<ProviderEventArgs> ProviderEvent;
-
-    protected virtual void OnMapStateChanged(MapEventArgs e) => MapEvent?.Invoke(this, e);
-    protected virtual void OnPlayerChanged(PlayerEventArgs e) => PlayerEvent?.Invoke(this, e);
-    protected virtual void OnRoundChanged(RoundEventArgs e) => RoundEvent?.Invoke(this, e);
-    protected virtual void OnProviderStateChanged(ProviderEventArgs e) => ProviderEvent?.Invoke(this, e);
-
-    public GameState()
-    {
-    }
-
-    internal void ProcessEvent(Data @event)
+    internal void ProcessEvent(GameStateData @event)
     {
         if (@event.Player is not null)
         {
@@ -108,10 +77,17 @@ public class GameState
         {
             Round = @event.Round;
         }
+    }
 
-        if (@event.Provider is not null)
+    private MapEvent CreateMapEvent() => new(player?.SteamId64, map);
+    private PlayerEvent CreatePlayerEvent() => new(player!);
+    private RoundEvent CreateRoundEvent() => new(player?.SteamId64, round);
+
+    private static void PushEvent<T>(IEnumerable<IObserver<T>> observers, T @event)
+    {
+        foreach (var observer in observers)
         {
-            Provider = @event.Provider;
+            observer.OnNext(@event);
         }
     }
 }
