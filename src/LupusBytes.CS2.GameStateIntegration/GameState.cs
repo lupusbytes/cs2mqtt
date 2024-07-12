@@ -1,6 +1,6 @@
 using LupusBytes.CS2.GameStateIntegration.Contracts;
 using LupusBytes.CS2.GameStateIntegration.Contracts.Enums;
-using LupusBytes.CS2.GameStateIntegration.Events;
+using LupusBytes.CS2.GameStateIntegration.Extensions;
 
 namespace LupusBytes.CS2.GameStateIntegration;
 
@@ -21,7 +21,7 @@ internal sealed class GameState : ObservableGameState
             }
 
             round = value;
-            PushEvent(RoundObservers, CreateRoundEvent());
+            PushEvent(RoundObservers, round.ToEvent(player?.SteamId64));
         }
     }
 
@@ -37,7 +37,7 @@ internal sealed class GameState : ObservableGameState
             }
 
             player = value;
-            PushEvent(PlayerObservers, CreatePlayerEvent());
+            PushEvent(PlayerObservers, value.ToEvent());
         }
     }
 
@@ -52,7 +52,7 @@ internal sealed class GameState : ObservableGameState
             }
 
             map = value;
-            PushEvent(MapObservers, CreateMapEvent());
+            PushEvent(MapObservers, value.ToEvent(player?.SteamId64));
         }
     }
 
@@ -78,10 +78,6 @@ internal sealed class GameState : ObservableGameState
             Round = @event.Round;
         }
     }
-
-    private MapEvent CreateMapEvent() => new(player?.SteamId64, map);
-    private PlayerEvent CreatePlayerEvent() => new(player!);
-    private RoundEvent CreateRoundEvent() => new(player?.SteamId64, round);
 
     private static void PushEvent<T>(IEnumerable<IObserver<T>> observers, T @event)
     {
