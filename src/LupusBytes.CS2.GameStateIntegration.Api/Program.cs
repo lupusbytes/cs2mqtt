@@ -19,9 +19,8 @@ public class Program
         app.MapIngestionEndpoint();
         app.MapGetEndpoints();
 
-        // Debug helpers
-        app.MapIngestionDebugEndpoint();
         app.UseMiddleware<LogRequestBodyOnException>();
+
         app.Run();
     }
 }
