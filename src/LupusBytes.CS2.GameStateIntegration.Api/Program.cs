@@ -1,5 +1,5 @@
 using LupusBytes.CS2.GameStateIntegration.Api.Extensions;
-using LupusBytes.CS2.GameStateIntegration.Events;
+using LupusBytes.CS2.GameStateIntegration.Mqtt;
 
 namespace LupusBytes.CS2.GameStateIntegration.Api;
 
@@ -10,6 +10,11 @@ public class Program
         var builder = WebApplication.CreateBuilder(args);
         var gameStateService = new GameStateService();
         builder.Services.AddSingleton(gameStateService);
+
+        var mqttOptions = new MqttOptions();
+        builder.Configuration.GetSection(MqttOptions.Section).Bind(mqttOptions);
+        builder.Services.AddHostedService(_ => new GameStateMqttPublisher(gameStateService, mqttOptions));
+
         var app = builder.Build();
         app.MapIngestionEndpoint();
         app.MapGetEndpoints();
@@ -17,7 +22,6 @@ public class Program
         // Debug helpers
         app.MapIngestionDebugEndpoint();
         app.UseMiddleware<LogRequestBodyOnException>();
-
         app.Run();
     }
 }

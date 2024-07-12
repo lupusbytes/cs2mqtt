@@ -14,6 +14,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LupusBytes.CS2.GameStateInt
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LupusBytes.CS2.GameStateIntegration", "src\LupusBytes.CS2.GameStateIntegration\LupusBytes.CS2.GameStateIntegration.csproj", "{3775F777-8B41-46CE-90F3-162323FC1D69}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LupusBytes.CS2.GameStateIntegration.Mqtt", "src\LupusBytes.CS2.GameStateIntegration.Mqtt\LupusBytes.CS2.GameStateIntegration.Mqtt.csproj", "{55AB67AD-E28B-4196-B8F2-5E3E63168C58}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -40,6 +42,10 @@ Global
 		{3775F777-8B41-46CE-90F3-162323FC1D69}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{3775F777-8B41-46CE-90F3-162323FC1D69}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{3775F777-8B41-46CE-90F3-162323FC1D69}.Release|Any CPU.Build.0 = Release|Any CPU
+		{55AB67AD-E28B-4196-B8F2-5E3E63168C58}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{55AB67AD-E28B-4196-B8F2-5E3E63168C58}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{55AB67AD-E28B-4196-B8F2-5E3E63168C58}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{55AB67AD-E28B-4196-B8F2-5E3E63168C58}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
 		{805EDDA1-F961-4B51-AB07-3F4F3A0D20D4} = {36655383-D743-4AC6-9E7D-3BFF9BDD69B6}
@@ -47,5 +53,6 @@ Global
 		{DAF06728-EB61-425D-B50A-732FA97FDF9F} = {E8A90952-2F60-4324-9046-7CDCF150268E}
 		{6ABC5CDB-C16F-4408-952F-9A0C71C3F9EE} = {36655383-D743-4AC6-9E7D-3BFF9BDD69B6}
 		{3775F777-8B41-46CE-90F3-162323FC1D69} = {36655383-D743-4AC6-9E7D-3BFF9BDD69B6}
+		{55AB67AD-E28B-4196-B8F2-5E3E63168C58} = {36655383-D743-4AC6-9E7D-3BFF9BDD69B6}
 	EndGlobalSection
 EndGlobal
