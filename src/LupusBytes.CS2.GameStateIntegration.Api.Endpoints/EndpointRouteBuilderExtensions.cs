@@ -1,9 +1,9 @@
 using LupusBytes.CS2.GameStateIntegration.Contracts;
 using Microsoft.AspNetCore.Mvc;
 
-namespace LupusBytes.CS2.GameStateIntegration.Api.Extensions;
+namespace LupusBytes.CS2.GameStateIntegration.Api.Endpoints;
 
-public static class Endpoints
+public static class EndpointRouteBuilderExtensions
 {
     public static void MapGetEndpoints(this IEndpointRouteBuilder app)
     {

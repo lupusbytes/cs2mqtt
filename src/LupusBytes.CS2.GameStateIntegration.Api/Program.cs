@@ -1,4 +1,4 @@
-using LupusBytes.CS2.GameStateIntegration.Api.Extensions;
+using LupusBytes.CS2.GameStateIntegration.Api.Endpoints;
 using LupusBytes.CS2.GameStateIntegration.Api.Middleware;
 using LupusBytes.CS2.GameStateIntegration.Mqtt;
 
