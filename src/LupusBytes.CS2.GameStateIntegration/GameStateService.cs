@@ -6,7 +6,20 @@ namespace LupusBytes.CS2.GameStateIntegration;
 
 internal sealed class GameStateService : ObservableGameState, IGameStateService
 {
-    private readonly ConcurrentDictionary<SteamId64, Subscription> gameStateSubscriptions = new();
+    private readonly ConcurrentDictionary<SteamId64, Subscription> gameStateSubscriptions;
+
+    public GameStateService()
+    {
+        gameStateSubscriptions = new ConcurrentDictionary<SteamId64, Subscription>();
+
+        // Start a periodic background task that will remove subscriptions that have stopped receiving events.
+        // We do not receive any explicit events from Counter-Strike that we can use to determine that a provider has been disconnected.
+        // When the player quits the game, we just stop receiving events.
+        // The subscription timeout should be a tiny bit longer than the heartbeat defined in the gamestate_integration.cfg
+        _ = CleanupDeadSubscriptionsAsync(
+            checkInterval: TimeSpan.FromSeconds(30),
+            subscriptionTimeout: TimeSpan.FromSeconds(60.5));
+    }
 
     public Map? GetMap(SteamId64 steamId)
         => gameStateSubscriptions.GetValueOrDefault(steamId)?.GameState.Map;
@@ -34,6 +47,7 @@ internal sealed class GameStateService : ObservableGameState, IGameStateService
             new Subscription(this, new GameState(steamId64)));
 
         gameStateSubscription.GameState.ProcessEvent(data);
+        gameStateSubscription.LastActivity = DateTimeOffset.UtcNow;
     }
 
     private static void PushEvent<T>(IEnumerable<IObserver<T>> observers, T @event)
@@ -44,13 +58,44 @@ internal sealed class GameStateService : ObservableGameState, IGameStateService
         }
     }
 
-    private void OnCompleted(SteamId64 steamId) => gameStateSubscriptions.Remove(steamId, out _);
-
     private void OnMapEvent(MapEvent value) => PushEvent(MapObservers, value);
 
     private void OnPlayerEvent(PlayerEvent value) => PushEvent(PlayerObservers, value);
 
     private void OnRoundEvent(RoundEvent value) => PushEvent(RoundObservers, value);
+
+    private async Task CleanupDeadSubscriptionsAsync(
+        TimeSpan checkInterval,
+        TimeSpan subscriptionTimeout)
+    {
+        using var timer = new PeriodicTimer(checkInterval);
+        while (await timer.WaitForNextTickAsync())
+        {
+            var deadSubscriptions = gameStateSubscriptions.Values
+                .Where(x => DateTimeOffset.UtcNow - x.LastActivity > subscriptionTimeout)
+                .ToList();
+
+            foreach (var deadSubscription in deadSubscriptions)
+            {
+                deadSubscription.OnCompleted();
+            }
+        }
+    }
+
+    /// <summary>
+    /// The provider has been disconnected.
+    /// </summary>
+    /// <param name="steamId">The SteamID of the disconnected provider.</param>
+    private void OnDisconnectEvent(SteamId64 steamId)
+    {
+        // Remove the local subscription
+        gameStateSubscriptions.Remove(steamId, out _);
+
+        // Send null events to all observers for this SteamID to overwrite their last buffer.
+        PushEvent(MapObservers, new MapEvent(steamId, Map: null));
+        PushEvent(RoundObservers, new RoundEvent(steamId, Round: null));
+        PushEvent(PlayerObservers, new PlayerEvent(steamId, Player: null));
+    }
 
     private sealed class Subscription : IObserver<MapEvent>, IObserver<PlayerEvent>, IObserver<RoundEvent>
     {
@@ -58,6 +103,7 @@ internal sealed class GameStateService : ObservableGameState, IGameStateService
         private readonly IDisposable[] subscriptions;
 
         public IGameState GameState { get; }
+        public DateTimeOffset LastActivity { get; set; }
 
         public Subscription(GameStateService service, IGameState gameState)
         {
@@ -82,7 +128,7 @@ internal sealed class GameStateService : ObservableGameState, IGameStateService
                 subscription.Dispose();
             }
 
-            service.OnCompleted(GameState.SteamId);
+            service.OnDisconnectEvent(GameState.SteamId);
         }
 
         public void OnError(Exception error) => throw error;
