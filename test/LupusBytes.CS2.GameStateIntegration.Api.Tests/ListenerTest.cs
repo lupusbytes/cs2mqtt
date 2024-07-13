@@ -69,7 +69,7 @@ public class ListenerTest(TestWebApplicationFactory<Program> factory)
         using var payload = new StringContent(json, Encoding.UTF8, "application/json");
 
         // Act
-        var response = await httpClient.PostAsync("http://127.0.0.1:8080", payload);
+        var response = await httpClient.PostAsync("/", payload);
 
         // Assert
         response.StatusCode.Should().Be(HttpStatusCode.NoContent);
