@@ -4,7 +4,7 @@ using LupusBytes.CS2.GameStateIntegration.Extensions;
 
 namespace LupusBytes.CS2.GameStateIntegration;
 
-internal sealed class GameState : ObservableGameState
+internal sealed class GameState : ObservableGameState, IGameState
 {
     private Map? map;
     private Player? player;
@@ -56,26 +56,26 @@ internal sealed class GameState : ObservableGameState
         }
     }
 
-    internal void ProcessEvent(GameStateData @event)
+    public void ProcessEvent(GameStateData data)
     {
-        if (@event.Player is not null)
+        if (data.Player is not null)
         {
-            Player = @event.Player;
-            if (@event.Player.Activity == Activity.Menu)
+            Player = data.Player;
+            if (data.Player.Activity == Activity.Menu)
             {
                 Round = null;
                 Map = null;
             }
         }
 
-        if (@event.Map is not null)
+        if (data.Map is not null)
         {
-            Map = @event.Map;
+            Map = data.Map;
         }
 
-        if (@event.Round is not null)
+        if (data.Round is not null)
         {
-            Round = @event.Round;
+            Round = data.Round;
         }
     }
 

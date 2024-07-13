@@ -12,7 +12,7 @@ public sealed class GameStateService :
     IObserver<PlayerEvent>,
     IObserver<RoundEvent>
 {
-    private readonly ConcurrentDictionary<SteamId64, GameState> gameStates = new();
+    private readonly ConcurrentDictionary<SteamId64, IGameState> gameStates = new();
 
     public Map? GetMap(SteamId64 steamId)
         => gameStates.GetValueOrDefault(steamId)?.Map;
