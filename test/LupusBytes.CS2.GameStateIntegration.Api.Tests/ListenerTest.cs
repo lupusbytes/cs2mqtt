@@ -15,6 +15,13 @@ public class ListenerTest(TestWebApplicationFactory<Program> factory)
         // Arrange
         var json = """
                       {
+                        "provider": {
+                          "name": "Counter-Strike: Global Offensive",
+                          "appid": 730,
+                          "version": 14020,
+                          "steamid": "76561197981496355",
+                          "timestamp": 1720553252
+                        },
                         "map": {
                           "mode": "competitive",
                           "name": "de_ancient",
