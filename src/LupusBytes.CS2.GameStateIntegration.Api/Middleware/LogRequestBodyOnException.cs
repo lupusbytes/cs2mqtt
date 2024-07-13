@@ -1,6 +1,6 @@
 using System.Diagnostics.CodeAnalysis;
 
-namespace LupusBytes.CS2.GameStateIntegration.Api.Extensions;
+namespace LupusBytes.CS2.GameStateIntegration.Api.Middleware;
 
 [SuppressMessage("Naming", "CA1711:Identifiers should not have incorrect suffix", Justification = "It's fine.")]
 [SuppressMessage("Major Code Smell", "S2166:Classes named like \"Exception\" should extend \"Exception\" or a subclass", Justification = "It's fine")]
