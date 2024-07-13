@@ -36,15 +36,6 @@ internal sealed class GameStateService : ObservableGameState, IGameStateService
         gameStateSubscription.GameState.ProcessEvent(data);
     }
 
-    public void OnNext(MapEvent value)
-        => PushEvent(MapObservers, value);
-
-    public void OnNext(PlayerEvent value)
-        => PushEvent(PlayerObservers, value);
-
-    public void OnNext(RoundEvent value)
-        => PushEvent(RoundObservers, value);
-
     private static void PushEvent<T>(IEnumerable<IObserver<T>> observers, T @event)
     {
         foreach (var observer in observers)
