@@ -3,7 +3,7 @@
 
   <PropertyGroup Label="Metadata configuration">
     <OrganizationName>lupusbytes</OrganizationName>
-    <RepositoryName>cs2-gamestate-integration</RepositoryName>
+    <RepositoryName>cs2mqtt</RepositoryName>
   </PropertyGroup>
 
   <!-- Solution wide properties -->
