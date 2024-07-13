@@ -8,7 +8,7 @@ using MQTTnet.Client;
 namespace LupusBytes.CS2.GameStateIntegration.Mqtt;
 
 public sealed class GameStateMqttPublisher(
-    GameStateService gameStateService,
+    IGameStateService gameStateService,
     MqttOptions options)
     : BackgroundService, IGameStateObserver
 {

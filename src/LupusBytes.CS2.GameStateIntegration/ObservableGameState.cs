@@ -2,7 +2,7 @@ using LupusBytes.CS2.GameStateIntegration.Events;
 
 namespace LupusBytes.CS2.GameStateIntegration;
 
-public abstract class ObservableGameState :
+internal abstract class ObservableGameState :
     IObservable<MapEvent>,
     IObservable<PlayerEvent>,
     IObservable<RoundEvent>

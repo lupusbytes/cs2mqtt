@@ -4,7 +4,7 @@ using LupusBytes.CS2.GameStateIntegration.Events;
 
 namespace LupusBytes.CS2.GameStateIntegration;
 
-public sealed class GameStateService : ObservableGameState, IGameStateService
+internal sealed class GameStateService : ObservableGameState, IGameStateService
 {
     private readonly ConcurrentDictionary<SteamId64, Subscription> gameStateSubscriptions = new();
 

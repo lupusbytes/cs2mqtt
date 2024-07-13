@@ -10,7 +10,7 @@ public static class EndpointRouteBuilderExtensions
     public static void MapCS2GetEndpoints(this IEndpointRouteBuilder app)
     {
         app.MapGet("{steamId}/map", (
-            [FromServices] GameStateService gameStateService,
+            [FromServices] IGameStateService gameStateService,
             string steamId) =>
         {
             var map = gameStateService.GetMap(steamId);
@@ -20,7 +20,7 @@ public static class EndpointRouteBuilderExtensions
         });
 
         app.MapGet("{steamId}/round", (
-            [FromServices] GameStateService gameStateService,
+            [FromServices] IGameStateService gameStateService,
             string steamId) =>
         {
             var round = gameStateService.GetRound(steamId);
@@ -30,7 +30,7 @@ public static class EndpointRouteBuilderExtensions
         });
 
         app.MapGet("{steamId}/player", (
-            [FromServices] GameStateService gameStateService,
+            [FromServices] IGameStateService gameStateService,
             string steamId) =>
         {
             var player = gameStateService.GetPlayer(steamId);
@@ -42,7 +42,7 @@ public static class EndpointRouteBuilderExtensions
 
     public static void MapCS2IngestionEndpoint(this IEndpointRouteBuilder app)
         => app.MapPost("/", (
-            [FromServices] GameStateService gameStateService,
+            [FromServices] IGameStateService gameStateService,
             [FromBody] GameStateData data) =>
         {
             gameStateService.ProcessEvent(data);
