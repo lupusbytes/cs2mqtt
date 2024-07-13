@@ -17,8 +17,8 @@ public class Program
         builder.Services.AddHostedService(_ => new GameStateMqttPublisher(gameStateService, mqttOptions));
 
         var app = builder.Build();
-        app.MapIngestionEndpoint();
-        app.MapGetEndpoints();
+        app.MapCS2IngestionEndpoint();
+        app.MapCS2GetEndpoints();
 
         app.UseMiddleware<LogRequestBodyOnException>();
 

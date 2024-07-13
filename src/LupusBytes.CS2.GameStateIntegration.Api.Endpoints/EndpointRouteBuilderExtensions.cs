@@ -1,11 +1,13 @@
+using System.Diagnostics.CodeAnalysis;
 using LupusBytes.CS2.GameStateIntegration.Contracts;
 using Microsoft.AspNetCore.Mvc;
 
 namespace LupusBytes.CS2.GameStateIntegration.Api.Endpoints;
 
+[SuppressMessage("ReSharper", "InconsistentNaming", Justification = "CS is a specific two-letter acronym for Counter-Strike. Two-letter acronyms should be fully upper or lowercase")]
 public static class EndpointRouteBuilderExtensions
 {
-    public static void MapGetEndpoints(this IEndpointRouteBuilder app)
+    public static void MapCS2GetEndpoints(this IEndpointRouteBuilder app)
     {
         app.MapGet("{steamId}/map", (
             [FromServices] GameStateService gameStateService,
@@ -38,7 +40,7 @@ public static class EndpointRouteBuilderExtensions
         });
     }
 
-    public static void MapIngestionEndpoint(this IEndpointRouteBuilder app)
+    public static void MapCS2IngestionEndpoint(this IEndpointRouteBuilder app)
         => app.MapPost("/", (
             [FromServices] GameStateService gameStateService,
             [FromBody] GameStateData data) =>
