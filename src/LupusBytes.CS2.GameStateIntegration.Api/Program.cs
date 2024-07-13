@@ -5,7 +5,7 @@ using LupusBytes.CS2.GameStateIntegration.Mqtt;
 
 namespace LupusBytes.CS2.GameStateIntegration.Api;
 
-public class Program
+public sealed class Program
 {
     private static void Main(string[] args)
     {
