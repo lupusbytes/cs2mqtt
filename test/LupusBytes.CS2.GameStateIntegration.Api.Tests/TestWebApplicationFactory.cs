@@ -12,7 +12,7 @@ public class TestWebApplicationFactory<TProgram> : WebApplicationFactory<TProgra
     {
         builder.ConfigureHostConfiguration(config =>
         {
-            // config.AddJsonFile("appsettings.Test.json", optional: false, reloadOnChange: true);
+            config.AddJsonFile("appsettings.Test.json", optional: false, reloadOnChange: true);
         });
 
         builder.ConfigureServices(services =>
