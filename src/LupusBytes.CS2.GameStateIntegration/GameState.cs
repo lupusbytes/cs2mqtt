@@ -4,11 +4,13 @@ using LupusBytes.CS2.GameStateIntegration.Extensions;
 
 namespace LupusBytes.CS2.GameStateIntegration;
 
-internal sealed class GameState : ObservableGameState, IGameState
+internal sealed class GameState(SteamId64 steamId) : ObservableGameState, IGameState
 {
     private Map? map;
     private Player? player;
     private Round? round;
+
+    public SteamId64 SteamId => steamId;
 
     public Round? Round
     {

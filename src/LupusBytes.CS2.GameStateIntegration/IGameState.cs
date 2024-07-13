@@ -8,6 +8,7 @@ public interface IGameState :
     IObservable<RoundEvent>,
     IObservable<PlayerEvent>
 {
+    SteamId64 SteamId { get; }
     Map? Map { get; }
     Round? Round { get; }
     Player? Player { get; }

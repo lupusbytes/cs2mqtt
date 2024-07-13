@@ -1,122 +1,99 @@
 using System.Collections.Concurrent;
-using System.Diagnostics.CodeAnalysis;
 using LupusBytes.CS2.GameStateIntegration.Contracts;
 using LupusBytes.CS2.GameStateIntegration.Events;
 
 namespace LupusBytes.CS2.GameStateIntegration;
 
-[SuppressMessage("Reliability", "CA2000:Dispose objects before losing scope", Justification = "TODO")]
-public sealed class GameStateService :
-    ObservableGameState,
-    IObserver<MapEvent>,
-    IObserver<PlayerEvent>,
-    IObserver<RoundEvent>
+public sealed class GameStateService : ObservableGameState, IGameStateService
 {
-    private readonly ConcurrentDictionary<SteamId64, IGameState> gameStates = new();
+    private readonly ConcurrentDictionary<SteamId64, Subscription> gameStateSubscriptions = new();
 
     public Map? GetMap(SteamId64 steamId)
-        => gameStates.GetValueOrDefault(steamId)?.Map;
+        => gameStateSubscriptions.GetValueOrDefault(steamId)?.GameState.Map;
 
     public Player? GetPlayer(SteamId64 steamId)
-        => gameStates.GetValueOrDefault(steamId)?.Player;
+        => gameStateSubscriptions.GetValueOrDefault(steamId)?.GameState.Player;
 
     public Round? GetRound(SteamId64 steamId)
-        => gameStates.GetValueOrDefault(steamId)?.Round;
+        => gameStateSubscriptions.GetValueOrDefault(steamId)?.GameState.Round;
 
-    void IObserver<MapEvent>.OnCompleted()
+    public void ProcessEvent(GameStateData data)
     {
-        foreach (var observer in MapObservers)
+        if (data.Provider is null)
         {
-            observer.OnCompleted();
+            throw new ArgumentException(
+                "Cannot get SteamID because provider object is missing. " +
+                "Include \"provider\": \"1\" in the CS2 gamestate config",
+                nameof(data));
         }
-    }
 
-    void IObserver<PlayerEvent>.OnCompleted()
-    {
-        foreach (var observer in PlayerObservers)
-        {
-            observer.OnCompleted();
-        }
-    }
+        var steamId64 = SteamId64.FromString(data.Provider.SteamId64);
 
-    void IObserver<RoundEvent>.OnCompleted()
-    {
-        foreach (var observer in RoundObservers)
-        {
-            observer.OnCompleted();
-        }
-    }
+        var gameStateSubscription = gameStateSubscriptions.GetOrAdd(
+            steamId64,
+            new Subscription(this, new GameState(steamId64)));
 
-    void IObserver<MapEvent>.OnError(Exception error)
-    {
-        foreach (var observer in MapObservers)
-        {
-            observer.OnError(error);
-        }
-    }
-
-    void IObserver<PlayerEvent>.OnError(Exception error)
-    {
-        foreach (var observer in PlayerObservers)
-        {
-            observer.OnError(error);
-        }
-    }
-
-    void IObserver<RoundEvent>.OnError(Exception error)
-    {
-        foreach (var observer in RoundObservers)
-        {
-            observer.OnError(error);
-        }
+        gameStateSubscription.GameState.ProcessEvent(data);
     }
 
     public void OnNext(MapEvent value)
-    {
-        foreach (var observer in MapObservers)
-        {
-            observer.OnNext(value);
-        }
-    }
+        => PushEvent(MapObservers, value);
 
     public void OnNext(PlayerEvent value)
-    {
-        foreach (var observer in PlayerObservers)
-        {
-            observer.OnNext(value);
-        }
-    }
+        => PushEvent(PlayerObservers, value);
 
     public void OnNext(RoundEvent value)
+        => PushEvent(RoundObservers, value);
+
+    private static void PushEvent<T>(IEnumerable<IObserver<T>> observers, T @event)
     {
-        foreach (var observer in RoundObservers)
+        foreach (var observer in observers)
         {
-            observer.OnNext(value);
+            observer.OnNext(@event);
         }
     }
 
-    public void ProcessEvent(GameStateData @event)
+    private void OnCompleted(SteamId64 steamId) => gameStateSubscriptions.Remove(steamId, out _);
+
+    private void OnMapEvent(MapEvent value) => PushEvent(MapObservers, value);
+
+    private void OnPlayerEvent(PlayerEvent value) => PushEvent(PlayerObservers, value);
+
+    private void OnRoundEvent(RoundEvent value) => PushEvent(RoundObservers, value);
+
+    private sealed class Subscription : IObserver<MapEvent>, IObserver<PlayerEvent>, IObserver<RoundEvent>
     {
-        if (@event.Player is null && @event.Provider is null)
+        private readonly GameStateService service;
+        private readonly IDisposable[] subscriptions;
+
+        public IGameState GameState { get; }
+
+        public Subscription(GameStateService service, IGameState gameState)
         {
-            throw new ArgumentException(
-                "Cannot get SteamID64 because player and provider are null. " +
-                "Include at least one of \"player\": \"1\" or \"provider\": \"1\" in the CS2 gamestate config",
-                nameof(@event));
+            this.service = service;
+            GameState = gameState;
+            var mapSub = GameState.Subscribe(this as IObserver<MapEvent>);
+            var roundSub = GameState.Subscribe(this as IObserver<RoundEvent>);
+            var playerSub = GameState.Subscribe(this as IObserver<PlayerEvent>);
+            subscriptions = [mapSub, roundSub, playerSub];
         }
 
-        var steamId64 = SteamId64.FromString(@event.Player?.SteamId64 ?? @event.Provider?.SteamId64);
+        public void OnNext(MapEvent value) => service.OnMapEvent(value);
 
-        var gameState = gameStates.GetOrAdd(steamId64, CreateAndSubscribeToGameState);
-        gameState.ProcessEvent(@event);
-    }
+        public void OnNext(PlayerEvent value) => service.OnPlayerEvent(value);
 
-    private GameState CreateAndSubscribeToGameState(SteamId64 steamId64)
-    {
-        var gs = new GameState();
-        gs.Subscribe(this as IObserver<MapEvent>);
-        gs.Subscribe(this as IObserver<PlayerEvent>);
-        gs.Subscribe(this as IObserver<RoundEvent>);
-        return gs;
+        public void OnNext(RoundEvent value) => service.OnRoundEvent(value);
+
+        public void OnCompleted()
+        {
+            foreach (var subscription in subscriptions)
+            {
+                subscription.Dispose();
+            }
+
+            service.OnCompleted(GameState.SteamId);
+        }
+
+        public void OnError(Exception error) => throw error;
     }
 }
