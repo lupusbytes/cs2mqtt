@@ -23,7 +23,7 @@ internal sealed class GameState(SteamId64 steamId) : ObservableGameState, IGameS
             }
 
             round = value;
-            PushEvent(RoundObservers, round.ToEvent(player?.SteamId64));
+            PushEvent(RoundObservers, round.ToEvent(SteamId));
         }
     }
 
@@ -39,7 +39,7 @@ internal sealed class GameState(SteamId64 steamId) : ObservableGameState, IGameS
             }
 
             player = value;
-            PushEvent(PlayerObservers, value.ToEvent());
+            PushEvent(PlayerObservers, value.ToEvent(SteamId));
         }
     }
 
@@ -54,7 +54,7 @@ internal sealed class GameState(SteamId64 steamId) : ObservableGameState, IGameS
             }
 
             map = value;
-            PushEvent(MapObservers, value.ToEvent(player?.SteamId64));
+            PushEvent(MapObservers, value.ToEvent(SteamId));
         }
     }
 
