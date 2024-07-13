@@ -23,7 +23,7 @@ internal sealed class GameState(SteamId64 steamId) : ObservableGameState, IGameS
             }
 
             round = value;
-            PushEvent(RoundObservers, round.ToEvent(SteamId));
+            PushEvent(RoundObservers, value.ToEvent(SteamId));
         }
     }
 
@@ -32,7 +32,6 @@ internal sealed class GameState(SteamId64 steamId) : ObservableGameState, IGameS
         get => player;
         private set
         {
-            ArgumentNullException.ThrowIfNull(value);
             if (player == value)
             {
                 return;
@@ -60,25 +59,9 @@ internal sealed class GameState(SteamId64 steamId) : ObservableGameState, IGameS
 
     public void ProcessEvent(GameStateData data)
     {
-        if (data.Player is not null)
-        {
-            Player = data.Player;
-            if (data.Player.Activity == Activity.Menu)
-            {
-                Round = null;
-                Map = null;
-            }
-        }
-
-        if (data.Map is not null)
-        {
-            Map = data.Map;
-        }
-
-        if (data.Round is not null)
-        {
-            Round = data.Round;
-        }
+        Player = data.Player;
+        Map = data.Map;
+        Round = data.Round;
     }
 
     private static void PushEvent<T>(IEnumerable<IObserver<T>> observers, T @event)
