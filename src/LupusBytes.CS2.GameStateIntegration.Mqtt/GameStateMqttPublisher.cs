@@ -9,8 +9,10 @@ namespace LupusBytes.CS2.GameStateIntegration.Mqtt;
 
 public sealed class GameStateMqttPublisher(
     IGameStateService gameStateService,
-    MqttOptions options)
-    : BackgroundService, IGameStateObserver
+    MqttOptions options) : BackgroundService,
+    IObserver<MapEvent>,
+    IObserver<PlayerEvent>,
+    IObserver<RoundEvent>
 {
     public const string BaseTopic = "cs2mqtt";
 
