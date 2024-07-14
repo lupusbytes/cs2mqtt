@@ -10,7 +10,8 @@ public sealed class Program
     private static void Main(string[] args)
     {
         var builder = WebApplication.CreateBuilder(args);
-        builder.Services.AddGameStateService();
+        builder.Services.Configure<GameStateOptions>(builder.Configuration.GetSection(GameStateOptions.Section));
+        builder.Services.AddGameStateService(builder.Configuration);
 
         var mqttOptions = new MqttOptions();
         builder.Configuration.GetSection(MqttOptions.Section).Bind(mqttOptions);

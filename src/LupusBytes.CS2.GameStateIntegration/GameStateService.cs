@@ -8,7 +8,7 @@ internal sealed class GameStateService : ObservableGameState, IGameStateService
 {
     private readonly ConcurrentDictionary<SteamId64, Subscription> gameStateSubscriptions;
 
-    public GameStateService()
+    public GameStateService(GameStateOptions options)
     {
         gameStateSubscriptions = new ConcurrentDictionary<SteamId64, Subscription>();
 
@@ -17,8 +17,8 @@ internal sealed class GameStateService : ObservableGameState, IGameStateService
         // When the player quits the game, we just stop receiving events.
         // The subscription timeout should be a tiny bit longer than the heartbeat defined in the gamestate_integration.cfg
         _ = CleanupDeadSubscriptionsAsync(
-            checkInterval: TimeSpan.FromSeconds(30),
-            subscriptionTimeout: TimeSpan.FromSeconds(60.5));
+            checkInterval: TimeSpan.FromSeconds(options.TimeoutCleanupIntervalInSeconds),
+            subscriptionTimeout: TimeSpan.FromSeconds(options.TimeoutInSeconds));
     }
 
     public Map? GetMap(SteamId64 steamId)
