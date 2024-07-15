@@ -44,7 +44,8 @@ internal sealed class GameStateService : ObservableGameState, IGameStateService
 
         var gameStateSubscription = gameStateSubscriptions.GetOrAdd(
             steamId64,
-            new Subscription(this, new GameState(steamId64)));
+            static (key, arg) => new Subscription(arg, new GameState(key)),
+            this);
 
         gameStateSubscription.GameState.ProcessEvent(data);
         gameStateSubscription.LastActivity = DateTimeOffset.UtcNow;
