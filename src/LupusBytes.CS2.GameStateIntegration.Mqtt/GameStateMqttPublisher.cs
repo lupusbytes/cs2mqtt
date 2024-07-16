@@ -52,27 +52,11 @@ public sealed class GameStateMqttPublisher(
         }
     }
 
-    void IObserver<MapEvent>.OnCompleted()
+    public void OnCompleted()
     {
     }
 
-    void IObserver<RoundEvent>.OnCompleted()
-    {
-    }
-
-    void IObserver<PlayerEvent>.OnCompleted()
-    {
-    }
-
-    void IObserver<RoundEvent>.OnError(Exception error)
-    {
-    }
-
-    void IObserver<PlayerEvent>.OnError(Exception error)
-    {
-    }
-
-    void IObserver<MapEvent>.OnError(Exception error)
+    public void OnError(Exception error)
     {
     }
 }
