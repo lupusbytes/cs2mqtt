@@ -21,6 +21,10 @@ public static class EventExtensions
                 topic = $"{GameStateMqttPublisher.BaseTopic}/{@event.SteamId}/player";
                 payload = JsonSerializer.Serialize(p.Player);
                 break;
+            case PlayerStateEvent ps:
+                topic = $"{GameStateMqttPublisher.BaseTopic}/{@event.SteamId}/player-state";
+                payload = JsonSerializer.Serialize(ps.PlayerState);
+                break;
             case RoundEvent r:
                 topic = $"{GameStateMqttPublisher.BaseTopic}/{@event.SteamId}/round";
                 payload = JsonSerializer.Serialize(r.Round);

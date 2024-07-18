@@ -24,7 +24,7 @@ internal sealed class GameStateService : ObservableGameState, IGameStateService
     public Map? GetMap(SteamId64 steamId)
         => gameStateSubscriptions.GetValueOrDefault(steamId)?.GameState.Map;
 
-    public Player? GetPlayer(SteamId64 steamId)
+    public PlayerWithState? GetPlayer(SteamId64 steamId)
         => gameStateSubscriptions.GetValueOrDefault(steamId)?.GameState.Player;
 
     public Round? GetRound(SteamId64 steamId)
@@ -63,6 +63,8 @@ internal sealed class GameStateService : ObservableGameState, IGameStateService
 
     private void OnPlayerEvent(PlayerEvent value) => PushEvent(PlayerObservers, value);
 
+    private void OnPlayerStateEvent(PlayerStateEvent value) => PushEvent(PlayerStateObservers, value);
+
     private void OnRoundEvent(RoundEvent value) => PushEvent(RoundObservers, value);
 
     private async Task CleanupDeadSubscriptionsAsync(
@@ -96,9 +98,14 @@ internal sealed class GameStateService : ObservableGameState, IGameStateService
         PushEvent(MapObservers, new MapEvent(steamId, Map: null));
         PushEvent(RoundObservers, new RoundEvent(steamId, Round: null));
         PushEvent(PlayerObservers, new PlayerEvent(steamId, Player: null));
+        PushEvent(PlayerStateObservers, new PlayerStateEvent(steamId, PlayerState: null));
     }
 
-    private sealed class Subscription : IObserver<MapEvent>, IObserver<PlayerEvent>, IObserver<RoundEvent>
+    private sealed class Subscription :
+        IObserver<MapEvent>,
+        IObserver<PlayerEvent>,
+        IObserver<PlayerStateEvent>,
+        IObserver<RoundEvent>
     {
         private readonly GameStateService service;
         private readonly IDisposable[] subscriptions;
@@ -113,12 +120,15 @@ internal sealed class GameStateService : ObservableGameState, IGameStateService
             var mapSub = GameState.Subscribe(this as IObserver<MapEvent>);
             var roundSub = GameState.Subscribe(this as IObserver<RoundEvent>);
             var playerSub = GameState.Subscribe(this as IObserver<PlayerEvent>);
-            subscriptions = [mapSub, roundSub, playerSub];
+            var playerStateSub = GameState.Subscribe(this as IObserver<PlayerStateEvent>);
+            subscriptions = [mapSub, roundSub, playerSub, playerStateSub];
         }
 
         public void OnNext(MapEvent value) => service.OnMapEvent(value);
 
         public void OnNext(PlayerEvent value) => service.OnPlayerEvent(value);
+
+        public void OnNext(PlayerStateEvent value) => service.OnPlayerStateEvent(value);
 
         public void OnNext(RoundEvent value) => service.OnRoundEvent(value);
 

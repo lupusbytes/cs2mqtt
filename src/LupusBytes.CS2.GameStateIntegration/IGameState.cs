@@ -6,7 +6,8 @@ namespace LupusBytes.CS2.GameStateIntegration;
 public interface IGameState :
     IObservable<MapEvent>,
     IObservable<RoundEvent>,
-    IObservable<PlayerEvent>
+    IObservable<PlayerEvent>,
+    IObservable<PlayerStateEvent>
 {
     /// <summary>
     /// The SteamID of the game state provider.
@@ -14,6 +15,6 @@ public interface IGameState :
     SteamId64 SteamId { get; }
     Map? Map { get; }
     Round? Round { get; }
-    Player? Player { get; }
+    PlayerWithState? Player { get; }
     void ProcessEvent(GameStateData data);
 }

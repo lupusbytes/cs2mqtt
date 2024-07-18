@@ -1,5 +1,5 @@
 using LupusBytes.CS2.GameStateIntegration.Contracts;
-using LupusBytes.CS2.GameStateIntegration.Contracts.Enums;
+using LupusBytes.CS2.GameStateIntegration.Events;
 using LupusBytes.CS2.GameStateIntegration.Extensions;
 
 namespace LupusBytes.CS2.GameStateIntegration;
@@ -8,6 +8,7 @@ internal sealed class GameState(SteamId64 steamId) : ObservableGameState, IGameS
 {
     private Map? map;
     private Player? player;
+    private PlayerState? playerState;
     private Round? round;
 
     public SteamId64 SteamId => steamId;
@@ -27,18 +28,29 @@ internal sealed class GameState(SteamId64 steamId) : ObservableGameState, IGameS
         }
     }
 
-    public Player? Player
+    public PlayerWithState? Player
     {
-        get => player;
+        get => player is null
+            ? null
+            : new PlayerWithState(player.SteamId64, player.Name, player.Team, player.Activity)
+            {
+                State = playerState,
+            };
         private set
         {
-            if (player == value)
+            if (player != value)
+            {
+                player = value;
+                PushEvent(PlayerObservers, value.ToEvent(SteamId));
+            }
+
+            if (playerState == value?.State)
             {
                 return;
             }
 
-            player = value;
-            PushEvent(PlayerObservers, value.ToEvent(SteamId));
+            playerState = value?.State;
+            PushEvent(PlayerStateObservers, playerState.ToEvent(SteamId));
         }
     }
 
