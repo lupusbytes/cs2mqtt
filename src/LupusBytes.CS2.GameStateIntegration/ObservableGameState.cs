@@ -29,7 +29,8 @@ internal abstract class ObservableGameState :
         return new Unsubscriber<RoundEvent>(RoundObservers, observer);
     }
 
-    private sealed class Unsubscriber<T>(ISet<IObserver<T>> observers, IObserver<T> observer) : IDisposable
+    private sealed class Unsubscriber<TEvent>(ISet<IObserver<TEvent>> observers, IObserver<TEvent> observer) : IDisposable
+        where TEvent : BaseEvent
     {
         public void Dispose() => observers.Remove(observer);
     }

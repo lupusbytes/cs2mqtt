@@ -64,7 +64,8 @@ internal sealed class GameState(SteamId64 steamId) : ObservableGameState, IGameS
         Round = data.Round;
     }
 
-    private static void PushEvent<T>(IEnumerable<IObserver<T>> observers, T @event)
+    private static void PushEvent<TEvent>(IEnumerable<IObserver<TEvent>> observers, TEvent @event)
+        where TEvent : BaseEvent
     {
         foreach (var observer in observers)
         {
