@@ -38,10 +38,14 @@ internal sealed class GameState(SteamId64 steamId) : ObservableGameState, IGameS
             };
         private set
         {
-            if (player != value)
+            var valuePlayer = value is null
+                ? null
+                : new Player(value.SteamId64, value.Name, value.Team, value.Activity);
+
+            if (player != valuePlayer)
             {
-                player = value;
-                PushEvent(PlayerObservers, value.ToEvent(SteamId));
+                player = valuePlayer;
+                PushEvent(PlayerObservers, valuePlayer.ToEvent(SteamId));
             }
 
             if (playerState == value?.State)
