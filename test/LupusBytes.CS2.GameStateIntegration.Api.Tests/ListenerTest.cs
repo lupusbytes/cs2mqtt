@@ -1,6 +1,5 @@
 using System.Net;
 using System.Text;
-using FluentAssertions;
 
 namespace LupusBytes.CS2.GameStateIntegration.Api.Tests;
 

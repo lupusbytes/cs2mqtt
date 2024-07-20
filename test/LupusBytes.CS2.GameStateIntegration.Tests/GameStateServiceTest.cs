@@ -1,5 +1,3 @@
-using AutoFixture.Xunit2;
-using FluentAssertions;
 using LupusBytes.CS2.GameStateIntegration.Contracts;
 
 namespace LupusBytes.CS2.GameStateIntegration.Tests;
