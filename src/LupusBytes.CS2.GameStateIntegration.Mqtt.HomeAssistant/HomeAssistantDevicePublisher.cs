@@ -167,7 +167,6 @@ public sealed class HomeAssistantDevicePublisher(
         return deviceState;
     }
 
-
     private async Task SendDiscoveryPayloadsAsync(
         IDeviceSensors deviceSensors,
         CancellationToken cancellationToken)
