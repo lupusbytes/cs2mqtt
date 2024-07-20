@@ -2,14 +2,12 @@ using System.Threading.Channels;
 using LupusBytes.CS2.GameStateIntegration.Events;
 using LupusBytes.CS2.GameStateIntegration.Mqtt.Extensions;
 using Microsoft.Extensions.Hosting;
-using MQTTnet;
-using MQTTnet.Client;
 
 namespace LupusBytes.CS2.GameStateIntegration.Mqtt;
 
 public sealed class GameStateMqttPublisher(
     IGameStateService gameStateService,
-    MqttOptions options) : BackgroundService,
+    IMqttClient mqttClient) : BackgroundService,
     IObserver<MapEvent>,
     IObserver<PlayerEvent>,
     IObserver<PlayerStateEvent>,
@@ -35,16 +33,6 @@ public sealed class GameStateMqttPublisher(
         using var playerStateSubscription = gameStateService.Subscribe(this as IObserver<PlayerStateEvent>);
         using var roundSubscription = gameStateService.Subscribe(this as IObserver<RoundEvent>);
         using var mapSubscription = gameStateService.Subscribe(this as IObserver<MapEvent>);
-
-        var mqttFactory = new MqttFactory();
-        using var mqttClient = mqttFactory.CreateMqttClient();
-
-        var mqttClientOptions = new MqttClientOptionsBuilder()
-            .WithTcpServer(options.Host, options.Port)
-            .WithTlsOptions(b => b.UseTls(options.UseTls))
-            .Build();
-
-        await mqttClient.ConnectAsync(mqttClientOptions, stoppingToken);
 
         while (await channel.Reader.WaitToReadAsync(stoppingToken))
         {

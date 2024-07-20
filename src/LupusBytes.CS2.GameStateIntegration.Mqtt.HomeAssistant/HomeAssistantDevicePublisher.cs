@@ -4,14 +4,12 @@ using System.Text.Json;
 using System.Threading.Channels;
 using LupusBytes.CS2.GameStateIntegration.Events;
 using Microsoft.Extensions.Hosting;
-using MQTTnet;
-using MQTTnet.Client;
 
 namespace LupusBytes.CS2.GameStateIntegration.Mqtt.HomeAssistant;
 
 public sealed class HomeAssistantDevicePublisher(
     IGameStateService gameStateService,
-    MqttOptions options) :
+    IMqttClient mqttClient) :
     BackgroundService,
     IObserver<BaseEvent>
 {
@@ -23,8 +21,6 @@ public sealed class HomeAssistantDevicePublisher(
     });
 
     private readonly ConcurrentDictionary<string, DeviceState> devices = [];
-
-    private IMqttClient? mqttClient;
 
     public void OnNext(BaseEvent value) => channel.Writer.TryWrite(value);
 
@@ -40,16 +36,6 @@ public sealed class HomeAssistantDevicePublisher(
         using var playerStateSubscription = gameStateService.Subscribe(this as IObserver<PlayerStateEvent>);
         using var roundSubscription = gameStateService.Subscribe(this as IObserver<RoundEvent>);
         using var mapSubscription = gameStateService.Subscribe(this as IObserver<MapEvent>);
-
-        var mqttFactory = new MqttFactory();
-        mqttClient = mqttFactory.CreateMqttClient();
-
-        var mqttClientOptions = new MqttClientOptionsBuilder()
-            .WithTcpServer(options.Host, options.Port)
-            .WithTlsOptions(b => b.UseTls(options.UseTls))
-            .Build();
-
-        await mqttClient.ConnectAsync(mqttClientOptions, stoppingToken);
 
         await ProcessChannelAsync(stoppingToken);
     }
@@ -173,12 +159,13 @@ public sealed class HomeAssistantDevicePublisher(
     {
         foreach (var discoveryPayload in deviceSensors.DiscoveryPayloads)
         {
-            var message = new MqttApplicationMessageBuilder()
-                .WithTopic($"homeassistant/sensor/{discoveryPayload.UniqueId}/config")
-                .WithPayload(JsonSerializer.Serialize(discoveryPayload))
-                .Build();
+            var message = new MqttMessage
+            {
+                Topic = $"homeassistant/sensor/{discoveryPayload.UniqueId}/config",
+                Payload = JsonSerializer.Serialize(discoveryPayload),
+            };
 
-            await mqttClient!.PublishAsync(message, cancellationToken);
+            await mqttClient.PublishAsync(message, cancellationToken);
         }
     }
 
@@ -195,21 +182,14 @@ public sealed class HomeAssistantDevicePublisher(
 
         foreach (var topic in availabilityTopics)
         {
-            var message = new MqttApplicationMessageBuilder()
-                .WithTopic(topic)
-                .WithPayload(available
-                    ? "online"
-                    : "offline")
-                .Build();
+            var message = new MqttMessage
+            {
+                Topic = topic,
+                Payload = available ? "online" : "offline",
+            };
 
-            await mqttClient!.PublishAsync(message, cancellationToken);
+            await mqttClient.PublishAsync(message, cancellationToken);
         }
-    }
-
-    public override void Dispose()
-    {
-        mqttClient?.Dispose();
-        base.Dispose();
     }
 
     private sealed record DeviceState(

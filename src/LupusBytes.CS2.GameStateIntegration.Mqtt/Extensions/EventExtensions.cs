@@ -1,13 +1,12 @@
 using System.Runtime.CompilerServices;
 using System.Text.Json;
 using LupusBytes.CS2.GameStateIntegration.Events;
-using MQTTnet;
 
 namespace LupusBytes.CS2.GameStateIntegration.Mqtt.Extensions;
 
 public static class EventExtensions
 {
-    public static MqttApplicationMessage ToMqttMessage(this BaseEvent @event)
+    public static MqttMessage ToMqttMessage(this BaseEvent @event)
     {
         string topic;
         string payload;
@@ -32,9 +31,10 @@ public static class EventExtensions
             default: throw new SwitchExpressionException();
         }
 
-        return new MqttApplicationMessageBuilder()
-            .WithTopic(topic)
-            .WithPayload(payload)
-            .Build();
+        return new MqttMessage
+        {
+            Payload = payload,
+            Topic = topic,
+        };
     }
 }
