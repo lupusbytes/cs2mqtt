@@ -10,6 +10,7 @@
     <ItemGroup>
       <ProjectReference Include="..\LupusBytes.CS2.GameStateIntegration.Api.Endpoints\LupusBytes.CS2.GameStateIntegration.Api.Endpoints.csproj" />
       <ProjectReference Include="..\LupusBytes.CS2.GameStateIntegration.Contracts\LupusBytes.CS2.GameStateIntegration.Contracts.csproj" />
+      <ProjectReference Include="..\LupusBytes.CS2.GameStateIntegration.Mqtt.HomeAssistant\LupusBytes.CS2.GameStateIntegration.Mqtt.HomeAssistant.csproj" />
       <ProjectReference Include="..\LupusBytes.CS2.GameStateIntegration.Mqtt\LupusBytes.CS2.GameStateIntegration.Mqtt.csproj" />
       <ProjectReference Include="..\LupusBytes.CS2.GameStateIntegration\LupusBytes.CS2.GameStateIntegration.csproj" />
     </ItemGroup>
