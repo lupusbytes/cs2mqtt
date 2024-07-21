@@ -19,9 +19,10 @@ public class MqttClient : IMqttClient
         var factory = new MqttFactory();
         mqttClient = factory.CreateMqttClient();
 
-        // TODO: Implement clientId and credentials options
+        // TODO: Implement credentials options
         mqttOptions = new MqttClientOptionsBuilder()
             .WithTcpServer(options.Host, options.Port)
+            .WithClientId(options.ClientId)
             .WithTlsOptions(b => b.UseTls(options.UseTls))
             .Build();
 
