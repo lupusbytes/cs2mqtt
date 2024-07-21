@@ -1,7 +1,7 @@
 using System.Collections.Concurrent;
-using System.Runtime.CompilerServices;
 using System.Text.Json;
 using System.Threading.Channels;
+using LupusBytes.CS2.GameStateIntegration.Contracts;
 using LupusBytes.CS2.GameStateIntegration.Events;
 using Microsoft.Extensions.Hosting;
 
@@ -11,18 +11,31 @@ public sealed class HomeAssistantDevicePublisher(
     IGameStateService gameStateService,
     IMqttClient mqttClient) :
     BackgroundService,
-    IObserver<BaseEvent>
+    IObserver<PlayerEvent>,
+    IObserver<PlayerStateEvent>,
+    IObserver<MapEvent>,
+    IObserver<RoundEvent>
 {
-    private readonly Channel<BaseEvent> channel = Channel.CreateBounded<BaseEvent>(new BoundedChannelOptions(1000)
+    private static readonly BoundedChannelOptions ChannelOptions = new(1000)
     {
         SingleWriter = false,
         SingleReader = true,
         FullMode = BoundedChannelFullMode.DropOldest,
-    });
+    };
+    private readonly ConcurrentDictionary<SteamId64, Device> devices = [];
+    private readonly HashSet<SteamId64> publishedPlayerConfigs = [];
+    private readonly HashSet<SteamId64> publishedPlayerStateConfigs = [];
+    private readonly HashSet<SteamId64> publishedMapConfigs = [];
+    private readonly HashSet<SteamId64> publishedRoundConfigs = [];
+    private readonly Channel<PlayerEvent> playerChannel = Channel.CreateBounded<PlayerEvent>(ChannelOptions);
+    private readonly Channel<PlayerStateEvent> playerStateChannel = Channel.CreateBounded<PlayerStateEvent>(ChannelOptions);
+    private readonly Channel<MapEvent> mapChannel = Channel.CreateBounded<MapEvent>(ChannelOptions);
+    private readonly Channel<RoundEvent> roundChannel = Channel.CreateBounded<RoundEvent>(ChannelOptions);
 
-    private readonly ConcurrentDictionary<string, DeviceState> devices = [];
-
-    public void OnNext(BaseEvent value) => channel.Writer.TryWrite(value);
+    public void OnNext(PlayerEvent value) => playerChannel.Writer.TryWrite(value);
+    public void OnNext(PlayerStateEvent value) => playerStateChannel.Writer.TryWrite(value);
+    public void OnNext(MapEvent value) => mapChannel.Writer.TryWrite(value);
+    public void OnNext(RoundEvent value) => roundChannel.Writer.TryWrite(value);
 
     public void OnCompleted()
     {
@@ -37,121 +50,40 @@ public sealed class HomeAssistantDevicePublisher(
         using var roundSubscription = gameStateService.Subscribe(this as IObserver<RoundEvent>);
         using var mapSubscription = gameStateService.Subscribe(this as IObserver<MapEvent>);
 
+        var tasks = new[]
+        {
+            ProcessChannelAsync(playerChannel, publishedPlayerConfigs, stoppingToken),
+            ProcessChannelAsync(playerStateChannel, publishedPlayerStateConfigs, stoppingToken),
+            ProcessChannelAsync(mapChannel, publishedMapConfigs, stoppingToken),
+            ProcessChannelAsync(roundChannel, publishedRoundConfigs, stoppingToken),
+        };
+
         // This task must be awaited to prevent the subscriptions from being disposed.
-        await ProcessChannelAsync(stoppingToken);
+        await Task.WhenAll(tasks);
     }
 
-    private async Task ProcessChannelAsync(CancellationToken cancellationToken)
+    private async Task ProcessChannelAsync<TEvent>(
+        Channel<TEvent> channel,
+        HashSet<SteamId64> publishedConfigSet,
+        CancellationToken cancellationToken)
+        where TEvent : BaseEvent
     {
         while (await channel.Reader.WaitToReadAsync(cancellationToken))
         {
             while (channel.Reader.TryRead(out var @event))
             {
-                var deviceId = @event.SteamId.ToString();
-                var deviceState = devices.GetOrAdd(
-                    deviceId,
-                    key => new DeviceState(
-                        new Device(
-                            Name: "CS2",
-                            Id: key,
-                            Manufacturer: "lupusbytes",
-                            Model: "cs2mqtt",
-                            SoftwareVersion: "0.0.1-beta")));
+                var device = devices.GetOrAdd(@event.SteamId, CreateDevice);
 
-                deviceState = @event switch
+                if (!publishedConfigSet.Add(@event.SteamId))
                 {
-                    PlayerEvent p => await UpdatePlayerSensorsAsync(deviceState, p.Player is not null, cancellationToken),
-                    PlayerStateEvent ps => await UpdatePlayerStateSensorsAsync(deviceState, ps.PlayerState is not null, cancellationToken),
-                    MapEvent m => await UpdateMapSensorsAsync(deviceState, m.Map is not null, cancellationToken),
-                    RoundEvent r => await UpdateRoundSensorsAsync(deviceState, r.Round is not null, cancellationToken),
-                    _ => throw new SwitchExpressionException(),
-                };
+                    continue;
+                }
 
-                devices[deviceId] = deviceState;
+                var sensors = CreateDeviceSensors(@event, device);
+
+                await SendDiscoveryPayloadsAsync(sensors, cancellationToken);
             }
         }
-    }
-
-    private Task<DeviceState> UpdatePlayerSensorsAsync(
-        DeviceState deviceState,
-        bool eventHadData,
-        CancellationToken cancellationToken) =>
-        UpdateSensorsAsync(
-            deviceState,
-            new PlayerSensors(deviceState.Device),
-            eventHadData,
-            d => d.PlayerSensorsAnnounced,
-            d => d with { PlayerSensorsAnnounced = true },
-            d => d.PlayerAvailability,
-            d => d with { PlayerAvailability = eventHadData },
-            cancellationToken);
-
-    private Task<DeviceState> UpdatePlayerStateSensorsAsync(
-        DeviceState deviceState,
-        bool eventHadData,
-        CancellationToken cancellationToken) =>
-        UpdateSensorsAsync(
-            deviceState,
-            new PlayerStateSensors(deviceState.Device),
-            eventHadData,
-            d => d.PlayerStateSensorsAnnounced,
-            d => d with { PlayerStateSensorsAnnounced = true },
-            d => d.PlayerStateAvailability,
-            d => d with { PlayerStateAvailability = eventHadData },
-            cancellationToken);
-
-    private Task<DeviceState> UpdateMapSensorsAsync(
-        DeviceState deviceState,
-        bool eventHadData,
-        CancellationToken cancellationToken) =>
-        UpdateSensorsAsync(
-            deviceState,
-            new MapSensors(deviceState.Device),
-            eventHadData,
-            d => d.MapSensorsAnnounced,
-            d => d with { MapSensorsAnnounced = true },
-            d => d.MapAvailability,
-            d => d with { MapAvailability = eventHadData },
-            cancellationToken);
-
-    private Task<DeviceState> UpdateRoundSensorsAsync(
-        DeviceState deviceState,
-        bool eventHadData,
-        CancellationToken cancellationToken) =>
-        UpdateSensorsAsync(
-            deviceState,
-            new RoundSensors(deviceState.Device),
-            eventHadData,
-            d => d.RoundSensorsAnnounced,
-            d => d with { RoundSensorsAnnounced = true },
-            d => d.RoundAvailability,
-            d => d with { RoundAvailability = eventHadData },
-            cancellationToken);
-
-    private async Task<DeviceState> UpdateSensorsAsync(
-        DeviceState deviceState,
-        IDeviceSensors sensors,
-        bool eventHadData,
-        Func<DeviceState, bool> getSensorsAnnounced,
-        Func<DeviceState, DeviceState> setSensorsAnnounced,
-        Func<DeviceState, bool> getAvailability,
-        Func<DeviceState, DeviceState> setAvailability,
-        CancellationToken cancellationToken)
-    {
-        if (eventHadData && !getSensorsAnnounced(deviceState))
-        {
-            await SendDiscoveryPayloadsAsync(sensors, cancellationToken);
-            deviceState = setSensorsAnnounced(deviceState);
-        }
-
-        if (eventHadData == getAvailability(deviceState))
-        {
-            return deviceState;
-        }
-
-        await SetSensorAvailabilityAsync(sensors, eventHadData, cancellationToken);
-        deviceState = setAvailability(deviceState);
-        return deviceState;
     }
 
     private async Task SendDiscoveryPayloadsAsync(
@@ -170,37 +102,19 @@ public sealed class HomeAssistantDevicePublisher(
         }
     }
 
-    private async Task SetSensorAvailabilityAsync(
-        IDeviceSensors deviceSensors,
-        bool available,
-        CancellationToken cancellationToken)
+    private static Device CreateDevice(SteamId64 steamId) => new(
+        Id: steamId.ToString(),
+        Name: "CS2",
+        Manufacturer: "lupusbytes",
+        Model: "cs2mqtt",
+        SoftwareVersion: "0.0.1-beta");
+
+    private static IDeviceSensors CreateDeviceSensors(BaseEvent @event, Device device) => @event switch
     {
-        var availabilityTopics = deviceSensors
-            .DiscoveryPayloads
-            .Select(x => x.Availability)
-            .Select(x => x.Topic)
-            .Distinct(StringComparer.Ordinal);
-
-        foreach (var topic in availabilityTopics)
-        {
-            var message = new MqttMessage
-            {
-                Topic = topic,
-                Payload = available ? "online" : "offline",
-            };
-
-            await mqttClient.PublishAsync(message, cancellationToken);
-        }
-    }
-
-    private sealed record DeviceState(
-        Device Device,
-        bool PlayerSensorsAnnounced = false,
-        bool PlayerAvailability = false,
-        bool PlayerStateSensorsAnnounced = false,
-        bool PlayerStateAvailability = false,
-        bool MapSensorsAnnounced = false,
-        bool MapAvailability = false,
-        bool RoundSensorsAnnounced = false,
-        bool RoundAvailability = false);
+        PlayerEvent => new PlayerSensors(device),
+        PlayerStateEvent => new PlayerStateSensors(device),
+        MapEvent => new MapSensors(device),
+        RoundEvent => new RoundSensors(device),
+        _ => throw new ArgumentException($"Unknown event type {@event.GetType()}", nameof(@event)),
+    };
 }

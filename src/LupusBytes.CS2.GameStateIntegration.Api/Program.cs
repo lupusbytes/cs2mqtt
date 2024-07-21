@@ -18,6 +18,7 @@ public sealed class Program
         builder.Configuration.GetSection(MqttOptions.Section).Bind(mqttOptions);
         builder.Services.AddSingleton<IMqttClient>(s => new MqttClient(mqttOptions, s.GetRequiredService<ILogger<MqttClient>>()));
         builder.Services.AddHostedService(s => new GameStateMqttPublisher(s.GetRequiredService<IGameStateService>(), s.GetRequiredService<IMqttClient>()));
+        builder.Services.AddHostedService(s => new AvailabilityMqttPublisher(s.GetRequiredService<IGameStateService>(), s.GetRequiredService<IMqttClient>()));
         builder.Services.AddHostedService(s => new HomeAssistantDevicePublisher(s.GetRequiredService<IGameStateService>(), s.GetRequiredService<IMqttClient>()));
 
         var app = builder.Build();
