@@ -35,6 +35,7 @@ public static class EventExtensions
         {
             Payload = payload,
             Topic = topic,
+            RetainFlag = true,
         };
     }
 }
