@@ -24,6 +24,9 @@ public class MqttClient : IMqttClient
             .WithTcpServer(options.Host, options.Port)
             .WithClientId(options.ClientId)
             .WithTlsOptions(b => b.UseTls(options.UseTls))
+            .WithWillTopic("cs2mqtt/status")
+            .WithWillPayload("offline")
+            .WithWillRetain()
             .Build();
 
         mqttClient.ConnectedAsync += OnConnected;
