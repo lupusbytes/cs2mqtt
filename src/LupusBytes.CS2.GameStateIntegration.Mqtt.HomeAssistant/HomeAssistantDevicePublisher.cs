@@ -37,6 +37,7 @@ public sealed class HomeAssistantDevicePublisher(
         using var roundSubscription = gameStateService.Subscribe(this as IObserver<RoundEvent>);
         using var mapSubscription = gameStateService.Subscribe(this as IObserver<MapEvent>);
 
+        // This task must be awaited to prevent the subscriptions from being disposed.
         await ProcessChannelAsync(stoppingToken);
     }
 

@@ -55,6 +55,7 @@ public sealed class GameStateMqttPublisher(
             ProcessChannelAsync(roundChannel, stoppingToken),
         };
 
+        // This task must be awaited to prevent the subscriptions from being disposed.
         await Task.WhenAll(tasks);
     }
 
