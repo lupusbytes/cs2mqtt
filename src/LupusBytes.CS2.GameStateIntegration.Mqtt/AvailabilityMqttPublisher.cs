@@ -46,6 +46,8 @@ public class AvailabilityMqttPublisher(
         using var mapSubscription = gameStateService.Subscribe(this as IObserver<MapEvent>);
         using var roundStateSubscription = gameStateService.Subscribe(this as IObserver<RoundEvent>);
 
+        await SetBaseAvailability(stoppingToken);
+
         var tasks = new[]
         {
             ProcessChannelAsync(playerChannel, onlinePlayers, ShouldBeOnline, "player/status", stoppingToken),
@@ -58,10 +60,15 @@ public class AvailabilityMqttPublisher(
         await Task.WhenAll(tasks);
     }
 
-    private static bool ShouldBeOnline(PlayerEvent @event) => @event.Player is not null;
-    private static bool ShouldBeOnline(PlayerStateEvent @event) => @event.PlayerState is not null;
-    private static bool ShouldBeOnline(MapEvent @event) => @event.Map is not null;
-    private static bool ShouldBeOnline(RoundEvent @event) => @event.Round is not null;
+    private Task SetBaseAvailability(CancellationToken cancellationToken) =>
+        mqttClient.PublishAsync(
+            new MqttMessage
+            {
+                Topic = "cs2mqtt/status",
+                Payload = "online",
+                RetainFlag = true,
+            },
+            cancellationToken);
 
     private async Task ProcessChannelAsync<TEvent>(
         Channel<TEvent> channel,
@@ -99,4 +106,9 @@ public class AvailabilityMqttPublisher(
             }
         }
     }
+
+    private static bool ShouldBeOnline(PlayerEvent @event) => @event.Player is not null;
+    private static bool ShouldBeOnline(PlayerStateEvent @event) => @event.PlayerState is not null;
+    private static bool ShouldBeOnline(MapEvent @event) => @event.Map is not null;
+    private static bool ShouldBeOnline(RoundEvent @event) => @event.Round is not null;
 }

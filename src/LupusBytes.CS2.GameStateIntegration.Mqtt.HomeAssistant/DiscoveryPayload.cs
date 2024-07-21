@@ -9,4 +9,4 @@ public record DiscoveryPayload(
     [property: JsonPropertyName("value_template")] string ValueTemplate,
     [property: JsonPropertyName("icon")] string Icon,
     [property: JsonPropertyName("device")] Device Device,
-    [property: JsonPropertyName("availability")] Availability Availability);
+    [property: JsonPropertyName("availability")] IReadOnlyCollection<Availability> Availability);

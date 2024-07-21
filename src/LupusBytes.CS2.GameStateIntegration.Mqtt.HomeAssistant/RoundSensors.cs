@@ -20,7 +20,7 @@ public class RoundSensors(Device device) : IDeviceSensors
             ValueTemplate: "{{ value_json.phase }}",
             Icon: "mdi:clock-outline",
             device,
-            new Availability($"cs2mqtt/{device.Id}/round/status"));
+            Availability: [new($"cs2mqtt/{device.Id}/round/status"), new("cs2mqtt/status")]);
 
     private DiscoveryPayload RoundWinningTeamDiscoveryPayload =>
         new(
@@ -30,7 +30,7 @@ public class RoundSensors(Device device) : IDeviceSensors
             ValueTemplate: "{{ value_json.win_team }}",
             Icon: "mdi:trophy",
             device,
-            new Availability($"cs2mqtt/{device.Id}/round/status"));
+            Availability: [new($"cs2mqtt/{device.Id}/round/status"), new("cs2mqtt/status")]);
 
     private DiscoveryPayload BombDiscoveryPayload =>
         new(
@@ -40,5 +40,5 @@ public class RoundSensors(Device device) : IDeviceSensors
             ValueTemplate: "{{ value_json.bomb }}",
             Icon: "mdi:bomb",
             device,
-            new Availability($"cs2mqtt/{device.Id}/round/status"));
+            Availability: [new($"cs2mqtt/{device.Id}/round/status"), new("cs2mqtt/status")]);
 }

@@ -21,7 +21,7 @@ public class PlayerSensors(Device device) : IDeviceSensors
             ValueTemplate: "{{ value_json.steamid }}",
             Icon: "mdi:identifier",
             device,
-            new Availability($"cs2mqtt/{device.Id}/player/status"));
+            Availability: [new($"cs2mqtt/{device.Id}/player/status"), new("cs2mqtt/status")]);
 
     private DiscoveryPayload NameDiscoveryPayload =>
         new(
@@ -31,7 +31,7 @@ public class PlayerSensors(Device device) : IDeviceSensors
             ValueTemplate: "{{ value_json.name }}",
             Icon: "mdi:account",
             device,
-            new Availability($"cs2mqtt/{device.Id}/player/status"));
+            Availability: [new($"cs2mqtt/{device.Id}/player/status"), new("cs2mqtt/status")]);
 
     private DiscoveryPayload TeamDiscoveryPayload =>
         new(
@@ -41,7 +41,7 @@ public class PlayerSensors(Device device) : IDeviceSensors
             ValueTemplate: "{{ value_json.team }}",
             Icon: "mdi:account-multiple-outline",
             device,
-            new Availability($"cs2mqtt/{device.Id}/player/status"));
+            Availability: [new($"cs2mqtt/{device.Id}/player/status"), new("cs2mqtt/status")]);
 
     private DiscoveryPayload ActivityDiscoveryPayload =>
         new(
@@ -51,5 +51,5 @@ public class PlayerSensors(Device device) : IDeviceSensors
             ValueTemplate: "{{ value_json.activity }}",
             Icon: "mdi:play",
             device,
-            new Availability($"cs2mqtt/{device.Id}/player/status"));
+            Availability: [new($"cs2mqtt/{device.Id}/player/status"), new("cs2mqtt/status")]);
 }

@@ -23,7 +23,7 @@ public class MapSensors(Device device) : IDeviceSensors
             ValueTemplate: "{{ value_json.name }}",
             Icon: "mdi:map",
             device,
-            new Availability($"cs2mqtt/{device.Id}/map/status"));
+            Availability: [new($"cs2mqtt/{device.Id}/map/status"), new("cs2mqtt/status")]);
 
     private DiscoveryPayload ModeDiscoveryPayload =>
         new(
@@ -33,7 +33,7 @@ public class MapSensors(Device device) : IDeviceSensors
             ValueTemplate: "{{ value_json.mode }}",
             Icon: "mdi:target-account",
             device,
-            new Availability($"cs2mqtt/{device.Id}/map/status"));
+            Availability: [new($"cs2mqtt/{device.Id}/map/status"), new("cs2mqtt/status")]);
 
     private DiscoveryPayload MapPhaseDiscoveryPayload =>
         new(
@@ -43,7 +43,7 @@ public class MapSensors(Device device) : IDeviceSensors
             ValueTemplate: "{{ value_json.phase }}",
             Icon: "mdi:clock-outline",
             device,
-            new Availability($"cs2mqtt/{device.Id}/map/status"));
+            Availability: [new($"cs2mqtt/{device.Id}/map/status"), new("cs2mqtt/status")]);
 
     private DiscoveryPayload RoundNumberDiscoveryPayload =>
         new(
@@ -53,7 +53,7 @@ public class MapSensors(Device device) : IDeviceSensors
             ValueTemplate: "{{ value_json.round }}",
             Icon: "mdi:counter",
             device,
-            new Availability($"cs2mqtt/{device.Id}/map/status"));
+            Availability: [new($"cs2mqtt/{device.Id}/map/status"), new("cs2mqtt/status")]);
 
     private DiscoveryPayload TScoreDiscoveryPayload =>
         new(
@@ -63,7 +63,7 @@ public class MapSensors(Device device) : IDeviceSensors
             ValueTemplate: "{{ value_json[\"team_t\"].score }}",
             Icon: "mdi:account-group",
             device,
-            new Availability($"cs2mqtt/{device.Id}/map/status"));
+            Availability: [new($"cs2mqtt/{device.Id}/map/status"), new("cs2mqtt/status")]);
 
     private DiscoveryPayload CTScoreDiscoveryPayload =>
         new(
@@ -73,5 +73,5 @@ public class MapSensors(Device device) : IDeviceSensors
             ValueTemplate: "{{ value_json[\"team_ct\"].score }}",
             Icon: "mdi:account-group-outline",
             device,
-            new Availability($"cs2mqtt/{device.Id}/map/status"));
+            Availability: [new($"cs2mqtt/{device.Id}/map/status"), new("cs2mqtt/status")]);
 }

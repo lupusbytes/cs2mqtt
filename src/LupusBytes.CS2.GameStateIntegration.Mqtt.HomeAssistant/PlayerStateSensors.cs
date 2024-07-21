@@ -27,7 +27,7 @@ public class PlayerStateSensors(Device device) : IDeviceSensors
             ValueTemplate: "{{ value_json.health }}",
             Icon: "mdi:medical-bag",
             device,
-            new Availability($"cs2mqtt/{device.Id}/player-state/status"));
+            Availability: [new($"cs2mqtt/{device.Id}/player-state/status"), new("cs2mqtt/status")]);
 
     private DiscoveryPayload ArmorDiscoveryPayload =>
         new(
@@ -37,7 +37,7 @@ public class PlayerStateSensors(Device device) : IDeviceSensors
             ValueTemplate: "{{ value_json.armor }}",
             Icon: "mdi:shield",
             device,
-            new Availability($"cs2mqtt/{device.Id}/player-state/status"));
+            Availability: [new($"cs2mqtt/{device.Id}/player-state/status"), new("cs2mqtt/status")]);
 
     private DiscoveryPayload HelmetDiscoveryPayload =>
         new(
@@ -47,7 +47,7 @@ public class PlayerStateSensors(Device device) : IDeviceSensors
             ValueTemplate: "{{ value_json.helmet }}",
             Icon: "mdi:account-hard-hat",
             device,
-            new Availability($"cs2mqtt/{device.Id}/player-state/status"));
+            Availability: [new($"cs2mqtt/{device.Id}/player-state/status"), new("cs2mqtt/status")]);
 
     private DiscoveryPayload FlashedDiscoveryPayload =>
         new(
@@ -57,7 +57,7 @@ public class PlayerStateSensors(Device device) : IDeviceSensors
             ValueTemplate: "{{ value_json.flashed }}",
             Icon: "mdi:flash-alert",
             device,
-            new Availability($"cs2mqtt/{device.Id}/player-state/status"));
+            Availability: [new($"cs2mqtt/{device.Id}/player-state/status"), new("cs2mqtt/status")]);
 
     private DiscoveryPayload SmokedDiscoveryPayload =>
         new(
@@ -67,7 +67,7 @@ public class PlayerStateSensors(Device device) : IDeviceSensors
             ValueTemplate: "{{ value_json.smoked }}",
             Icon: "mdi:weather-fog",
             device,
-            new Availability($"cs2mqtt/{device.Id}/player-state/status"));
+            Availability: [new($"cs2mqtt/{device.Id}/player-state/status"), new("cs2mqtt/status")]);
 
     private DiscoveryPayload BurningDiscoveryPayload =>
         new(
@@ -77,7 +77,7 @@ public class PlayerStateSensors(Device device) : IDeviceSensors
             ValueTemplate: "{{ value_json.burning }}",
             Icon: "mdi:fire-alert",
             device,
-            new Availability($"cs2mqtt/{device.Id}/player-state/status"));
+            Availability: [new($"cs2mqtt/{device.Id}/player-state/status"), new("cs2mqtt/status")]);
 
     private DiscoveryPayload MoneyDiscoveryPayload =>
         new(
@@ -87,7 +87,7 @@ public class PlayerStateSensors(Device device) : IDeviceSensors
             ValueTemplate: "{{ value_json.money }}",
             Icon: "mdi:currency-usd",
             device,
-            new Availability($"cs2mqtt/{device.Id}/player-state/status"));
+            Availability: [new($"cs2mqtt/{device.Id}/player-state/status"), new("cs2mqtt/status")]);
 
     private DiscoveryPayload RoundKillsDiscoveryPayload =>
         new(
@@ -97,7 +97,7 @@ public class PlayerStateSensors(Device device) : IDeviceSensors
             ValueTemplate: "{{ value_json.round_kills }}",
             Icon: "mdi:account-alert",
             device,
-            new Availability($"cs2mqtt/{device.Id}/player-state/status"));
+            Availability: [new($"cs2mqtt/{device.Id}/player-state/status"), new("cs2mqtt/status")]);
 
     private DiscoveryPayload RoundHeadshotsDiscoveryPayload =>
         new(
@@ -107,7 +107,7 @@ public class PlayerStateSensors(Device device) : IDeviceSensors
             ValueTemplate: "{{ value_json.round_killhs }}",
             Icon: "mdi:head-alert",
             device,
-            new Availability($"cs2mqtt/{device.Id}/player-state/status"));
+            Availability: [new($"cs2mqtt/{device.Id}/player-state/status"), new("cs2mqtt/status")]);
 
     private DiscoveryPayload EquipmentValueDiscoveryPayload =>
         new(
@@ -117,5 +117,5 @@ public class PlayerStateSensors(Device device) : IDeviceSensors
             ValueTemplate: "{{ value_json.equip_value }}",
             Icon: "mdi:currency-usd",
             device,
-            new Availability($"cs2mqtt/{device.Id}/player-state/status"));
+            Availability: [new($"cs2mqtt/{device.Id}/player-state/status"), new("cs2mqtt/status")]);
 }
