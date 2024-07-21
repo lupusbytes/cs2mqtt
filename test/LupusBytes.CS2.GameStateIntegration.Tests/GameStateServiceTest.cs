@@ -5,6 +5,20 @@ namespace LupusBytes.CS2.GameStateIntegration.Tests;
 public class GameStateServiceTest
 {
     [Theory, AutoData]
+    internal void ProcessEvent_throws_ArgumentException(
+        GameStateData data,
+        GameStateService sut)
+    {
+        // Arrange
+        data = data with { Provider = null };
+
+        // Act & Assert
+        sut.Invoking(x => x.ProcessEvent(data))
+            .Should()
+            .Throw<ArgumentException>();
+    }
+
+    [Theory, AutoData]
     public async Task Removes_disconnected_providers_in_background(GameStateData data)
     {
         // Arrange
