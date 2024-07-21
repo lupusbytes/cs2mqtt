@@ -88,6 +88,7 @@ public class AvailabilityMqttPublisher(
                     {
                         Topic = $"cs2mqtt/{@event.SteamId}/{topicSuffix}",
                         Payload = shouldBeOnline ? "online" : "offline",
+                        RetainFlag = true,
                     },
                     cancellationToken);
 
