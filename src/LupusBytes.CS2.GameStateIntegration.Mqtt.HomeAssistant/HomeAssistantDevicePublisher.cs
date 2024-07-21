@@ -96,6 +96,7 @@ public sealed class HomeAssistantDevicePublisher(
             {
                 Topic = $"homeassistant/sensor/{discoveryPayload.UniqueId}/config",
                 Payload = JsonSerializer.Serialize(discoveryPayload),
+                RetainFlag = true,
             };
 
             await mqttClient.PublishAsync(message, cancellationToken);
