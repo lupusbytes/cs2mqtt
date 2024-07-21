@@ -42,10 +42,10 @@
   <!-- Shared code analyzers used for all projects in the solution -->
   <ItemGroup Label="Code Analyzers">
     <PackageReference Include="AsyncFixer" Version="1.6.0" PrivateAssets="All" />
-    <PackageReference Include="Meziantou.Analyzer" Version="2.0.139" PrivateAssets="All" />
+    <PackageReference Include="Meziantou.Analyzer" Version="2.0.161" PrivateAssets="All" />
     <PackageReference Include="SecurityCodeScan.VS2019" Version="5.6.7" PrivateAssets="All" />
     <PackageReference Include="StyleCop.Analyzers" Version="1.2.0-beta.556" PrivateAssets="All" />
-    <PackageReference Include="SonarAnalyzer.CSharp" Version="9.19.0.84025" PrivateAssets="All" />
+    <PackageReference Include="SonarAnalyzer.CSharp" Version="9.29.0.95321" PrivateAssets="All" />
   </ItemGroup>
 
 </Project>
