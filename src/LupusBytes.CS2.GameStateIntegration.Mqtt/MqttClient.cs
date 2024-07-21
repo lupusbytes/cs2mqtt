@@ -71,10 +71,10 @@ public class MqttClient : IMqttClient
             return;
         }
 
-        // TODO: support retain flag
         var mqttMessage = new MqttApplicationMessageBuilder()
             .WithTopic(message.Topic)
             .WithPayload(message.Payload)
+            .WithRetainFlag(message.RetainFlag)
             .Build();
 
         await mqttClient.PublishAsync(mqttMessage, cancellationToken);
