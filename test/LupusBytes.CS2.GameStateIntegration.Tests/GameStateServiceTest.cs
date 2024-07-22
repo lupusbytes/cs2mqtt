@@ -19,6 +19,63 @@ public class GameStateServiceTest
             .Throw<ArgumentException>();
     }
 
+    [Theory, AutoData]
+    internal void GetPlayer_returns_Player_by_SteamId(
+        GameStateData data1,
+        GameStateData data2,
+        GameStateData data3,
+        GameStateService sut)
+    {
+        // Arrange
+        sut.ProcessEvent(data1);
+        sut.ProcessEvent(data2);
+        sut.ProcessEvent(data3);
+
+        // Act
+        var player = sut.GetPlayer(data1.Provider!.SteamId64);
+
+        // Assert
+        player.Should().BeEquivalentTo(data1.Player);
+    }
+
+    [Theory, AutoData]
+    internal void GetMap_returns_Map_by_SteamId(
+        GameStateData data1,
+        GameStateData data2,
+        GameStateData data3,
+        GameStateService sut)
+    {
+        // Arrange
+        sut.ProcessEvent(data1);
+        sut.ProcessEvent(data2);
+        sut.ProcessEvent(data3);
+
+        // Act
+        var map = sut.GetMap(data2.Provider!.SteamId64);
+
+        // Assert
+        map.Should().BeEquivalentTo(data2.Map);
+    }
+
+    [Theory, AutoData]
+    internal void GetRound_returns_Map_by_SteamId(
+        GameStateData data1,
+        GameStateData data2,
+        GameStateData data3,
+        GameStateService sut)
+    {
+        // Arrange
+        sut.ProcessEvent(data1);
+        sut.ProcessEvent(data2);
+        sut.ProcessEvent(data3);
+
+        // Act
+        var round = sut.GetRound(data3.Provider!.SteamId64);
+
+        // Assert
+        round.Should().BeEquivalentTo(data3.Round);
+    }
+
     [Theory, AutoNSubstituteData]
     public async Task Removes_disconnected_providers_in_background(
         GameStateData data,
