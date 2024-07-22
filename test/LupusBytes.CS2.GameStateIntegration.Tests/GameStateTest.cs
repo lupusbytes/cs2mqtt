@@ -244,4 +244,43 @@ public class GameStateTest
         mapObserver.Received(1).OnNext(Arg.Any<MapEvent>());
         roundObserver.Received(1).OnNext(Arg.Any<RoundEvent>());
     }
+
+    [Theory, AutoNSubstituteData]
+    internal void ProcessEvent_sends_events_to_multiple_observers(
+        GameStateData data,
+        IObserver<PlayerEvent> playerObserver1,
+        IObserver<PlayerStateEvent> playerStateObserver1,
+        IObserver<MapEvent> mapObserver1,
+        IObserver<RoundEvent> roundObserver1,
+        IObserver<PlayerEvent> playerObserver2,
+        IObserver<PlayerStateEvent> playerStateObserver2,
+        IObserver<MapEvent> mapObserver2,
+        IObserver<RoundEvent> roundObserver2,
+        GameState sut)
+    {
+        // Arrange
+        sut.Subscribe(playerObserver1);
+        sut.Subscribe(playerStateObserver1);
+        sut.Subscribe(mapObserver1);
+        sut.Subscribe(roundObserver1);
+
+        sut.Subscribe(playerObserver2);
+        sut.Subscribe(playerStateObserver2);
+        sut.Subscribe(mapObserver2);
+        sut.Subscribe(roundObserver2);
+
+        // Act
+        sut.ProcessEvent(data);
+
+        // Assert
+        playerObserver1.Received(1).OnNext(Arg.Any<PlayerEvent>());
+        playerStateObserver1.Received(1).OnNext(Arg.Any<PlayerStateEvent>());
+        mapObserver1.Received(1).OnNext(Arg.Any<MapEvent>());
+        roundObserver1.Received(1).OnNext(Arg.Any<RoundEvent>());
+
+        playerObserver2.Received(1).OnNext(Arg.Any<PlayerEvent>());
+        playerStateObserver2.Received(1).OnNext(Arg.Any<PlayerStateEvent>());
+        mapObserver2.Received(1).OnNext(Arg.Any<MapEvent>());
+        roundObserver2.Received(1).OnNext(Arg.Any<RoundEvent>());
+    }
 }
