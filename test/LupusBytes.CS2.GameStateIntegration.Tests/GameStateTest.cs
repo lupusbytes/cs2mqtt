@@ -39,6 +39,26 @@ public class GameStateTest
     }
 
     [Theory, AutoNSubstituteData]
+    internal void ProcessEvent_sends_PlayerEvent_with_null_Player_to_observers(
+        GameStateData data,
+        IObserver<PlayerEvent> observer,
+        GameState sut)
+    {
+        // Arrange
+        sut.ProcessEvent(data); // Set initial properties
+        data = data with { Player = null };
+        sut.Subscribe(observer);
+
+        // Act
+        sut.ProcessEvent(data);
+
+        // Assert
+        observer.Received(1).OnNext(Arg.Is<PlayerEvent>(p =>
+            p.SteamId == sut.SteamId &&
+            p.Player == null));
+    }
+
+    [Theory, AutoNSubstituteData]
     internal void ProcessEvent_sends_PlayerStateEvent_to_observers(
         GameStateData data,
         IObserver<PlayerStateEvent> observer,
@@ -66,6 +86,26 @@ public class GameStateTest
     }
 
     [Theory, AutoNSubstituteData]
+    internal void ProcessEvent_sends_PlayerStateEvent_with_null_PlayerState_to_observers(
+        GameStateData data,
+        IObserver<PlayerStateEvent> observer,
+        GameState sut)
+    {
+        // Arrange
+        sut.ProcessEvent(data); // Set initial properties
+        data = data with { Player = data.Player! with { State = null } };
+        sut.Subscribe(observer);
+
+        // Act
+        sut.ProcessEvent(data);
+
+        // Assert
+        observer.Received(1).OnNext(Arg.Is<PlayerStateEvent>(ps =>
+            ps.SteamId == sut.SteamId &&
+            ps.PlayerState == null));
+    }
+
+    [Theory, AutoNSubstituteData]
     internal void ProcessEvent_sends_MapEvent_to_observers(
         GameStateData data,
         IObserver<MapEvent> observer,
@@ -89,6 +129,26 @@ public class GameStateTest
     }
 
     [Theory, AutoNSubstituteData]
+    internal void ProcessEvent_sends_MapEvent_with_null_Map_to_observers(
+        GameStateData data,
+        IObserver<MapEvent> observer,
+        GameState sut)
+    {
+        // Arrange
+        sut.ProcessEvent(data); // Set initial properties
+        data = data with { Map = null };
+        sut.Subscribe(observer);
+
+        // Act
+        sut.ProcessEvent(data);
+
+        // Assert
+        observer.Received(1).OnNext(Arg.Is<MapEvent>(m =>
+            m.SteamId == sut.SteamId &&
+            m.Map == null));
+    }
+
+    [Theory, AutoNSubstituteData]
     internal void ProcessEvent_sends_RoundEvent_to_observers(
         GameStateData data,
         IObserver<RoundEvent> observer,
@@ -106,5 +166,25 @@ public class GameStateTest
             r.Round!.Phase == data.Round!.Phase &&
             r.Round.WinTeam == data.Round.WinTeam &&
             r.Round.Bomb == data.Round.Bomb));
+    }
+
+    [Theory, AutoNSubstituteData]
+    internal void ProcessEvent_sends_RoundEvent_with_null_Round_to_observers(
+        GameStateData data,
+        IObserver<RoundEvent> observer,
+        GameState sut)
+    {
+        // Arrange
+        sut.ProcessEvent(data); // Set initial properties
+        data = data with { Round = null };
+        sut.Subscribe(observer);
+
+        // Act
+        sut.ProcessEvent(data);
+
+        // Assert
+        observer.Received(1).OnNext(Arg.Is<RoundEvent>(r =>
+            r.SteamId == sut.SteamId &&
+            r.Round == null));
     }
 }
