@@ -11,9 +11,11 @@ public class ServiceCollectionExtensionsTest
     {
         // Arrange
         var sut = new ServiceCollection();
+
+        // Act
         sut.AddGameStateService(configuration);
 
-        // Act & Assert
+        // Assert
         sut.BuildServiceProvider()
             .GetRequiredService<IGameStateService>()
             .Should()
