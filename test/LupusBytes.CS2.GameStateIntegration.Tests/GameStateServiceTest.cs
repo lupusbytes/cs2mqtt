@@ -39,6 +39,25 @@ public class GameStateServiceTest
     }
 
     [Theory, AutoData]
+    internal void GetPlayer_returns_null_on_unknown_SteamId(
+        List<GameStateData> data,
+        SteamId64 unknownSteamId,
+        GameStateService sut)
+    {
+        // Arrange
+        foreach (var @event in data)
+        {
+            sut.ProcessEvent(@event);
+        }
+
+        // Act
+        var player = sut.GetPlayer(unknownSteamId);
+
+        // Assert
+        player.Should().BeNull();
+    }
+
+    [Theory, AutoData]
     internal void GetMap_returns_Map_by_SteamId(
         GameStateData data1,
         GameStateData data2,
@@ -58,7 +77,26 @@ public class GameStateServiceTest
     }
 
     [Theory, AutoData]
-    internal void GetRound_returns_Map_by_SteamId(
+    internal void GetMap_returns_null_on_unknown_SteamId(
+        List<GameStateData> data,
+        SteamId64 unknownSteamId,
+        GameStateService sut)
+    {
+        // Arrange
+        foreach (var @event in data)
+        {
+            sut.ProcessEvent(@event);
+        }
+
+        // Act
+        var map = sut.GetMap(unknownSteamId);
+
+        // Assert
+        map.Should().BeNull();
+    }
+
+    [Theory, AutoData]
+    internal void GetRound_returns_Round_by_SteamId(
         GameStateData data1,
         GameStateData data2,
         GameStateData data3,
@@ -74,6 +112,25 @@ public class GameStateServiceTest
 
         // Assert
         round.Should().BeEquivalentTo(data3.Round);
+    }
+
+    [Theory, AutoData]
+    internal void GetRound_returns_null_on_unknown_SteamId(
+        List<GameStateData> data,
+        SteamId64 unknownSteamId,
+        GameStateService sut)
+    {
+        // Arrange
+        foreach (var @event in data)
+        {
+            sut.ProcessEvent(@event);
+        }
+
+        // Act
+        var round = sut.GetRound(unknownSteamId);
+
+        // Assert
+        round.Should().BeNull();
     }
 
     [Theory, AutoNSubstituteData]
