@@ -1,4 +1,5 @@
 using LupusBytes.CS2.GameStateIntegration.Contracts;
+using LupusBytes.CS2.GameStateIntegration.Events;
 
 namespace LupusBytes.CS2.GameStateIntegration.Tests;
 
@@ -18,8 +19,13 @@ public class GameStateServiceTest
             .Throw<ArgumentException>();
     }
 
-    [Theory, AutoData]
-    public async Task Removes_disconnected_providers_in_background(GameStateData data)
+    [Theory, AutoNSubstituteData]
+    public async Task Removes_disconnected_providers_in_background(
+        GameStateData data,
+        IObserver<PlayerEvent> playerObserver,
+        IObserver<PlayerStateEvent> playerStateObserver,
+        IObserver<MapEvent> mapObserver,
+        IObserver<RoundEvent> roundObserver)
     {
         // Arrange
         var options = new GameStateOptions
@@ -27,7 +33,13 @@ public class GameStateServiceTest
             TimeoutInSeconds = 0.2,
             TimeoutCleanupIntervalInSeconds = 0.5,
         };
+
         var sut = new GameStateService(options);
+
+        sut.Subscribe(playerObserver);
+        sut.Subscribe(playerStateObserver);
+        sut.Subscribe(mapObserver);
+        sut.Subscribe(roundObserver);
 
         // Act
         sut.ProcessEvent(data);
@@ -41,5 +53,22 @@ public class GameStateServiceTest
 
         // After the wait, the background cleanup task should have removed the provider.
         sut.GetPlayer(data.Provider.SteamId64).Should().BeNull();
+
+        // All the observers should have received null events for the corresponding SteamID.
+        playerObserver.Received(1).OnNext(Arg.Is<PlayerEvent>(p =>
+            p.SteamId == data.Provider.SteamId64 &&
+            p.Player == null));
+
+        playerStateObserver.Received(1).OnNext(Arg.Is<PlayerStateEvent>(ps =>
+            ps.SteamId == data.Provider.SteamId64 &&
+            ps.PlayerState == null));
+
+        mapObserver.Received(1).OnNext(Arg.Is<MapEvent>(m =>
+            m.SteamId == data.Provider.SteamId64 &&
+            m.Map == null));
+
+        roundObserver.Received(1).OnNext(Arg.Is<RoundEvent>(r =>
+            r.SteamId == data.Provider.SteamId64 &&
+            r.Round == null));
     }
 }
