@@ -213,4 +213,35 @@ public class GameStateTest
         mapObserver.Received(0).OnNext(Arg.Any<MapEvent>());
         roundObserver.Received(0).OnNext(Arg.Any<RoundEvent>());
     }
+
+    [Theory, AutoNSubstituteData]
+    internal void ProcessEvent_does_not_send_events_to_unsubscribed_observers(
+        GameStateData data1,
+        GameStateData data2,
+        IObserver<PlayerEvent> playerObserver,
+        IObserver<PlayerStateEvent> playerStateObserver,
+        IObserver<MapEvent> mapObserver,
+        IObserver<RoundEvent> roundObserver,
+        GameState sut)
+    {
+        // Arrange
+        var playerSubscription = sut.Subscribe(playerObserver);
+        var playerStateSubscription = sut.Subscribe(playerStateObserver);
+        var mapSubscription = sut.Subscribe(mapObserver);
+        var roundSubscription = sut.Subscribe(roundObserver);
+
+        // Act
+        sut.ProcessEvent(data1);
+        playerSubscription.Dispose();
+        playerStateSubscription.Dispose();
+        mapSubscription.Dispose();
+        roundSubscription.Dispose();
+        sut.ProcessEvent(data2);
+
+        // Assert
+        playerObserver.Received(1).OnNext(Arg.Any<PlayerEvent>());
+        playerStateObserver.Received(1).OnNext(Arg.Any<PlayerStateEvent>());
+        mapObserver.Received(1).OnNext(Arg.Any<MapEvent>());
+        roundObserver.Received(1).OnNext(Arg.Any<RoundEvent>());
+    }
 }
