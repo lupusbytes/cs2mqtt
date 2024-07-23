@@ -1,0 +1,41 @@
+name: Codecov
+
+on:
+  workflow_dispatch:
+  push:
+    paths-ignore:
+      - '**/*'
+      - '!.github/workflows/codecov.yml'
+      - '!src/**/*.csproj'
+      - '!src/**/*.cs'
+    branches:
+      - '*'
+  pull_request:
+    paths-ignore:
+      - '**/*'
+      - '!.github/workflows/codecov.yml'
+      - '!src/**/*.csproj'
+      - '!src/**/*.cs'
+    branches:
+      - '*'
+
+jobs:
+  build:
+    name: Collect code coverage
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: 🛒 Checkout repository
+      uses: actions/checkout@v4
+
+    - name: 🧪 Test
+      run: dotnet test -c Release -p:CollectCoverage=true -p:CoverletOutput=../ -p:MergeWith=../coverage.json -p:CoverletOutputFormat=\"opencover,json\" -m:1
+
+    - name: 📊 Upload coverage reports to Codecov
+      uses: codecov/codecov-action@v4
+      with:
+        file: test/coverage.opencover.xml
+        flags: unittests
+        fail_ci_if_error: true
+        verbose: true
+        token: ${{ secrets.CODECOV_TOKEN }}
