@@ -106,6 +106,32 @@ public class GameStateServiceTest
         roundObserver2.Received(1).OnNext(Arg.Any<RoundEvent>());
     }
 
+    [Theory, AutoNSubstituteData]
+    internal void ProcessEvent_does_not_send_events_on_same_data(
+        GameStateData data,
+        IObserver<PlayerEvent> playerObserver,
+        IObserver<PlayerStateEvent> playerStateObserver,
+        IObserver<MapEvent> mapObserver,
+        IObserver<RoundEvent> roundObserver,
+        GameStateService sut)
+    {
+        // Arrange
+        sut.ProcessEvent(data); // Set initial properties
+        sut.Subscribe(playerObserver);
+        sut.Subscribe(playerStateObserver);
+        sut.Subscribe(mapObserver);
+        sut.Subscribe(roundObserver);
+
+        // Act
+        sut.ProcessEvent(data); // Send same data again
+
+        // Assert
+        playerObserver.Received(0).OnNext(Arg.Any<PlayerEvent>());
+        playerStateObserver.Received(0).OnNext(Arg.Any<PlayerStateEvent>());
+        mapObserver.Received(0).OnNext(Arg.Any<MapEvent>());
+        roundObserver.Received(0).OnNext(Arg.Any<RoundEvent>());
+    }
+
     [Theory, AutoData]
     internal void GetPlayer_returns_Player_by_SteamId(
         GameStateData data1,
