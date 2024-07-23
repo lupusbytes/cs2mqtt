@@ -19,6 +19,54 @@ public class GameStateServiceTest
             .Throw<ArgumentException>();
     }
 
+    [Theory, AutoNSubstituteData]
+    internal void ProcessEvent_sends_events_from_multiple_providers(
+        Provider provider1,
+        Provider provider2,
+        GameStateData data1,
+        GameStateData data2,
+        GameStateData data3,
+        GameStateData data4,
+        IObserver<PlayerEvent> playerObserver,
+        IObserver<PlayerStateEvent> playerStateObserver,
+        IObserver<MapEvent> mapObserver,
+        IObserver<RoundEvent> roundObserver,
+        GameStateService sut)
+    {
+        // Arrange
+        sut.Subscribe(playerObserver);
+        sut.Subscribe(playerStateObserver);
+        sut.Subscribe(mapObserver);
+        sut.Subscribe(roundObserver);
+
+        var data = new List<GameStateData>
+        {
+            data1 with { Provider = provider1 },
+            data2 with { Provider = provider2 },
+            data3 with { Provider = provider1 },
+            data4 with { Provider = provider2 },
+        };
+
+        // Act
+        foreach (var @event in data)
+        {
+            sut.ProcessEvent(@event);
+        }
+
+        // Assert
+        // Should have received 2 events from provider1
+        playerObserver.Received(2).OnNext(Arg.Is<PlayerEvent>(r => r.SteamId == provider1.SteamId64));
+        playerStateObserver.Received(2).OnNext(Arg.Is<PlayerStateEvent>(r => r.SteamId == provider1.SteamId64));
+        mapObserver.Received(2).OnNext(Arg.Is<MapEvent>(r => r.SteamId == provider1.SteamId64));
+        roundObserver.Received(2).OnNext(Arg.Is<RoundEvent>(r => r.SteamId == provider1.SteamId64));
+
+        // Should have received 2 events from provider2
+        playerObserver.Received(2).OnNext(Arg.Is<PlayerEvent>(r => r.SteamId == provider2.SteamId64));
+        playerStateObserver.Received(2).OnNext(Arg.Is<PlayerStateEvent>(r => r.SteamId == provider2.SteamId64));
+        mapObserver.Received(2).OnNext(Arg.Is<MapEvent>(r => r.SteamId == provider2.SteamId64));
+        roundObserver.Received(2).OnNext(Arg.Is<RoundEvent>(r => r.SteamId == provider2.SteamId64));
+    }
+
     [Theory, AutoData]
     internal void GetPlayer_returns_Player_by_SteamId(
         GameStateData data1,
