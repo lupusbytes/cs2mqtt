@@ -1,0 +1,26 @@
+name: Build and test
+
+on:
+  push:
+  workflow_dispatch:
+
+jobs:
+  build:
+    strategy:
+      matrix:
+        os: [ubuntu-latest, macos-latest, windows-latest]
+    runs-on: ${{ matrix.os }}
+    steps:
+      - name: 🛒 Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: 🔁 Restore packages
+        run: dotnet restore
+
+      - name: 🛠️ Build in release mode
+        run: dotnet build -c Release --no-restore /p:UseSourceLink=true
+
+      - name: 🧪 Run unit tests
+        run: dotnet test -c Release --no-build
