@@ -13,19 +13,19 @@ public static class EventExtensions
         switch (@event)
         {
             case MapEvent m:
-                topic = $"{GameStateMqttPublisher.BaseTopic}/{@event.SteamId}/map";
+                topic = $"{MqttConstants.BaseTopic}/{@event.SteamId}/map";
                 payload = m.Map is null ? string.Empty : JsonSerializer.Serialize(m.Map);
                 break;
             case PlayerEvent p:
-                topic = $"{GameStateMqttPublisher.BaseTopic}/{@event.SteamId}/player";
+                topic = $"{MqttConstants.BaseTopic}/{@event.SteamId}/player";
                 payload = p.Player is null ? string.Empty : JsonSerializer.Serialize(p.Player);
                 break;
             case PlayerStateEvent ps:
-                topic = $"{GameStateMqttPublisher.BaseTopic}/{@event.SteamId}/player-state";
+                topic = $"{MqttConstants.BaseTopic}/{@event.SteamId}/player-state";
                 payload = ps.PlayerState is null ? string.Empty : JsonSerializer.Serialize(ps.PlayerState);
                 break;
             case RoundEvent r:
-                topic = $"{GameStateMqttPublisher.BaseTopic}/{@event.SteamId}/round";
+                topic = $"{MqttConstants.BaseTopic}/{@event.SteamId}/round";
                 payload = r.Round is null ? string.Empty : JsonSerializer.Serialize(r.Round);
                 break;
             default: throw new SwitchExpressionException();

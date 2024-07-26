@@ -46,7 +46,7 @@ public class AvailabilityMqttPublisher(
         using var mapSubscription = gameStateService.Subscribe(this as IObserver<MapEvent>);
         using var roundStateSubscription = gameStateService.Subscribe(this as IObserver<RoundEvent>);
 
-        await SetBaseAvailability(stoppingToken);
+        await SetSystemAvailability(stoppingToken);
 
         var tasks = new[]
         {
@@ -60,11 +60,11 @@ public class AvailabilityMqttPublisher(
         await Task.WhenAll(tasks);
     }
 
-    private Task SetBaseAvailability(CancellationToken cancellationToken) =>
+    private Task SetSystemAvailability(CancellationToken cancellationToken) =>
         mqttClient.PublishAsync(
             new MqttMessage
             {
-                Topic = "cs2mqtt/status",
+                Topic = MqttConstants.SystemAvailabilityTopic,
                 Payload = "online",
                 RetainFlag = true,
             },
@@ -93,7 +93,7 @@ public class AvailabilityMqttPublisher(
                 await mqttClient.PublishAsync(
                     new MqttMessage
                     {
-                        Topic = $"cs2mqtt/{@event.SteamId}/{topicSuffix}",
+                        Topic = $"{MqttConstants.BaseTopic}/{@event.SteamId}/{topicSuffix}",
                         Payload = shouldBeOnline ? "online" : "offline",
                         RetainFlag = true,
                     },
