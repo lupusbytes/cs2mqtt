@@ -1,0 +1,1 @@
+[![codecov](https://codecov.io/gh/lupusbytes/cs2mqtt/graph/badge.svg?token=FJYRCDUDRH)](https://codecov.io/gh/lupusbytes/cs2mqtt)
