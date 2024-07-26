@@ -1,1 +1,2 @@
+[![build](https://github.com/lupusbytes/cs2mqtt/actions/workflows/build.yml/badge.svg)](https://github.com/lupusbytes/cs2mqtt/actions/workflows/build.yml)
 [![codecov](https://codecov.io/gh/lupusbytes/cs2mqtt/graph/badge.svg?token=FJYRCDUDRH)](https://codecov.io/gh/lupusbytes/cs2mqtt)
