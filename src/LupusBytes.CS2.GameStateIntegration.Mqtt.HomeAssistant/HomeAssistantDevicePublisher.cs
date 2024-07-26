@@ -107,7 +107,7 @@ public sealed class HomeAssistantDevicePublisher(
         Id: steamId.ToString(),
         Name: "CS2",
         Manufacturer: "lupusbytes",
-        Model: "cs2mqtt",
+        Model: Constants.ProjectName,
         SoftwareVersion: "0.0.1-beta");
 
     private static IDeviceSensors CreateDeviceSensors(BaseEvent @event, Device device) => @event switch
