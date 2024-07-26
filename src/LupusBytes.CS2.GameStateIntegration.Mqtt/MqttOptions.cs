@@ -20,7 +20,7 @@ public class MqttOptions
     /// <summary>
     /// The client ID to use when connecting to the MQTT broker.
     /// </summary>
-    public string ClientId { get; set; } = "cs2mqtt";
+    public string ClientId { get; set; } = Constants.ProjectName;
 
     /// <summary>
     /// Whether to use SSL/TLS when connecting to the MQTT broker. The default setting is <see langword="false" />.
