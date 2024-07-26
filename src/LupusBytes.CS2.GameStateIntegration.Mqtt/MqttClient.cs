@@ -24,7 +24,7 @@ public class MqttClient : IMqttClient
             .WithTcpServer(options.Host, options.Port)
             .WithClientId(options.ClientId)
             .WithTlsOptions(b => b.UseTls(options.UseTls))
-            .WithWillTopic("cs2mqtt/status")
+            .WithWillTopic(MqttConstants.SystemAvailabilityTopic)
             .WithWillPayload("offline")
             .WithWillRetain()
             .Build();

@@ -13,8 +13,6 @@ public sealed class GameStateMqttPublisher(
     IObserver<PlayerStateEvent>,
     IObserver<RoundEvent>
 {
-    public const string BaseTopic = "cs2mqtt";
-
     private static readonly BoundedChannelOptions ChannelOptions = new(1000)
     {
         SingleWriter = false,
