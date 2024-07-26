@@ -1,0 +1,3 @@
+# Ignore .NET build outputs
+**/bin
+**/obj
