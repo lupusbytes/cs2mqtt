@@ -8,8 +8,6 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LupusBytes.CS2.GameStateInt
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "test", "test", "{E8A90952-2F60-4324-9046-7CDCF150268E}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LupusBytes.CS2.GameStateIntegration.Api.Tests", "test\LupusBytes.CS2.GameStateIntegration.Api.Tests\LupusBytes.CS2.GameStateIntegration.Api.Tests.csproj", "{DAF06728-EB61-425D-B50A-732FA97FDF9F}"
-EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LupusBytes.CS2.GameStateIntegration.Api.Endpoints", "src\LupusBytes.CS2.GameStateIntegration.Api.Endpoints\LupusBytes.CS2.GameStateIntegration.Api.Endpoints.csproj", "{6ABC5CDB-C16F-4408-952F-9A0C71C3F9EE}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LupusBytes.CS2.GameStateIntegration", "src\LupusBytes.CS2.GameStateIntegration\LupusBytes.CS2.GameStateIntegration.csproj", "{3775F777-8B41-46CE-90F3-162323FC1D69}"
@@ -19,6 +17,8 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LupusBytes.CS2.GameStateIntegration.Tests", "test\LupusBytes.CS2.GameStateIntegration.Tests\LupusBytes.CS2.GameStateIntegration.Tests.csproj", "{DBD0B230-2E68-4205-8D5D-34958762AE3B}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LupusBytes.CS2.GameStateIntegration.Mqtt.HomeAssistant", "src\LupusBytes.CS2.GameStateIntegration.Mqtt.HomeAssistant\LupusBytes.CS2.GameStateIntegration.Mqtt.HomeAssistant.csproj", "{F4CF5888-16EC-4C12-A0B1-1F7E519B7A3C}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LupusBytes.CS2.GameStateIntegration.Api.EndToEnd.Tests", "test\LupusBytes.CS2.GameStateIntegration.Api.EndToEnd.Tests\LupusBytes.CS2.GameStateIntegration.Api.EndToEnd.Tests.csproj", "{2B5E0A4C-E37E-4A0F-BE47-B284596A963D}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -34,10 +34,6 @@ Global
 		{9DAD871B-BAB2-4267-9B44-38C5D67A0B8D}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{9DAD871B-BAB2-4267-9B44-38C5D67A0B8D}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{9DAD871B-BAB2-4267-9B44-38C5D67A0B8D}.Release|Any CPU.Build.0 = Release|Any CPU
-		{DAF06728-EB61-425D-B50A-732FA97FDF9F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{DAF06728-EB61-425D-B50A-732FA97FDF9F}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{DAF06728-EB61-425D-B50A-732FA97FDF9F}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{DAF06728-EB61-425D-B50A-732FA97FDF9F}.Release|Any CPU.Build.0 = Release|Any CPU
 		{6ABC5CDB-C16F-4408-952F-9A0C71C3F9EE}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{6ABC5CDB-C16F-4408-952F-9A0C71C3F9EE}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{6ABC5CDB-C16F-4408-952F-9A0C71C3F9EE}.Release|Any CPU.ActiveCfg = Release|Any CPU
@@ -58,15 +54,19 @@ Global
 		{F4CF5888-16EC-4C12-A0B1-1F7E519B7A3C}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{F4CF5888-16EC-4C12-A0B1-1F7E519B7A3C}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{F4CF5888-16EC-4C12-A0B1-1F7E519B7A3C}.Release|Any CPU.Build.0 = Release|Any CPU
+		{2B5E0A4C-E37E-4A0F-BE47-B284596A963D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{2B5E0A4C-E37E-4A0F-BE47-B284596A963D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{2B5E0A4C-E37E-4A0F-BE47-B284596A963D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{2B5E0A4C-E37E-4A0F-BE47-B284596A963D}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
 		{805EDDA1-F961-4B51-AB07-3F4F3A0D20D4} = {36655383-D743-4AC6-9E7D-3BFF9BDD69B6}
 		{9DAD871B-BAB2-4267-9B44-38C5D67A0B8D} = {36655383-D743-4AC6-9E7D-3BFF9BDD69B6}
-		{DAF06728-EB61-425D-B50A-732FA97FDF9F} = {E8A90952-2F60-4324-9046-7CDCF150268E}
 		{6ABC5CDB-C16F-4408-952F-9A0C71C3F9EE} = {36655383-D743-4AC6-9E7D-3BFF9BDD69B6}
 		{3775F777-8B41-46CE-90F3-162323FC1D69} = {36655383-D743-4AC6-9E7D-3BFF9BDD69B6}
 		{55AB67AD-E28B-4196-B8F2-5E3E63168C58} = {36655383-D743-4AC6-9E7D-3BFF9BDD69B6}
 		{DBD0B230-2E68-4205-8D5D-34958762AE3B} = {E8A90952-2F60-4324-9046-7CDCF150268E}
 		{F4CF5888-16EC-4C12-A0B1-1F7E519B7A3C} = {36655383-D743-4AC6-9E7D-3BFF9BDD69B6}
+		{2B5E0A4C-E37E-4A0F-BE47-B284596A963D} = {E8A90952-2F60-4324-9046-7CDCF150268E}
 	EndGlobalSection
 EndGlobal

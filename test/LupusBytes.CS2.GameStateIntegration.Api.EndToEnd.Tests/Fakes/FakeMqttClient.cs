@@ -1,6 +1,6 @@
 using LupusBytes.CS2.GameStateIntegration.Mqtt;
 
-namespace LupusBytes.CS2.GameStateIntegration.Api.Tests.Fakes;
+namespace LupusBytes.CS2.GameStateIntegration.Api.EndToEnd.Tests.Fakes;
 
 public class FakeMqttClient : IMqttClient
 {
