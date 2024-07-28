@@ -11,26 +11,15 @@ public class AvailabilityMqttPublisherTests
         AvailabilityMqttPublisher sut)
     {
         // Arrange
-        using var cts = new CancellationTokenSource(TimeSpan.FromSeconds(5));
-        var tcs = new TaskCompletionSource<bool>();
-        cts.Token.Register(() => tcs.TrySetCanceled(CancellationToken.None));
-        mqttClient
-            .When(x => x.PublishAsync(
-                Arg.Is<MqttMessage>(m => m.Topic == MqttConstants.SystemAvailabilityTopic),
-                Arg.Any<CancellationToken>()))
-            .Do(_ => tcs.SetResult(true));
+        var tcs = CompletionSourceFromTopicPublishment(mqttClient, MqttConstants.SystemAvailabilityTopic);
+        using var cts = EnableCompletionSourceTimeout(tcs);
 
         // Act
         await sut.StartAsync(CancellationToken.None);
 
         // Assert
         await tcs.Task;
-        await mqttClient.Received(1).PublishAsync(
-            Arg.Is<MqttMessage>(x =>
-                x.Topic == MqttConstants.SystemAvailabilityTopic &&
-                x.Payload == "online" &&
-                x.RetainFlag),
-            Arg.Any<CancellationToken>());
+        await AssertAvailabilityPublishedOnTopic(mqttClient, MqttConstants.SystemAvailabilityTopic);
     }
 
     [Theory, AutoNSubstituteData]
@@ -41,15 +30,9 @@ public class AvailabilityMqttPublisherTests
         AvailabilityMqttPublisher sut)
     {
         // Arrange
-        using var cts = new CancellationTokenSource(TimeSpan.FromSeconds(5));
-        var tcs = new TaskCompletionSource<bool>();
-        cts.Token.Register(() => tcs.TrySetCanceled(CancellationToken.None));
-        mqttClient
-            .When(x => x.PublishAsync(
-                Arg.Is<MqttMessage>(m => m.Topic == $"{MqttConstants.BaseTopic}/{steamId}/player/status"),
-                Arg.Any<CancellationToken>()))
-            .Do(_ => tcs.SetResult(true));
-
+        var topic = $"{MqttConstants.BaseTopic}/{steamId}/player/status";
+        var tcs = CompletionSourceFromTopicPublishment(mqttClient, topic);
+        using var cts = EnableCompletionSourceTimeout(tcs);
         await sut.StartAsync(CancellationToken.None);
 
         // Act
@@ -57,12 +40,7 @@ public class AvailabilityMqttPublisherTests
 
         // Assert
         await tcs.Task;
-        await mqttClient.Received(1).PublishAsync(
-            Arg.Is<MqttMessage>(x =>
-                x.Topic == $"{MqttConstants.BaseTopic}/{steamId}/player/status" &&
-                x.Payload == "online" &&
-                x.RetainFlag),
-            Arg.Any<CancellationToken>());
+        await AssertAvailabilityPublishedOnTopic(mqttClient, topic);
     }
 
     [Theory, AutoNSubstituteData]
@@ -73,15 +51,9 @@ public class AvailabilityMqttPublisherTests
         AvailabilityMqttPublisher sut)
     {
         // Arrange
-        using var cts = new CancellationTokenSource(TimeSpan.FromSeconds(5));
-        var tcs = new TaskCompletionSource<bool>();
-        cts.Token.Register(() => tcs.TrySetCanceled(CancellationToken.None));
-        mqttClient
-            .When(x => x.PublishAsync(
-                Arg.Is<MqttMessage>(m => m.Topic == $"{MqttConstants.BaseTopic}/{steamId}/player-state/status"),
-                Arg.Any<CancellationToken>()))
-            .Do(_ => tcs.SetResult(true));
-
+        var topic = $"{MqttConstants.BaseTopic}/{steamId}/player-state/status";
+        var tcs = CompletionSourceFromTopicPublishment(mqttClient, topic);
+        using var cts = EnableCompletionSourceTimeout(tcs);
         await sut.StartAsync(CancellationToken.None);
 
         // Act
@@ -89,12 +61,7 @@ public class AvailabilityMqttPublisherTests
 
         // Assert
         await tcs.Task;
-        await mqttClient.Received(1).PublishAsync(
-            Arg.Is<MqttMessage>(x =>
-                x.Topic == $"{MqttConstants.BaseTopic}/{steamId}/player-state/status" &&
-                x.Payload == "online" &&
-                x.RetainFlag),
-            Arg.Any<CancellationToken>());
+        await AssertAvailabilityPublishedOnTopic(mqttClient, topic);
     }
 
     [Theory, AutoNSubstituteData]
@@ -105,15 +72,9 @@ public class AvailabilityMqttPublisherTests
         AvailabilityMqttPublisher sut)
     {
         // Arrange
-        using var cts = new CancellationTokenSource(TimeSpan.FromSeconds(5));
-        var tcs = new TaskCompletionSource<bool>();
-        cts.Token.Register(() => tcs.TrySetCanceled(CancellationToken.None));
-        mqttClient
-            .When(x => x.PublishAsync(
-                Arg.Is<MqttMessage>(m => m.Topic == $"{MqttConstants.BaseTopic}/{steamId}/map/status"),
-                Arg.Any<CancellationToken>()))
-            .Do(_ => tcs.SetResult(true));
-
+        var topic = $"{MqttConstants.BaseTopic}/{steamId}/map/status";
+        var tcs = CompletionSourceFromTopicPublishment(mqttClient, topic);
+        using var cts = EnableCompletionSourceTimeout(tcs);
         await sut.StartAsync(CancellationToken.None);
 
         // Act
@@ -121,12 +82,7 @@ public class AvailabilityMqttPublisherTests
 
         // Assert
         await tcs.Task;
-        await mqttClient.Received(1).PublishAsync(
-            Arg.Is<MqttMessage>(x =>
-                x.Topic == $"{MqttConstants.BaseTopic}/{steamId}/map/status" &&
-                x.Payload == "online" &&
-                x.RetainFlag),
-            Arg.Any<CancellationToken>());
+        await AssertAvailabilityPublishedOnTopic(mqttClient, topic);
     }
 
     [Theory, AutoNSubstituteData]
@@ -137,15 +93,9 @@ public class AvailabilityMqttPublisherTests
         AvailabilityMqttPublisher sut)
     {
         // Arrange
-        using var cts = new CancellationTokenSource(TimeSpan.FromSeconds(5));
-        var tcs = new TaskCompletionSource<bool>();
-        cts.Token.Register(() => tcs.TrySetCanceled(CancellationToken.None));
-        mqttClient
-            .When(x => x.PublishAsync(
-                Arg.Is<MqttMessage>(m => m.Topic == $"{MqttConstants.BaseTopic}/{steamId}/round/status"),
-                Arg.Any<CancellationToken>()))
-            .Do(_ => tcs.SetResult(true));
-
+        var topic = $"{MqttConstants.BaseTopic}/{steamId}/round/status";
+        var tcs = CompletionSourceFromTopicPublishment(mqttClient, topic);
+        using var cts = EnableCompletionSourceTimeout(tcs);
         await sut.StartAsync(CancellationToken.None);
 
         // Act
@@ -153,12 +103,7 @@ public class AvailabilityMqttPublisherTests
 
         // Assert
         await tcs.Task;
-        await mqttClient.Received(1).PublishAsync(
-            Arg.Is<MqttMessage>(x =>
-                x.Topic == $"{MqttConstants.BaseTopic}/{steamId}/round/status" &&
-                x.Payload == "online" &&
-                x.RetainFlag),
-            Arg.Any<CancellationToken>());
+        await AssertAvailabilityPublishedOnTopic(mqttClient, topic);
     }
 
     [Theory, AutoNSubstituteData]
@@ -169,9 +114,8 @@ public class AvailabilityMqttPublisherTests
         AvailabilityMqttPublisher sut)
     {
         // Arrange
-        using var cts = new CancellationTokenSource(TimeSpan.FromSeconds(5));
+        var topic = $"{MqttConstants.BaseTopic}/{steamId}/player/status";
         var tcs = new TaskCompletionSource<bool>();
-        cts.Token.Register(() => tcs.TrySetCanceled(CancellationToken.None));
         var receivedTimes = 0;
         mqttClient
             .When(x => x.PublishAsync(
@@ -191,7 +135,8 @@ public class AvailabilityMqttPublisherTests
                 }
             });
 
-        await sut.StartAsync(cts.Token);
+        using var cts = EnableCompletionSourceTimeout(tcs);
+        await sut.StartAsync(CancellationToken.None);
 
         // Act
         sut.OnNext(new PlayerEvent(steamId, player));
@@ -201,19 +146,17 @@ public class AvailabilityMqttPublisherTests
         // Assert
         await tcs.Task;
 
-        await mqttClient.Received(2).PublishAsync(
-            Arg.Is<MqttMessage>(x =>
-                x.Topic == $"{MqttConstants.BaseTopic}/{steamId}/player/status" &&
-                x.Payload == "online" &&
-                x.RetainFlag),
-            Arg.Any<CancellationToken>());
+        await AssertAvailabilityPublishedOnTopic(
+            mqttClient,
+            topic,
+            publishCount: 2,
+            payload: "online");
 
-        await mqttClient.Received(1).PublishAsync(
-            Arg.Is<MqttMessage>(x =>
-                x.Topic == $"{MqttConstants.BaseTopic}/{steamId}/player/status" &&
-                x.Payload == "offline" &&
-                x.RetainFlag),
-            Arg.Any<CancellationToken>());
+        await AssertAvailabilityPublishedOnTopic(
+            mqttClient,
+            topic,
+            publishCount: 1,
+            payload: "offline");
     }
 
     [Theory, AutoNSubstituteData]
@@ -225,15 +168,9 @@ public class AvailabilityMqttPublisherTests
         AvailabilityMqttPublisher sut)
     {
         // Arrange
-        using var cts = new CancellationTokenSource(TimeSpan.FromSeconds(5));
-        var tcs = new TaskCompletionSource<bool>();
-        cts.Token.Register(() => tcs.TrySetCanceled(CancellationToken.None));
-        mqttClient
-            .When(x => x.PublishAsync(
-                Arg.Is<MqttMessage>(m => m.Topic == $"{MqttConstants.BaseTopic}/{steamId}/round/status"),
-                Arg.Any<CancellationToken>()))
-            .Do(_ => tcs.SetResult(true));
-
+        var topic = $"{MqttConstants.BaseTopic}/{steamId}/round/status";
+        var tcs = CompletionSourceFromTopicPublishment(mqttClient, topic);
+        using var cts = EnableCompletionSourceTimeout(tcs);
         await sut.StartAsync(CancellationToken.None);
 
         // Act
@@ -242,11 +179,45 @@ public class AvailabilityMqttPublisherTests
 
         // Assert
         await tcs.Task;
-        await mqttClient.Received(1).PublishAsync(
-            Arg.Is<MqttMessage>(x =>
-                x.Topic == $"{MqttConstants.BaseTopic}/{steamId}/round/status" &&
-                x.Payload == "online" &&
-                x.RetainFlag),
-            Arg.Any<CancellationToken>());
+        await AssertAvailabilityPublishedOnTopic(
+            mqttClient,
+            topic,
+            publishCount: 1);
+    }
+
+    private static Task AssertAvailabilityPublishedOnTopic(
+        IMqttClient mqttClient,
+        string topic,
+        int publishCount = 1,
+        string payload = "online",
+        bool retainFlag = true)
+        => mqttClient
+            .Received(publishCount)
+            .PublishAsync(
+                Arg.Is<MqttMessage>(x =>
+                    x.Topic == topic &&
+                    x.Payload == payload &&
+                    x.RetainFlag == retainFlag),
+                Arg.Any<CancellationToken>());
+
+    private static TaskCompletionSource<bool> CompletionSourceFromTopicPublishment(
+        IMqttClient mqttClient,
+        string topic)
+    {
+        var tcs = new TaskCompletionSource<bool>();
+        mqttClient
+            .When(x => x.PublishAsync(
+                Arg.Is<MqttMessage>(m => m.Topic == topic),
+                Arg.Any<CancellationToken>()))
+            .Do(_ => tcs.SetResult(true));
+        return tcs;
+    }
+
+    private static CancellationTokenSource EnableCompletionSourceTimeout(
+        TaskCompletionSource<bool> tcs)
+    {
+        var cts = new CancellationTokenSource(TimeSpan.FromSeconds(5));
+        cts.Token.Register(() => tcs.TrySetCanceled(CancellationToken.None));
+        return cts;
     }
 }
