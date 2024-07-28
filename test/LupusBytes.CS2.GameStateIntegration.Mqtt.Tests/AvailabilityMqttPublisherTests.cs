@@ -128,4 +128,36 @@ public class AvailabilityMqttPublisherTests
                 x.RetainFlag),
             Arg.Any<CancellationToken>());
     }
+
+    [Theory, AutoNSubstituteData]
+    public async Task Publishes_round_availability(
+        [Frozen] IMqttClient mqttClient,
+        SteamId64 steamId,
+        Round round,
+        AvailabilityMqttPublisher sut)
+    {
+        // Arrange
+        using var cts = new CancellationTokenSource(TimeSpan.FromSeconds(5));
+        var tcs = new TaskCompletionSource<bool>();
+        cts.Token.Register(() => tcs.TrySetCanceled(CancellationToken.None));
+        mqttClient
+            .When(x => x.PublishAsync(
+                Arg.Is<MqttMessage>(m => m.Topic == $"{MqttConstants.BaseTopic}/{steamId}/round/status"),
+                Arg.Any<CancellationToken>()))
+            .Do(_ => tcs.SetResult(true));
+
+        await sut.StartAsync(CancellationToken.None);
+
+        // Act
+        sut.OnNext(new RoundEvent(steamId, round));
+
+        // Assert
+        await tcs.Task;
+        await mqttClient.Received(1).PublishAsync(
+            Arg.Is<MqttMessage>(x =>
+                x.Topic == $"{MqttConstants.BaseTopic}/{steamId}/round/status" &&
+                x.Payload == "online" &&
+                x.RetainFlag),
+            Arg.Any<CancellationToken>());
+    }
 }
