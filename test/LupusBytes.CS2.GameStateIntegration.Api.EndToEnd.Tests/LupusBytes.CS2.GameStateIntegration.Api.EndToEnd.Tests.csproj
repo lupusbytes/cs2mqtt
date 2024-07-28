@@ -14,13 +14,14 @@
     </ItemGroup>
 
     <ItemGroup>
-      <ProjectReference Include="..\..\src\LupusBytes.CS2.GameStateIntegration.Api\LupusBytes.CS2.GameStateIntegration.Api.csproj" />
+      <None Update="appsettings.EndToEnd.json">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </None>
     </ItemGroup>
 
     <ItemGroup>
-      <None Update="appsettings.Test.json">
-        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-      </None>
+      <ProjectReference Include="..\..\src\LupusBytes.CS2.GameStateIntegration.Api\LupusBytes.CS2.GameStateIntegration.Api.csproj" />
+      <ProjectReference Include="..\..\src\LupusBytes.CS2.GameStateIntegration.Mqtt\LupusBytes.CS2.GameStateIntegration.Mqtt.csproj" />
     </ItemGroup>
 
 </Project>
