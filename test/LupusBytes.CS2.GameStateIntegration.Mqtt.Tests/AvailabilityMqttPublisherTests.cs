@@ -11,8 +11,8 @@ public class AvailabilityMqttPublisherTests
         AvailabilityMqttPublisher sut)
     {
         // Arrange
-        var tcs = CompletionSourceFromTopicPublishment(mqttClient, MqttConstants.SystemAvailabilityTopic);
-        using var cts = EnableCompletionSourceTimeout(tcs);
+        var tcs = TaskHelper.CompletionSourceFromTopicPublishment(mqttClient, MqttConstants.SystemAvailabilityTopic);
+        using var cts = TaskHelper.EnableCompletionSourceTimeout(tcs);
 
         // Act
         await sut.StartAsync(CancellationToken.None);
@@ -31,8 +31,8 @@ public class AvailabilityMqttPublisherTests
     {
         // Arrange
         var topic = $"{MqttConstants.BaseTopic}/{steamId}/player/status";
-        var tcs = CompletionSourceFromTopicPublishment(mqttClient, topic);
-        using var cts = EnableCompletionSourceTimeout(tcs);
+        var tcs = TaskHelper.CompletionSourceFromTopicPublishment(mqttClient, topic);
+        using var cts = TaskHelper.EnableCompletionSourceTimeout(tcs);
         await sut.StartAsync(CancellationToken.None);
 
         // Act
@@ -52,8 +52,8 @@ public class AvailabilityMqttPublisherTests
     {
         // Arrange
         var topic = $"{MqttConstants.BaseTopic}/{steamId}/player-state/status";
-        var tcs = CompletionSourceFromTopicPublishment(mqttClient, topic);
-        using var cts = EnableCompletionSourceTimeout(tcs);
+        var tcs = TaskHelper.CompletionSourceFromTopicPublishment(mqttClient, topic);
+        using var cts = TaskHelper.EnableCompletionSourceTimeout(tcs);
         await sut.StartAsync(CancellationToken.None);
 
         // Act
@@ -73,8 +73,8 @@ public class AvailabilityMqttPublisherTests
     {
         // Arrange
         var topic = $"{MqttConstants.BaseTopic}/{steamId}/map/status";
-        var tcs = CompletionSourceFromTopicPublishment(mqttClient, topic);
-        using var cts = EnableCompletionSourceTimeout(tcs);
+        var tcs = TaskHelper.CompletionSourceFromTopicPublishment(mqttClient, topic);
+        using var cts = TaskHelper.EnableCompletionSourceTimeout(tcs);
         await sut.StartAsync(CancellationToken.None);
 
         // Act
@@ -94,8 +94,8 @@ public class AvailabilityMqttPublisherTests
     {
         // Arrange
         var topic = $"{MqttConstants.BaseTopic}/{steamId}/round/status";
-        var tcs = CompletionSourceFromTopicPublishment(mqttClient, topic);
-        using var cts = EnableCompletionSourceTimeout(tcs);
+        var tcs = TaskHelper.CompletionSourceFromTopicPublishment(mqttClient, topic);
+        using var cts = TaskHelper.EnableCompletionSourceTimeout(tcs);
         await sut.StartAsync(CancellationToken.None);
 
         // Act
@@ -135,7 +135,7 @@ public class AvailabilityMqttPublisherTests
                 }
             });
 
-        using var cts = EnableCompletionSourceTimeout(tcs);
+        using var cts = TaskHelper.EnableCompletionSourceTimeout(tcs);
         await sut.StartAsync(CancellationToken.None);
 
         // Act
@@ -169,8 +169,8 @@ public class AvailabilityMqttPublisherTests
     {
         // Arrange
         var topic = $"{MqttConstants.BaseTopic}/{steamId}/round/status";
-        var tcs = CompletionSourceFromTopicPublishment(mqttClient, topic);
-        using var cts = EnableCompletionSourceTimeout(tcs);
+        var tcs = TaskHelper.CompletionSourceFromTopicPublishment(mqttClient, topic);
+        using var cts = TaskHelper.EnableCompletionSourceTimeout(tcs);
         await sut.StartAsync(CancellationToken.None);
 
         // Act
@@ -199,25 +199,4 @@ public class AvailabilityMqttPublisherTests
                     x.Payload == payload &&
                     x.RetainFlag == retainFlag),
                 Arg.Any<CancellationToken>());
-
-    private static TaskCompletionSource<bool> CompletionSourceFromTopicPublishment(
-        IMqttClient mqttClient,
-        string topic)
-    {
-        var tcs = new TaskCompletionSource<bool>();
-        mqttClient
-            .When(x => x.PublishAsync(
-                Arg.Is<MqttMessage>(m => m.Topic == topic),
-                Arg.Any<CancellationToken>()))
-            .Do(_ => tcs.SetResult(true));
-        return tcs;
-    }
-
-    private static CancellationTokenSource EnableCompletionSourceTimeout(
-        TaskCompletionSource<bool> tcs)
-    {
-        var cts = new CancellationTokenSource(TimeSpan.FromSeconds(5));
-        cts.Token.Register(() => tcs.TrySetCanceled(CancellationToken.None));
-        return cts;
-    }
 }
