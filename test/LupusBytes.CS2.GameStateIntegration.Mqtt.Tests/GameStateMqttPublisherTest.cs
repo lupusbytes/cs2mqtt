@@ -28,6 +28,28 @@ public class GameStateMqttPublisherTest
         await AssertPayloadPublishedOnTopic(mqttClient, topic, expectedPayload);
     }
 
+    [Theory, AutoNSubstituteData]
+    public async Task Publishes_PlayerState_data(
+        [Frozen] IMqttClient mqttClient,
+        SteamId64 steamId,
+        PlayerState playerState,
+        GameStateMqttPublisher sut)
+    {
+        // Arrange
+        var topic = $"{MqttConstants.BaseTopic}/{steamId}/player-state";
+        var tcs = TaskHelper.CompletionSourceFromTopicPublishment(mqttClient, topic);
+        using var cts = TaskHelper.EnableCompletionSourceTimeout(tcs);
+        await sut.StartAsync(CancellationToken.None);
+
+        // Act
+        sut.OnNext(new PlayerStateEvent(steamId, playerState));
+
+        // Assert
+        await tcs.Task;
+        var expectedPayload = JsonSerializer.Serialize(playerState);
+        await AssertPayloadPublishedOnTopic(mqttClient, topic, expectedPayload);
+    }
+
     private static Task AssertPayloadPublishedOnTopic(
         IMqttClient mqttClient,
         string topic,
