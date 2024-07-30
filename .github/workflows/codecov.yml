@@ -8,6 +8,8 @@ on:
       - '!.github/workflows/codecov.yml'
       - '!src/**/*.csproj'
       - '!src/**/*.cs'
+      - '!test/**/*.csproj'
+      - '!test/**/*.cs'
     branches:
       - '*'
   pull_request:
@@ -16,6 +18,8 @@ on:
       - '!.github/workflows/codecov.yml'
       - '!src/**/*.csproj'
       - '!src/**/*.cs'
+      - '!test/**/*.csproj'
+      - '!test/**/*.cs'
     branches:
       - '*'
 
