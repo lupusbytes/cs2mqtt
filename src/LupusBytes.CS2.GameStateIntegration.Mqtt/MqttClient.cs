@@ -7,7 +7,7 @@ namespace LupusBytes.CS2.GameStateIntegration.Mqtt;
 
 [SuppressMessage("Performance", "CA1848:Use the LoggerMessage delegates", Justification = "TODO")]
 [SuppressMessage("Design", "CA1031:Do not catch general exception types", Justification = "Need to catch all connection exceptions")]
-public class MqttClient : IMqttClient
+public sealed class MqttClient : IMqttClient, IDisposable
 {
     private readonly ILogger<MqttClient> logger;
     private readonly MQTTnet.Client.IMqttClient mqttClient;
@@ -82,4 +82,6 @@ public class MqttClient : IMqttClient
 
         await mqttClient.PublishAsync(mqttMessage, cancellationToken);
     }
+
+    public void Dispose() => mqttClient.Dispose();
 }
