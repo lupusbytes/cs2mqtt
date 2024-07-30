@@ -11,6 +11,7 @@ public class MqttClientTest
 {
     private const string ListenAddress = "127.0.0.1";
     private const int ListenPort = 1883;
+    private const int TimeoutMilliseconds = 1000;
 
     [Fact]
     public async Task Last_will_and_testament()
@@ -19,13 +20,12 @@ public class MqttClientTest
         using var testServer = await CreateTestServerAsync();
         using var testClient = await CreateTestClientAsync();
 
-        // Should be set by onMessageReceived callback
-        var actual = string.Empty;
+        var tcs = new TaskCompletionSource<string>();
 
         await SubscribeToTopicAsync(
             testClient,
             MqttConstants.SystemAvailabilityTopic,
-            message => actual = message);
+            message => tcs.TrySetResult(message));
 
         var options = new MqttOptions
         {
@@ -38,10 +38,9 @@ public class MqttClientTest
 
         // Act
         await testServer.DisconnectClientAsync(options.ClientId); // Kicks the sut
-        await Task.Delay(100);
 
         // Assert
-        actual.Should().Be("offline");
+        await AssertPayload("offline", tcs);
     }
 
     [Theory]
@@ -53,13 +52,12 @@ public class MqttClientTest
         using var testServer = await CreateTestServerAsync();
         using var testClient = await CreateTestClientAsync();
 
-        // Should be set by onMessageReceived callback
-        var actual = string.Empty;
+        var tcs = new TaskCompletionSource<string>();
 
         await SubscribeToTopicAsync(
             testClient,
             topic,
-            message => actual = message);
+            message => tcs.TrySetResult(message));
 
         var options = new MqttOptions
         {
@@ -72,10 +70,23 @@ public class MqttClientTest
 
         // Act
         await sut.PublishAsync(new MqttMessage(topic, payload), CancellationToken.None);
-        await Task.Delay(100);
 
         // Assert
-        actual.Should().Be(payload);
+        await AssertPayload(payload, tcs);
+    }
+
+    private static async Task AssertPayload(string expected, TaskCompletionSource<string> tcs)
+    {
+        // Await which task completes first. Our task completion source or a timeout
+        var completedTask = await Task.WhenAny(tcs.Task, Task.Delay(TimeoutMilliseconds));
+
+        // The start task completion source should have finished first.
+        completedTask.Should().Be(
+            tcs.Task,
+            $"Expected to receive a message within the timeout period ({TimeoutMilliseconds} miliseconds)");
+
+        // Finally assert that the received message is equal to the expected message.
+        (await tcs.Task).Should().Be(expected);
     }
 
     private static async Task<MQTTnet.Client.IMqttClient> CreateTestClientAsync()
