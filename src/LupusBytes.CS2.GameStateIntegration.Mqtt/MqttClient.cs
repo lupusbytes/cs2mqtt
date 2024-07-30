@@ -1,26 +1,31 @@
 using System.Diagnostics.CodeAnalysis;
+using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using MQTTnet;
 using MQTTnet.Client;
+using Polly;
 
 namespace LupusBytes.CS2.GameStateIntegration.Mqtt;
 
-[SuppressMessage("Performance", "CA1848:Use the LoggerMessage delegates", Justification = "TODO")]
-[SuppressMessage("Design", "CA1031:Do not catch general exception types", Justification = "Need to catch all connection exceptions")]
-public sealed class MqttClient : IMqttClient, IDisposable
+public sealed class MqttClient : IHostedService, IMqttClient, IDisposable
 {
+    private const int ReconnectRetryCount = 5;
+    private const int ConnectRetryCount = 3;
+
+    private readonly MqttOptions options;
+    private readonly MqttClientOptions clientOptions;
     private readonly ILogger<MqttClient> logger;
     private readonly MQTTnet.Client.IMqttClient mqttClient;
-    private readonly MqttClientOptions mqttOptions;
 
     public MqttClient(MqttOptions options, ILogger<MqttClient> logger)
     {
+        this.options = options;
         this.logger = logger;
         var factory = new MqttFactory();
         mqttClient = factory.CreateMqttClient();
 
         // TODO: Implement credentials options
-        mqttOptions = new MqttClientOptionsBuilder()
+        clientOptions = new MqttClientOptionsBuilder()
             .WithTcpServer(options.Host, options.Port)
             .WithClientId(options.ClientId)
             .WithTlsOptions(b => b.UseTls(options.UseTls))
@@ -31,49 +36,47 @@ public sealed class MqttClient : IMqttClient, IDisposable
 
         mqttClient.ConnectedAsync += OnConnected;
         mqttClient.DisconnectedAsync += OnDisconnected;
-
-        // Initialize connection
-        ConnectAsync().GetAwaiter().GetResult();
     }
 
-    private async Task ConnectAsync(CancellationToken cancellationToken = default)
-    {
-        try
-        {
-            logger.LogInformation("Connecting to MQTT broker...");
-            await mqttClient.ConnectAsync(mqttOptions, cancellationToken);
-        }
-        catch (Exception ex)
-        {
-            logger.LogError(ex, "Error connecting to MQTT broker. Retrying in 5 seconds...");
-
-            // TODO: Poly
-            await Task.Delay(TimeSpan.FromSeconds(5), cancellationToken);
-            await ConnectAsync(cancellationToken);
-        }
-    }
+    private Task ConnectAsync(int retryCount, CancellationToken cancellationToken = default) => Policy
+        .Handle<Exception>()
+        .WaitAndRetryAsync(
+            retryCount,
+            sleepDurationProvider: attempt => TimeSpan.FromSeconds(Math.Pow(2.5, attempt)),
+            onRetry: (_, timeSpan, currentAttempt, _)
+                => logger.ConnectionToMqttBrokerFailed(
+                    options.Host,
+                    options.Port,
+                    currentAttempt,
+                    retryCount + 1,
+                    timeSpan.Seconds))
+        .ExecuteAsync(
+            async token =>
+            {
+                logger.ConnectingToMqttBroker(options.Host, options.Port);
+                await mqttClient.ConnectAsync(clientOptions, token);
+            },
+            cancellationToken);
 
     private Task OnConnected(MqttClientConnectedEventArgs arg)
     {
-        logger.LogInformation("Connected to MQTT broker");
+        logger.ConnectedToMqttBroker(options.Host, options.Port);
         return Task.CompletedTask;
     }
 
-    private async Task OnDisconnected(MqttClientDisconnectedEventArgs args)
+    private Task OnDisconnected(MqttClientDisconnectedEventArgs args)
     {
-        logger.LogWarning("Disconnected from MQTT broker. Reconnecting in 5 seconds");
-        await Task.Delay(TimeSpan.FromSeconds(5));
-        await ConnectAsync(CancellationToken.None);
+        if (!args.ClientWasConnected)
+        {
+            return Task.CompletedTask;
+        }
+
+        logger.DisconnectedFromBroker(options.Host, options.Port);
+        return ConnectAsync(ReconnectRetryCount, CancellationToken.None);
     }
 
     public async Task PublishAsync(MqttMessage message, CancellationToken cancellationToken)
     {
-        if (!mqttClient.IsConnected)
-        {
-            logger.LogWarning("MQTT client is not connected. Cannot publish message");
-            return;
-        }
-
         var mqttMessage = new MqttApplicationMessageBuilder()
             .WithTopic(message.Topic)
             .WithPayload(message.Payload)
@@ -81,7 +84,12 @@ public sealed class MqttClient : IMqttClient, IDisposable
             .Build();
 
         await mqttClient.PublishAsync(mqttMessage, cancellationToken);
+        logger.MqttMessagePublished(message.Topic, message.Payload);
     }
 
     public void Dispose() => mqttClient.Dispose();
+
+    public Task StartAsync(CancellationToken cancellationToken) => ConnectAsync(ConnectRetryCount, cancellationToken);
+
+    public Task StopAsync(CancellationToken cancellationToken) => mqttClient.DisconnectAsync(cancellationToken: cancellationToken);
 }

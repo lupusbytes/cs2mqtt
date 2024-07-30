@@ -35,6 +35,7 @@ public class MqttClientTest
             ClientId = "cs2mqtt",
         };
         using var sut = new MqttClient(options, NullLogger<MqttClient>.Instance);
+        await sut.StartAsync(CancellationToken.None);
 
         // Act
         await testServer.DisconnectClientAsync(options.ClientId); // Kicks the sut
@@ -67,6 +68,7 @@ public class MqttClientTest
             ClientId = "cs2mqtt",
         };
         using var sut = new MqttClient(options, NullLogger<MqttClient>.Instance);
+        await sut.StartAsync(CancellationToken.None);
 
         // Act
         await sut.PublishAsync(new MqttMessage(topic, payload), CancellationToken.None);
