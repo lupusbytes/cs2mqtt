@@ -17,6 +17,9 @@ public class MqttClientTest
         CancellationToken cancellationToken,
         MqttClient sut)
     {
+        // Arrange
+        mqttNetClient.IsConnected.Returns(true);
+
         // Act
         await sut.PublishAsync(message, cancellationToken);
 
@@ -72,6 +75,40 @@ public class MqttClientTest
 
         // Assert
         mqttNetClient.Received(1).Dispose();
+    }
+
+    [Theory, AutoNSubstituteData]
+    public async Task Publishes_last_message_collected_for_each_topic_while_disconnected_on_reconnect(
+        [Frozen] IMqttNetClient mqttNetClient,
+        IReadOnlyCollection<MqttMessage> messages,
+        MqttClient sut)
+    {
+        // Arrange
+        mqttNetClient.IsConnected.Returns(false);
+        foreach (var message in messages)
+        {
+            // Publish messages
+            await sut.PublishAsync(message, default);
+        }
+
+        foreach (var message in messages.Select(message => message with { Payload = "Hello World" }))
+        {
+            // Publish messages on the same topics, but with Hello World as payload
+            await sut.PublishAsync(message, default);
+        }
+
+        // Act
+        mqttNetClient.IsConnected.Returns(true);
+        mqttNetClient.ConnectedAsync += Raise.Event<Func<MqttClientConnectedEventArgs, Task>>(new MqttClientConnectedEventArgs(new MqttClientConnectResult()));
+
+        // Assert
+        await mqttNetClient.Received(messages.Count).PublishAsync(
+            Arg.Is<MqttApplicationMessage>(x =>
+                Encoding.UTF8.GetString(
+                    x.PayloadSegment.Array!,
+                    x.PayloadSegment.Offset,
+                    x.PayloadSegment.Count) == "Hello World"),
+            Arg.Any<CancellationToken>());
     }
 
     [Theory, AutoNSubstituteData]
