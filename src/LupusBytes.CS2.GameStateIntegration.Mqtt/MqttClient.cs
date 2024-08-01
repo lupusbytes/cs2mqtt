@@ -1,3 +1,4 @@
+using System.Collections.Concurrent;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using MQTTnet;
@@ -15,6 +16,8 @@ public sealed class MqttClient : IHostedService, IMqttClient, IDisposable
     private readonly MqttClientOptions clientOptions;
     private readonly ILogger<MqttClient> logger;
     private readonly MQTTnet.Client.IMqttClient mqttNetClient;
+
+    private ConcurrentDictionary<string, MqttMessage> backlog = new(StringComparer.Ordinal);
 
     public MqttClient(MQTTnet.Client.IMqttClient mqttNetClient, MqttOptions options, ILogger<MqttClient> logger)
     {
@@ -59,7 +62,15 @@ public sealed class MqttClient : IHostedService, IMqttClient, IDisposable
     private Task OnConnected(MqttClientConnectedEventArgs arg)
     {
         logger.ConnectedToMqttBroker(options.Host, options.Port);
-        return Task.CompletedTask;
+        return PublishBacklogAsync();
+    }
+
+    private Task PublishBacklogAsync()
+    {
+        var messages = backlog.Values;
+        backlog = new ConcurrentDictionary<string, MqttMessage>(StringComparer.Ordinal);
+
+        return Task.WhenAll(messages.Select(x => PublishAsync(x, CancellationToken.None)));
     }
 
     private Task OnDisconnected(MqttClientDisconnectedEventArgs args)
@@ -75,6 +86,12 @@ public sealed class MqttClient : IHostedService, IMqttClient, IDisposable
 
     public async Task PublishAsync(MqttMessage message, CancellationToken cancellationToken)
     {
+        if (!mqttNetClient.IsConnected)
+        {
+            backlog[message.Topic] = message;
+            return;
+        }
+
         var mqttMessage = new MqttApplicationMessageBuilder()
             .WithTopic(message.Topic)
             .WithPayload(message.Payload)
