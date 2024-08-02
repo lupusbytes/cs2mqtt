@@ -14,14 +14,16 @@ public sealed class MqttClient : IHostedService, IMqttClient, IDisposable
     private readonly MqttOptions options;
     private readonly MqttClientOptions clientOptions;
     private readonly ILogger<MqttClient> logger;
-    private readonly MQTTnet.Client.IMqttClient mqttClient;
+    private readonly MQTTnet.Client.IMqttClient mqttNetClient;
 
-    public MqttClient(MqttOptions options, ILogger<MqttClient> logger)
+    public MqttClient(MQTTnet.Client.IMqttClient mqttNetClient, MqttOptions options, ILogger<MqttClient> logger)
     {
+        this.mqttNetClient = mqttNetClient;
         this.options = options;
         this.logger = logger;
-        var factory = new MqttFactory();
-        mqttClient = factory.CreateMqttClient();
+
+        mqttNetClient.ConnectedAsync += OnConnected;
+        mqttNetClient.DisconnectedAsync += OnDisconnected;
 
         // TODO: Implement credentials options
         clientOptions = new MqttClientOptionsBuilder()
@@ -32,9 +34,6 @@ public sealed class MqttClient : IHostedService, IMqttClient, IDisposable
             .WithWillPayload("offline")
             .WithWillRetain()
             .Build();
-
-        mqttClient.ConnectedAsync += OnConnected;
-        mqttClient.DisconnectedAsync += OnDisconnected;
     }
 
     private Task ConnectAsync(int retryCount, CancellationToken cancellationToken = default) => Policy
@@ -53,7 +52,7 @@ public sealed class MqttClient : IHostedService, IMqttClient, IDisposable
             async token =>
             {
                 logger.ConnectingToMqttBroker(options.Host, options.Port);
-                await mqttClient.ConnectAsync(clientOptions, token);
+                await mqttNetClient.ConnectAsync(clientOptions, token);
             },
             cancellationToken);
 
@@ -82,13 +81,13 @@ public sealed class MqttClient : IHostedService, IMqttClient, IDisposable
             .WithRetainFlag(message.RetainFlag)
             .Build();
 
-        await mqttClient.PublishAsync(mqttMessage, cancellationToken);
+        await mqttNetClient.PublishAsync(mqttMessage, cancellationToken);
         logger.MqttMessagePublished(message.Topic, message.Payload);
     }
 
-    public void Dispose() => mqttClient.Dispose();
+    public void Dispose() => mqttNetClient.Dispose();
 
     public Task StartAsync(CancellationToken cancellationToken) => ConnectAsync(ConnectRetryCount, cancellationToken);
 
-    public Task StopAsync(CancellationToken cancellationToken) => mqttClient.DisconnectAsync(cancellationToken: cancellationToken);
+    public Task StopAsync(CancellationToken cancellationToken) => mqttNetClient.DisconnectAsync(cancellationToken: cancellationToken);
 }
