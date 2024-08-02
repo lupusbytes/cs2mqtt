@@ -8,8 +8,8 @@ namespace LupusBytes.CS2.GameStateIntegration.Mqtt;
 
 public sealed class MqttClient : IHostedService, IMqttClient, IDisposable
 {
-    private const int ReconnectRetryCount = 5;
     private const int ConnectRetryCount = 3;
+    private const int ReconnectRetryCount = 5;
 
     private readonly MqttOptions options;
     private readonly MqttClientOptions clientOptions;
