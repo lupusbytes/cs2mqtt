@@ -15,9 +15,9 @@ public sealed class Program
         builder.Services.Configure<GameStateOptions>(builder.Configuration.GetSection(GameStateOptions.Section));
         builder.Services.AddGameStateService(builder.Configuration);
         builder.Services.AddMqttClient(builder.Configuration);
-        builder.Services.AddHostedService(s => new GameStateMqttPublisher(s.GetRequiredService<IGameStateService>(), s.GetRequiredService<IMqttClient>()));
-        builder.Services.AddHostedService(s => new AvailabilityMqttPublisher(s.GetRequiredService<IGameStateService>(), s.GetRequiredService<IMqttClient>()));
-        builder.Services.AddHostedService(s => new HomeAssistantDevicePublisher(s.GetRequiredService<IGameStateService>(), s.GetRequiredService<IMqttClient>()));
+        builder.Services.AddHostedService<GameStateMqttPublisher>();
+        builder.Services.AddHostedService<AvailabilityMqttPublisher>();
+        builder.Services.AddHostedService<HomeAssistantDevicePublisher>();
 
         var app = builder.Build();
         app.MapCS2IngestionEndpoint();
