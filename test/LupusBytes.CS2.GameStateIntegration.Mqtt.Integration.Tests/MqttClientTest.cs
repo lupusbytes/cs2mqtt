@@ -17,8 +17,9 @@ public class MqttClientTest
     public async Task Last_will_and_testament()
     {
         // Arrange
-        using var testServer = await CreateTestServerAsync();
-        using var testClient = await CreateTestClientAsync();
+        var factory = new MqttFactory();
+        using var testServer = await CreateTestServerAsync(factory);
+        using var testClient = await CreateTestClientAsync(factory);
 
         var tcs = new TaskCompletionSource<string>();
 
@@ -34,7 +35,7 @@ public class MqttClientTest
             UseTls = false,
             ClientId = "cs2mqtt",
         };
-        using var sut = new MqttClient(options, NullLogger<MqttClient>.Instance);
+        using var sut = new MqttClient(factory.CreateMqttClient(), options, NullLogger<MqttClient>.Instance);
         await sut.StartAsync(CancellationToken.None);
 
         // Act
@@ -50,8 +51,9 @@ public class MqttClientTest
     public async Task PublishAsync_publishes_message(string topic, string payload)
     {
         // Arrange
-        using var testServer = await CreateTestServerAsync();
-        using var testClient = await CreateTestClientAsync();
+        var factory = new MqttFactory();
+        using var testServer = await CreateTestServerAsync(factory);
+        using var testClient = await CreateTestClientAsync(factory);
 
         var tcs = new TaskCompletionSource<string>();
 
@@ -67,7 +69,7 @@ public class MqttClientTest
             UseTls = false,
             ClientId = "cs2mqtt",
         };
-        using var sut = new MqttClient(options, NullLogger<MqttClient>.Instance);
+        using var sut = new MqttClient(factory.CreateMqttClient(), options, NullLogger<MqttClient>.Instance);
         await sut.StartAsync(CancellationToken.None);
 
         // Act
@@ -91,9 +93,8 @@ public class MqttClientTest
         (await tcs.Task).Should().Be(expected);
     }
 
-    private static async Task<MQTTnet.Client.IMqttClient> CreateTestClientAsync()
+    private static async Task<MQTTnet.Client.IMqttClient> CreateTestClientAsync(MqttFactory factory)
     {
-        var factory = new MqttFactory();
         var client = factory.CreateMqttClient();
         var clientOptions = new MqttClientOptionsBuilder()
             .WithTcpServer(ListenAddress, ListenPort)
@@ -103,9 +104,8 @@ public class MqttClientTest
         return client;
     }
 
-    private static async Task<MqttServer> CreateTestServerAsync()
+    private static async Task<MqttServer> CreateTestServerAsync(MqttFactory factory)
     {
-        var factory = new MqttFactory();
         var serverOptions = new MqttServerOptionsBuilder()
             .WithDefaultEndpoint()
             .WithDefaultEndpointBoundIPAddress(IPAddress.Parse(ListenAddress))
