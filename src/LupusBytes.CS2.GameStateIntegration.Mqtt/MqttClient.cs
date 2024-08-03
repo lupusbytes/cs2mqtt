@@ -23,21 +23,25 @@ public sealed class MqttClient : IHostedService, IMqttClient, IDisposable
     public MqttClient(IMqttNetClient mqttNetClient, MqttOptions options, ILogger<MqttClient> logger)
     {
         this.mqttNetClient = mqttNetClient;
+        this.mqttNetClient.ConnectedAsync += OnConnected;
+        this.mqttNetClient.DisconnectedAsync += OnDisconnected;
         this.options = options;
         this.logger = logger;
 
-        mqttNetClient.ConnectedAsync += OnConnected;
-        mqttNetClient.DisconnectedAsync += OnDisconnected;
-
-        // TODO: Implement credentials options
-        clientOptions = new MqttClientOptionsBuilder()
+        var clientOptionsBuilder = new MqttClientOptionsBuilder()
             .WithTcpServer(options.Host, options.Port)
             .WithClientId(options.ClientId)
             .WithTlsOptions(b => b.UseTls(options.UseTls))
             .WithWillTopic(MqttConstants.SystemAvailabilityTopic)
             .WithWillPayload("offline")
-            .WithWillRetain()
-            .Build();
+            .WithWillRetain();
+
+        if (!string.IsNullOrWhiteSpace(options.Username))
+        {
+            clientOptionsBuilder.WithCredentials(options.Username, options.Password);
+        }
+
+        clientOptions = clientOptionsBuilder.Build();
     }
 
     private Task ConnectAsync(int retryCount, CancellationToken cancellationToken = default) => Policy

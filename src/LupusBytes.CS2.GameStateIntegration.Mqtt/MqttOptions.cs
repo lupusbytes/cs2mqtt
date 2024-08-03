@@ -18,12 +18,22 @@ public class MqttOptions
     public int Port { get; set; } = 1883;
 
     /// <summary>
-    /// The client ID to use when connecting to the MQTT broker.
-    /// </summary>
-    public string ClientId { get; set; } = Constants.ProjectName;
-
-    /// <summary>
     /// Whether to use SSL/TLS when connecting to the MQTT broker. The default setting is <see langword="false" />.
     /// </summary>
     public bool UseTls { get; set; }
+
+    /// <summary>
+    /// The username to use when connecting to the MQTT broker.
+    /// </summary>
+    public string Username { get; set; } = null!;
+
+    /// <summary>
+    /// The password to use when connecting to the MQTT broker.
+    /// </summary>
+    public string Password { get; set; } = null!;
+
+    /// <summary>
+    /// The client ID to use when connecting to the MQTT broker.
+    /// </summary>
+    public string ClientId { get; set; } = Constants.ProjectName;
 }

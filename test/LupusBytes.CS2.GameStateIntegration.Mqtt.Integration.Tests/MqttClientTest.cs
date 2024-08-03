@@ -3,6 +3,7 @@ using System.Text;
 using Microsoft.Extensions.Logging.Abstractions;
 using MQTTnet;
 using MQTTnet.Client;
+using MQTTnet.Protocol;
 using MQTTnet.Server;
 using IMqttNetClient = MQTTnet.Client.IMqttClient;
 
@@ -80,6 +81,28 @@ public class MqttClientTest
         await AssertPayload(payload, tcs);
     }
 
+    [Theory, AutoData]
+    public async Task Connects_with_credentials(string username, string password)
+    {
+        // Arrange
+        var factory = new MqttFactory();
+        using var testServer = await CreateTestServerWithAuthenticationAsync(factory, username, password);
+
+        var options = new MqttOptions
+        {
+            Host = ListenAddress,
+            Port = ListenPort,
+            Username = username,
+            Password = password,
+            UseTls = false,
+        };
+        using var sut = new MqttClient(factory.CreateMqttClient(), options, NullLogger<MqttClient>.Instance);
+
+        // Act & Assert
+        var act = () => sut.StartAsync(CancellationToken.None);
+        await act.Should().NotThrowAsync();
+    }
+
     private static async Task AssertPayload(string expected, TaskCompletionSource<string> tcs)
     {
         // Await which task completes first. Our task completion source or a timeout
@@ -115,6 +138,25 @@ public class MqttClientTest
 
         var server = factory.CreateMqttServer(serverOptions);
         await server.StartAsync();
+        return server;
+    }
+
+    private static async Task<MqttServer> CreateTestServerWithAuthenticationAsync(
+        MqttFactory factory,
+        string username,
+        string password)
+    {
+        var server = await CreateTestServerAsync(factory);
+        server.ValidatingConnectionAsync += e =>
+        {
+            if (e.UserName != username || e.Password != password)
+            {
+                e.ReasonCode = MqttConnectReasonCode.NotAuthorized;
+            }
+
+            return Task.CompletedTask;
+        };
+
         return server;
     }
 
