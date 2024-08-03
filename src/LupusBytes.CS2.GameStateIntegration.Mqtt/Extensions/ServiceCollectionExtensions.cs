@@ -2,7 +2,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using MQTTnet;
-using MQTTnet.Client;
+using IMqttNetClient = MQTTnet.Client.IMqttClient;
 
 namespace LupusBytes.CS2.GameStateIntegration.Mqtt.Extensions;
 
@@ -20,7 +20,7 @@ public static class ServiceCollectionExtensions
 
         // Register concrete MqttClient class
         services.AddSingleton(sp => new MqttClient(
-            sp.GetRequiredService<MQTTnet.Client.IMqttClient>(),
+            sp.GetRequiredService<IMqttNetClient>(),
             mqttOptions,
             sp.GetRequiredService<ILogger<MqttClient>>()));
 

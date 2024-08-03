@@ -4,6 +4,7 @@ using Microsoft.Extensions.Logging.Abstractions;
 using MQTTnet;
 using MQTTnet.Client;
 using MQTTnet.Server;
+using IMqttNetClient = MQTTnet.Client.IMqttClient;
 
 namespace LupusBytes.CS2.GameStateIntegration.Mqtt.Integration.Tests;
 
@@ -93,7 +94,7 @@ public class MqttClientTest
         (await tcs.Task).Should().Be(expected);
     }
 
-    private static async Task<MQTTnet.Client.IMqttClient> CreateTestClientAsync(MqttFactory factory)
+    private static async Task<IMqttNetClient> CreateTestClientAsync(MqttFactory factory)
     {
         var client = factory.CreateMqttClient();
         var clientOptions = new MqttClientOptionsBuilder()
@@ -118,7 +119,7 @@ public class MqttClientTest
     }
 
     private static Task<MqttClientSubscribeResult> SubscribeToTopicAsync(
-        MQTTnet.Client.IMqttClient client,
+        IMqttNetClient client,
         string topic,
         Action<string> onMessageReceived)
     {

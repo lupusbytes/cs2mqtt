@@ -4,6 +4,7 @@ using Microsoft.Extensions.Logging;
 using MQTTnet;
 using MQTTnet.Client;
 using Polly;
+using IMqttNetClient = MQTTnet.Client.IMqttClient;
 
 namespace LupusBytes.CS2.GameStateIntegration.Mqtt;
 
@@ -15,11 +16,11 @@ public sealed class MqttClient : IHostedService, IMqttClient, IDisposable
     private readonly MqttOptions options;
     private readonly MqttClientOptions clientOptions;
     private readonly ILogger<MqttClient> logger;
-    private readonly MQTTnet.Client.IMqttClient mqttNetClient;
+    private readonly IMqttNetClient mqttNetClient;
 
     private ConcurrentDictionary<string, MqttMessage> backlog = new(StringComparer.Ordinal);
 
-    public MqttClient(MQTTnet.Client.IMqttClient mqttNetClient, MqttOptions options, ILogger<MqttClient> logger)
+    public MqttClient(IMqttNetClient mqttNetClient, MqttOptions options, ILogger<MqttClient> logger)
     {
         this.mqttNetClient = mqttNetClient;
         this.options = options;
