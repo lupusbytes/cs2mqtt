@@ -3,10 +3,9 @@ using System.Net.Sockets;
 using System.Text;
 using MQTTnet;
 using MQTTnet.Client;
+using IMqttNetClient = MQTTnet.Client.IMqttClient;
 
 namespace LupusBytes.CS2.GameStateIntegration.Mqtt.Tests;
-
-using IMqttNetClient = MQTTnet.Client.IMqttClient;
 
 public class MqttClientTest
 {
