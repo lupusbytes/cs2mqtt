@@ -25,10 +25,10 @@ public static class ServiceCollectionExtensions
             sp.GetRequiredService<ILogger<MqttClient>>()));
 
         // Also register the MqttClient as a hosted service, so it will connect on startup.
-        services.AddHostedService<MqttClient>(s => s.GetRequiredService<MqttClient>());
+        services.AddHostedService<MqttClient>(sp => sp.GetRequiredService<MqttClient>());
 
         // Finally register the MqttClient as an interface, which will be injected into other services
-        services.AddSingleton<IMqttClient, MqttClient>(s => s.GetRequiredService<MqttClient>());
+        services.AddSingleton<IMqttClient, MqttClient>(sp => sp.GetRequiredService<MqttClient>());
 
         return services;
     }
