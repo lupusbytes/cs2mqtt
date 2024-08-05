@@ -5,6 +5,11 @@ public class GameStateOptions
     public const string Section = nameof(GameStateOptions);
 
     /// <summary>
+    /// Counter-Strike 2 client authentication token.
+    /// </summary>
+    public string Token { get; set; } = null!;
+
+    /// <summary>
     /// The duration of inactivity after which a SteamID is considered disconnected, prompting the cleanup of their resources.
     /// This value should be a tiny bit longer than the heartbeat defined in the gamestate_integration.cfg
     /// </summary>

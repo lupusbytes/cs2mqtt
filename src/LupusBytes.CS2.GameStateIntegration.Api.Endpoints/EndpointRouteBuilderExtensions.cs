@@ -1,4 +1,5 @@
 using System.Diagnostics.CodeAnalysis;
+using System.Text.Json;
 using LupusBytes.CS2.GameStateIntegration.Contracts;
 using Microsoft.AspNetCore.Mvc;
 
@@ -41,13 +42,37 @@ public static class EndpointRouteBuilderExtensions
     }
 
     public static void MapCS2IngestionEndpoint(this IEndpointRouteBuilder app)
-        => app.MapPost("/", (
+    {
+        var ingestionEndpoint = app.MapPost("/", (
             [FromServices] IGameStateService gameStateService,
             [FromBody] GameStateData data) =>
         {
             gameStateService.ProcessEvent(data);
             return Results.NoContent();
         });
+
+        // Check if we should enable token authorization
+        var token = app.ServiceProvider.GetService<GameStateOptions>()?.Token;
+        if (!string.IsNullOrWhiteSpace(token))
+        {
+            RequireTokenAuthorization(ingestionEndpoint, token);
+        }
+    }
+
+    private static void RequireTokenAuthorization(RouteHandlerBuilder builder, string token)
+    {
+        builder.Add(b =>
+        {
+            var originalHandler = b.RequestDelegate;
+
+            var tokenHandler = new TokenAuthorizationMiddleware(
+                originalHandler!,
+                token,
+                b.ApplicationServices.GetRequiredService<ILogger<TokenAuthorizationMiddleware>>());
+
+            b.RequestDelegate = context => tokenHandler.InvokeAsync(context);
+        });
+    }
 
     public static void MapIngestionDebugEndpoint(this IEndpointRouteBuilder app)
         => app.MapPost("/debug", async (HttpRequest request) =>
