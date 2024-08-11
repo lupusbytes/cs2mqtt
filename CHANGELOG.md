@@ -1,3 +1,12 @@
+# Changelog
+
+## [1.1.0](https://github.com/lupusbytes/cs2mqtt/compare/v1.0.0...v1.1.0) (2024-08-11)
+
+
+### Features
+
+* **homeassistant:** use assembly version for mqtt device sw version ([9c64973](https://github.com/lupusbytes/cs2mqtt/commit/9c64973a1b7a373e1d968dc1e2bab6547c122a9a))
+
 ## 1.0.0 (2024-08-12)
 
 ### Features
