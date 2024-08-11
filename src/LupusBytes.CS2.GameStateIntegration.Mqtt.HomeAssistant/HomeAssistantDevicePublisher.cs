@@ -69,7 +69,7 @@ public sealed class HomeAssistantDevicePublisher(
         Name: "CS2",
         Manufacturer: "lupusbytes",
         Model: Constants.ProjectName,
-        SoftwareVersion: "0.0.1-beta");
+        SoftwareVersion: "1.0.0");
 
     private static IDeviceSensors CreateDeviceSensors(BaseEvent @event, Device device) => @event switch
     {
