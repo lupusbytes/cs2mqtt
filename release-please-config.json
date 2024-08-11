@@ -6,5 +6,8 @@
   "packages": {
     ".": {
     }
-  }
+  },
+  "extra-files": [
+    "Directory.Build.props"
+  ]
 }
