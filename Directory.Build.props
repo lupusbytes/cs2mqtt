@@ -7,11 +7,9 @@
   </PropertyGroup>
 
   <!-- Solution wide properties -->
-  <PropertyGroup Label="Assembly Naming">
-    <Company>$(OrganizationName)</Company>
-    <Authors>$(OrganizationName)</Authors>
-    <NeutralLanguage>en</NeutralLanguage>
-    <DefaultLanguage>en-US</DefaultLanguage>
+  <PropertyGroup Label="Versioning">
+    <Version>1.0.0</Version>
+    <IncludeSourceRevisionInInformationalVersion>true</IncludeSourceRevisionInInformationalVersion>
   </PropertyGroup>
 
   <PropertyGroup Label="Compile settings">
