@@ -5,6 +5,8 @@ on:
   push:
     branches:
       - 'main'
+    tags:
+      - 'v*.*.*'
   pull_request:
     branches:
       - 'main'
@@ -33,10 +35,20 @@ jobs:
         username: ${{ github.repository_owner }}
         password: ${{ secrets.GITHUB_TOKEN }}
 
+    - name: Extract tags for Docker
+      if: github.event_name != 'pull_request'
+      id: meta
+      uses: docker/metadata-action@v5
+      with:
+        images: ghcr.io/${{ github.repository }}
+        tags: |
+          type=semver,pattern={{version}}
+          type=ref,event=branch
+
     - name: Build and push Docker image
       uses: docker/build-push-action@v6
       with:
         context: .
         platforms: linux/amd64, linux/arm64
         push: ${{ github.event_name != 'pull_request' }}
-        tags: ghcr.io/${{ github.repository }}:latest
+        tags: ${{ steps.meta.outputs.tags }}
