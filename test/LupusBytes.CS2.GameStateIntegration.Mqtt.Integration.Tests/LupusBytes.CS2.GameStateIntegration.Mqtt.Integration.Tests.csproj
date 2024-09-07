@@ -10,7 +10,7 @@
     </PropertyGroup>
 
     <ItemGroup>
-        <PackageReference Include="MQTTnet" Version="4.3.6.1152" />
+        <PackageReference Include="MQTTnet" Version="4.3.7.1207" />
     </ItemGroup>
 
     <ItemGroup>
