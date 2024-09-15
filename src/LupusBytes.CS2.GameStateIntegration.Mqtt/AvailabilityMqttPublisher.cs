@@ -13,16 +13,20 @@ public sealed class AvailabilityMqttPublisher(
     private readonly HashSet<SteamId64> onlineMaps = [];
     private readonly HashSet<SteamId64> onlineRounds = [];
 
+    public override async Task StartAsync(CancellationToken cancellationToken)
+    {
+        await SetSystemAvailability(online: true, cancellationToken);
+        await base.StartAsync(cancellationToken);
+    }
+
     public override async Task StopAsync(CancellationToken cancellationToken)
     {
         await SetSystemAvailability(online: false, cancellationToken);
         await base.StopAsync(cancellationToken);
     }
 
-    protected override async Task ExecuteAsync(CancellationToken stoppingToken)
+    protected override Task ExecuteAsync(CancellationToken stoppingToken)
     {
-        await SetSystemAvailability(online: true, stoppingToken);
-
         var tasks = new[]
         {
             ProcessChannelAsync(PlayerChannelReader, onlinePlayers, ShouldBeOnline, "player/status", stoppingToken),
@@ -31,8 +35,7 @@ public sealed class AvailabilityMqttPublisher(
             ProcessChannelAsync(RoundChannelReader, onlineRounds, ShouldBeOnline, "round/status", stoppingToken),
         };
 
-        // This task must be awaited to prevent the subscriptions from being disposed.
-        await Task.WhenAll(tasks);
+        return Task.WhenAll(tasks);
     }
 
     private Task SetSystemAvailability(bool online, CancellationToken cancellationToken)
