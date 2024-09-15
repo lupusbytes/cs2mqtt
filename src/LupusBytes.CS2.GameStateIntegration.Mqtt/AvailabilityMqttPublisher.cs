@@ -13,9 +13,15 @@ public sealed class AvailabilityMqttPublisher(
     private readonly HashSet<SteamId64> onlineMaps = [];
     private readonly HashSet<SteamId64> onlineRounds = [];
 
+    public override async Task StopAsync(CancellationToken cancellationToken)
+    {
+        await SetSystemAvailability(online: false, cancellationToken);
+        await base.StopAsync(cancellationToken);
+    }
+
     protected override async Task ExecuteAsync(CancellationToken stoppingToken)
     {
-        await SetSystemAvailability(stoppingToken);
+        await SetSystemAvailability(online: true, stoppingToken);
 
         var tasks = new[]
         {
@@ -29,12 +35,12 @@ public sealed class AvailabilityMqttPublisher(
         await Task.WhenAll(tasks);
     }
 
-    private Task SetSystemAvailability(CancellationToken cancellationToken) =>
-        mqttClient.PublishAsync(
+    private Task SetSystemAvailability(bool online, CancellationToken cancellationToken)
+        => mqttClient.PublishAsync(
             new MqttMessage
             {
                 Topic = MqttConstants.SystemAvailabilityTopic,
-                Payload = "online",
+                Payload = online ? "online" : "offline",
                 RetainFlag = true,
             },
             cancellationToken);

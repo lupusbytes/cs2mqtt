@@ -23,6 +23,21 @@ public class AvailabilityMqttPublisherTests
     }
 
     [Theory, AutoNSubstituteData]
+    public async Task Publishes_system_availability_on_shutdown(
+        [Frozen] IMqttClient mqttClient,
+        AvailabilityMqttPublisher sut)
+    {
+        // Act
+        await sut.StopAsync(CancellationToken.None);
+
+        // Assert
+        await AssertAvailabilityPublishedOnTopic(
+            mqttClient,
+            MqttConstants.SystemAvailabilityTopic,
+            payload: "offline");
+    }
+
+    [Theory, AutoNSubstituteData]
     public async Task Publishes_player_availability(
         [Frozen] IMqttClient mqttClient,
         SteamId64 steamId,
