@@ -111,5 +111,15 @@ public sealed class MqttClient : IHostedService, IMqttClient, IDisposable
 
     public Task StartAsync(CancellationToken cancellationToken) => ConnectAsync(ConnectRetryCount, cancellationToken);
 
-    public Task StopAsync(CancellationToken cancellationToken) => mqttNetClient.DisconnectAsync(cancellationToken: cancellationToken);
+    public async Task StopAsync(CancellationToken cancellationToken)
+    {
+        await PublishAsync(
+            new MqttMessage(
+                MqttConstants.SystemAvailabilityTopic,
+                "offline",
+                RetainFlag: true),
+            cancellationToken);
+
+        await mqttNetClient.DisconnectAsync(cancellationToken: cancellationToken);
+    }
 }

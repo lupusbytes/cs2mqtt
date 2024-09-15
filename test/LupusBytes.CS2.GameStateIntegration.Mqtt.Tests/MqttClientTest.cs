@@ -65,6 +65,29 @@ public class MqttClientTest
     }
 
     [Theory, AutoNSubstituteData]
+    public async Task StopAsync_publishes_offline_message(
+        [Frozen] IMqttNetClient mqttNetClient,
+        CancellationToken cancellationToken,
+        MqttClient sut)
+    {
+        // Arrange
+        mqttNetClient.IsConnected.Returns(true);
+
+        // Act
+        await sut.StopAsync(cancellationToken);
+
+        // Assert
+        await mqttNetClient.Received(1).PublishAsync(
+            Arg.Is<MqttApplicationMessage>(x =>
+                x.Topic == MqttConstants.SystemAvailabilityTopic &&
+                Encoding.UTF8.GetString(
+                    x.PayloadSegment.Array!,
+                    x.PayloadSegment.Offset,
+                    x.PayloadSegment.Count) == "offline"),
+            cancellationToken);
+    }
+
+    [Theory, AutoNSubstituteData]
     public void Dispose_invokes_MQTTnet_Dispose(
         [Frozen] IMqttNetClient mqttNetClient,
         MqttClient sut)
