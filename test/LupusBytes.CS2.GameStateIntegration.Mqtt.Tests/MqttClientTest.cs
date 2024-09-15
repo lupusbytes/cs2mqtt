@@ -65,6 +65,31 @@ public class MqttClientTest
     }
 
     [Theory, AutoNSubstituteData]
+    public async Task StopAsync_does_not_trigger_reconnect_attempt(
+        [Frozen] IMqttNetClient mqttNetClient,
+        CancellationToken cancellationToken,
+        MqttClient sut)
+    {
+        // Arrange
+        await sut.StartAsync(cancellationToken);
+        mqttNetClient.IsConnected.Returns(false);
+
+        // Act
+        await sut.StopAsync(cancellationToken);
+        mqttNetClient.DisconnectedAsync += Raise.Event<Func<MqttClientDisconnectedEventArgs, Task>>(
+            new MqttClientDisconnectedEventArgs(
+                clientWasConnected: true,
+                new MqttClientConnectResult(),
+                MqttClientDisconnectReason.UnspecifiedError,
+                reasonString: "foo",
+                [],
+                new SocketException()));
+
+        // Assert that the MQTTnet client only received 1 connect call - when it was starting.
+        await mqttNetClient.Received(1).ConnectAsync(Arg.Any<MqttClientOptions>(), Arg.Any<CancellationToken>());
+    }
+
+    [Theory, AutoNSubstituteData]
     public async Task StopAsync_publishes_offline_message(
         [Frozen] IMqttNetClient mqttNetClient,
         CancellationToken cancellationToken,
