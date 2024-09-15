@@ -115,7 +115,6 @@ public class MqttClientTest
     [SuppressMessage("Style", "IDE0060:Remove unused parameter", Justification = "sut's event handler is doing work behind the scenes")]
     public Task Attempts_to_reconnect_after_disconnect(
         [Frozen] IMqttNetClient mqttNetClient,
-        [Frozen] MqttOptions options,
         MqttClient sut)
     {
         // Arrange
