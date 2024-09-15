@@ -1,5 +1,13 @@
 # Changelog
 
+## [1.1.1](https://github.com/lupusbytes/cs2mqtt/compare/v1.1.0...v1.1.1) (2024-09-15)
+
+
+### Bug Fixes
+
+* **mqtt:** ensure no broker reconnect is attempted on graceful shutdown ([4e0def7](https://github.com/lupusbytes/cs2mqtt/commit/4e0def7c567d46362f57c0cde5aa232ae80b8751))
+* **mqtt:** publish offline message to system availability topic on graceful shutdown ([5248c52](https://github.com/lupusbytes/cs2mqtt/commit/5248c52c22ba30afdc6d3e711123e28075d6359a))
+
 ## [1.1.0](https://github.com/lupusbytes/cs2mqtt/compare/v1.0.0...v1.1.0) (2024-08-11)
 
 
