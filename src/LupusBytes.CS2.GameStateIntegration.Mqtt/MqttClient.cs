@@ -19,6 +19,7 @@ public sealed class MqttClient : IHostedService, IMqttClient, IDisposable
     private readonly IMqttNetClient mqttNetClient;
 
     private ConcurrentDictionary<string, MqttMessage> backlog = new(StringComparer.Ordinal);
+    private bool shutdownRequested;
 
     public MqttClient(IMqttNetClient mqttNetClient, MqttOptions options, ILogger<MqttClient> logger)
     {
@@ -86,7 +87,10 @@ public sealed class MqttClient : IHostedService, IMqttClient, IDisposable
         }
 
         logger.DisconnectedFromBroker(options.Host, options.Port);
-        return ConnectAsync(ReconnectRetryCount, CancellationToken.None);
+
+        return !shutdownRequested
+            ? ConnectAsync(ReconnectRetryCount, CancellationToken.None)
+            : Task.CompletedTask;
     }
 
     public async Task PublishAsync(MqttMessage message, CancellationToken cancellationToken)
@@ -109,10 +113,16 @@ public sealed class MqttClient : IHostedService, IMqttClient, IDisposable
 
     public void Dispose() => mqttNetClient.Dispose();
 
-    public Task StartAsync(CancellationToken cancellationToken) => ConnectAsync(ConnectRetryCount, cancellationToken);
+    public Task StartAsync(CancellationToken cancellationToken)
+    {
+        shutdownRequested = false;
+        return ConnectAsync(ConnectRetryCount, cancellationToken);
+    }
 
     public async Task StopAsync(CancellationToken cancellationToken)
     {
+        shutdownRequested = true;
+
         await PublishAsync(
             new MqttMessage(
                 MqttConstants.SystemAvailabilityTopic,
