@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.1.2](https://github.com/lupusbytes/cs2mqtt/compare/v1.1.1...v1.1.2) (2024-09-17)
+
+
+### Bug Fixes
+
+* **homeassistant:** use `availability_mode: all` for mqtt entities ([32e8991](https://github.com/lupusbytes/cs2mqtt/commit/32e8991b19d8d078e5e817bc8d62b4ea2139c8b8))
+
 ## [1.1.1](https://github.com/lupusbytes/cs2mqtt/compare/v1.1.0...v1.1.1) (2024-09-15)
 
 
