@@ -1,5 +1,7 @@
+using System.Collections.ObjectModel;
 using LupusBytes.CS2.GameStateIntegration.Contracts;
 using LupusBytes.CS2.GameStateIntegration.Events;
+using LupusBytes.CS2.GameStateIntegration.Extensions;
 
 namespace LupusBytes.CS2.GameStateIntegration.Mqtt.Tests;
 
@@ -196,6 +198,40 @@ public class AvailabilityMqttPublisherTests
             mqttClient,
             topic,
             publishCount: 1);
+    }
+
+    [Theory, AutoNSubstituteData]
+    public async Task Publishes_availability_on_all_provider_topics_on_shutdown(
+        [Frozen] IMqttClient mqttClient,
+        ReadOnlyCollection<GameStateData> gameStates,
+        AvailabilityMqttPublisher sut)
+    {
+        // Arrange
+        await sut.StartAsync(CancellationToken.None);
+
+        var topics = new List<string>();
+        foreach (var gameState in gameStates)
+        {
+            var steamId = gameState.Provider!.SteamId64;
+            topics.Add($"{MqttConstants.BaseTopic}/{steamId}/player/status");
+            topics.Add($"{MqttConstants.BaseTopic}/{steamId}/player-state/status");
+            topics.Add($"{MqttConstants.BaseTopic}/{steamId}/map/status");
+            topics.Add($"{MqttConstants.BaseTopic}/{steamId}/round/status");
+
+            sut.OnNext(gameState.Player.ToEvent(steamId));
+            sut.OnNext(gameState.Player!.State.ToEvent(steamId));
+            sut.OnNext(gameState.Map.ToEvent(steamId));
+            sut.OnNext(gameState.Round.ToEvent(steamId));
+        }
+
+        // Act
+        await sut.StopAsync(CancellationToken.None);
+
+        // Assert
+        foreach (var topic in topics)
+        {
+            await AssertAvailabilityPublishedOnTopic(mqttClient, topic, payload: "offline");
+        }
     }
 
     private static Task AssertAvailabilityPublishedOnTopic(
