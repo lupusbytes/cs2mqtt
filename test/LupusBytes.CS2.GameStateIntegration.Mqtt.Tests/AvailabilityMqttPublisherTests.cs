@@ -10,16 +10,14 @@ public class AvailabilityMqttPublisherTests
         [Frozen] IMqttClient mqttClient,
         AvailabilityMqttPublisher sut)
     {
-        // Arrange
-        var tcs = TaskHelper.CompletionSourceFromTopicPublishment(mqttClient, MqttConstants.SystemAvailabilityTopic);
-        using var cts = TaskHelper.EnableCompletionSourceTimeout(tcs);
-
         // Act
         await sut.StartAsync(CancellationToken.None);
 
         // Assert
-        await tcs.Task;
-        await AssertAvailabilityPublishedOnTopic(mqttClient, MqttConstants.SystemAvailabilityTopic);
+        await AssertAvailabilityPublishedOnTopic(
+            mqttClient,
+            MqttConstants.SystemAvailabilityTopic,
+            payload: "online");
     }
 
     [Theory, AutoNSubstituteData]
