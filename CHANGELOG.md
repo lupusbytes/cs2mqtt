@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.2.0](https://github.com/lupusbytes/cs2mqtt/compare/v1.1.2...v1.2.0) (2024-10-02)
+
+
+### Features
+
+* **mqtt:** publish offline message to all availability topics on graceful shutdown ([30db192](https://github.com/lupusbytes/cs2mqtt/commit/30db19297262c29ef508a36187298950faa5b304))
+
 ## [1.1.2](https://github.com/lupusbytes/cs2mqtt/compare/v1.1.1...v1.1.2) (2024-09-17)
 
 
