@@ -53,5 +53,17 @@ flowchart LR;
     HomeAssistantDevicePublisher -- Use Home Assistant MQTT device discovery protocol to automatically create Home Assistant devices and sensors for each data provider. ---> MqttClient
 ```
 
+## Counter-Strike as a Home Assistant MQTT device
+If the [MQTT integration](https://www.home-assistant.io/integrations/mqtt/) is installed, **cs2mqtt** will automatically create MQTT devices using the [MQTT Discovery protocol](https://www.home-assistant.io/integrations/mqtt/#mqtt-discovery), with all values configured as [sensors](https://www.home-assistant.io/integrations/sensor.mqtt/).
 
+![Home Assistant MQTT device screenshot](docs/images/ha_mqtt_device.png)
 
+### System availability
+On startup, when **cs2mqtt** connects to the MQTT broker, it publishes an `online` message to `cs2mqtt/status`.
+It also sets a Last Will and Testament (LWT) for the MQTT broker to publish an `offline` message to this topic if it loses connection or terminates unexpectedly.
+On graceful shutdown, **cs2mqtt** will publish an offline message to this topic before disconnecting.
+
+### Device availability
+When a Counter-Strike 2 game instance submits data for the first time, **cs2mqtt** will automatically create an MQTT device for it, as described above, and publish online messages to `cs2mqtt/{steamId64}/+/status` topics.
+If a player disconnects from a game server, the topics related to `player_state`, `map`, and `round` will immediately be set to `offline`.
+When a player closes their Counter-Strike 2 game, there is no data transmitted, and there's nothing to indicate they've quit. As a result, **cs2mqtt** listens for heartbeats and eventually sets the entire device to an offline availability state once the timeout is reached.
