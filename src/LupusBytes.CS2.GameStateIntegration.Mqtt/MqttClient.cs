@@ -45,6 +45,38 @@ public sealed class MqttClient : IHostedService, IMqttClient, IDisposable
         clientOptions = clientOptionsBuilder.Build();
     }
 
+    public Task StartAsync(CancellationToken cancellationToken)
+    {
+        shutdownRequested = false;
+        return ConnectAsync(ConnectRetryCount, cancellationToken);
+    }
+
+    public Task StopAsync(CancellationToken cancellationToken)
+    {
+        shutdownRequested = true;
+        return mqttNetClient.DisconnectAsync(cancellationToken: cancellationToken);
+    }
+
+    public async Task PublishAsync(MqttMessage message, CancellationToken cancellationToken)
+    {
+        if (!mqttNetClient.IsConnected)
+        {
+            backlog[message.Topic] = message;
+            return;
+        }
+
+        var mqttMessage = new MqttApplicationMessageBuilder()
+            .WithTopic(message.Topic)
+            .WithPayload(message.Payload)
+            .WithRetainFlag(message.RetainFlag)
+            .Build();
+
+        await mqttNetClient.PublishAsync(mqttMessage, cancellationToken);
+        logger.MqttMessagePublished(message.Topic, message.Payload);
+    }
+
+    public void Dispose() => mqttNetClient.Dispose();
+
     private Task ConnectAsync(int retryCount, CancellationToken cancellationToken = default) => Policy
         .Handle<Exception>()
         .WaitAndRetryAsync(
@@ -91,37 +123,5 @@ public sealed class MqttClient : IHostedService, IMqttClient, IDisposable
         return !shutdownRequested
             ? ConnectAsync(ReconnectRetryCount, CancellationToken.None)
             : Task.CompletedTask;
-    }
-
-    public async Task PublishAsync(MqttMessage message, CancellationToken cancellationToken)
-    {
-        if (!mqttNetClient.IsConnected)
-        {
-            backlog[message.Topic] = message;
-            return;
-        }
-
-        var mqttMessage = new MqttApplicationMessageBuilder()
-            .WithTopic(message.Topic)
-            .WithPayload(message.Payload)
-            .WithRetainFlag(message.RetainFlag)
-            .Build();
-
-        await mqttNetClient.PublishAsync(mqttMessage, cancellationToken);
-        logger.MqttMessagePublished(message.Topic, message.Payload);
-    }
-
-    public void Dispose() => mqttNetClient.Dispose();
-
-    public Task StartAsync(CancellationToken cancellationToken)
-    {
-        shutdownRequested = false;
-        return ConnectAsync(ConnectRetryCount, cancellationToken);
-    }
-
-    public Task StopAsync(CancellationToken cancellationToken)
-    {
-        shutdownRequested = true;
-        return mqttNetClient.DisconnectAsync(cancellationToken: cancellationToken);
     }
 }
