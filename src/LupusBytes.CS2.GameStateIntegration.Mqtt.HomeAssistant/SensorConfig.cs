@@ -2,7 +2,7 @@
 
 namespace LupusBytes.CS2.GameStateIntegration.Mqtt.HomeAssistant;
 
-public record DiscoveryPayload(
+public record SensorConfig(
     [property: JsonPropertyName("name")] string Name,
     [property: JsonPropertyName("unique_id")] string UniqueId,
     [property: JsonPropertyName("state_topic")] string StateTopic,
