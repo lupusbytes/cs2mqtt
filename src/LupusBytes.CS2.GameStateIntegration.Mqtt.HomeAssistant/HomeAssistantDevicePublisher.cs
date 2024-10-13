@@ -1,5 +1,4 @@
 using System.Collections.Concurrent;
-using System.Text.Json;
 using System.Threading.Channels;
 using LupusBytes.CS2.GameStateIntegration.Contracts;
 using LupusBytes.CS2.GameStateIntegration.Events;
@@ -18,14 +17,31 @@ public sealed class HomeAssistantDevicePublisher(
 
     protected override Task ExecuteAsync(CancellationToken stoppingToken)
         => Task.WhenAll(
-            ProcessChannelAsync(PlayerChannelReader, publishedPlayerConfigs, stoppingToken),
-            ProcessChannelAsync(PlayerStateChannelReader, publishedPlayerStateConfigs, stoppingToken),
-            ProcessChannelAsync(MapChannelReader, publishedMapConfigs, stoppingToken),
-            ProcessChannelAsync(RoundChannelReader, publishedRoundConfigs, stoppingToken));
+            ProcessChannelAsync(
+                PlayerChannelReader,
+                publishedPlayerConfigs,
+                device => new PlayerDiscoveryMessages(device),
+                stoppingToken),
+            ProcessChannelAsync(
+                PlayerStateChannelReader,
+                publishedPlayerStateConfigs,
+                device => new PlayerStateDiscoveryMessages(device),
+                stoppingToken),
+            ProcessChannelAsync(
+                MapChannelReader,
+                publishedMapConfigs,
+                device => new MapDiscoveryMessages(device),
+                stoppingToken),
+            ProcessChannelAsync(
+                RoundChannelReader,
+                publishedRoundConfigs,
+                device => new RoundDiscoveryMessages(device),
+                stoppingToken));
 
     private async Task ProcessChannelAsync<TEvent>(
         ChannelReader<TEvent> channelReader,
         HashSet<SteamId64> publishedConfigSet,
+        Func<Device, MqttDiscoveryMessages> discoveryMessages,
         CancellationToken cancellationToken)
         where TEvent : BaseEvent
     {
@@ -40,27 +56,11 @@ public sealed class HomeAssistantDevicePublisher(
                     continue;
                 }
 
-                var sensors = CreateDeviceSensors(@event, device);
-
-                await SendDiscoveryPayloadsAsync(sensors, cancellationToken);
+                foreach (var discoveryMessage in discoveryMessages(device))
+                {
+                    await mqttClient.PublishAsync(discoveryMessage, cancellationToken);
+                }
             }
-        }
-    }
-
-    private async Task SendDiscoveryPayloadsAsync(
-        IDeviceSensors deviceSensors,
-        CancellationToken cancellationToken)
-    {
-        foreach (var discoveryPayload in deviceSensors.DiscoveryPayloads)
-        {
-            var message = new MqttMessage
-            {
-                Topic = $"homeassistant/sensor/{discoveryPayload.UniqueId}/config",
-                Payload = JsonSerializer.Serialize(discoveryPayload),
-                RetainFlag = true,
-            };
-
-            await mqttClient.PublishAsync(message, cancellationToken);
         }
     }
 
@@ -70,13 +70,4 @@ public sealed class HomeAssistantDevicePublisher(
         Manufacturer: "lupusbytes",
         Model: Constants.ProjectName,
         SoftwareVersion: Constants.Version);
-
-    private static IDeviceSensors CreateDeviceSensors(BaseEvent @event, Device device) => @event switch
-    {
-        PlayerEvent => new PlayerSensors(device),
-        PlayerStateEvent => new PlayerStateSensors(device),
-        MapEvent => new MapSensors(device),
-        RoundEvent => new RoundSensors(device),
-        _ => throw new ArgumentException($"Unknown event type {@event.GetType()}", nameof(@event)),
-    };
 }
