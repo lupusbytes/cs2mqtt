@@ -42,7 +42,7 @@ public class RoundDiscoveryMessages(Device device) : MqttDiscoveryMessages
         Name: "Bomb",
         UniqueId: $"{device.Id}_round_bomb",
         StateTopic: stateTopic,
-        ValueTemplate: ValueTemplate.JsonPropertyValue("bomb"),
+        ValueTemplate: ValueTemplate.JsonPropertyValueWithFallback("bomb", "Inactive"),
         Icon: "mdi:bomb",
         device,
         Availability: availability));
