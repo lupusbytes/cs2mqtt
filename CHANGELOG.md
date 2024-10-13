@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.2.1](https://github.com/lupusbytes/cs2mqtt/compare/v1.2.0...v1.2.1) (2024-10-13)
+
+
+### Bug Fixes
+
+* **homeassistant:** show "inactive" for bomb when value is null instead of "unknown" ([7292ef1](https://github.com/lupusbytes/cs2mqtt/commit/7292ef174bd7cc80cc5cf6befc1b39a819386e1e))
+
 ## [1.2.0](https://github.com/lupusbytes/cs2mqtt/compare/v1.1.2...v1.2.0) (2024-10-02)
 
 
