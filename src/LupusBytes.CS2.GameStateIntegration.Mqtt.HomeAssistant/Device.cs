@@ -7,4 +7,5 @@ public record Device(
     [property: JsonPropertyName("identifiers")] string Id,
     [property: JsonPropertyName("manufacturer")] string Manufacturer,
     [property: JsonPropertyName("model")] string Model,
-    [property: JsonPropertyName("sw_version")] string SoftwareVersion);
+    [property: JsonPropertyName("sw_version")] string SoftwareVersion,
+    [property: JsonPropertyName("via_device")] string ViaDevice = "");

@@ -12,8 +12,13 @@ public abstract class MqttDiscoveryMessages : IEnumerable<MqttMessage>
 
     protected abstract IEnumerable<MqttMessage> DiscoveryMessages { get; }
 
-    protected static MqttMessage CreateMqttMessage(SensorConfig sensorConfig) => new(
-        $"homeassistant/sensor/{sensorConfig.UniqueId}/config",
-        JsonSerializer.Serialize(sensorConfig),
+    protected static MqttMessage CreateMqttMessage(SensorConfig config) => new(
+        $"homeassistant/sensor/{config.UniqueId}/config",
+        JsonSerializer.Serialize(config),
+        RetainFlag: true);
+
+    protected static MqttMessage CreateMqttMessage(BinarySensorConfig config) => new(
+        $"homeassistant/binary_sensor/{config.UniqueId}/config",
+        JsonSerializer.Serialize(config),
         RetainFlag: true);
 }
