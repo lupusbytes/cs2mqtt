@@ -1,5 +1,13 @@
 # Changelog
 
+## [1.3.0](https://github.com/lupusbytes/cs2mqtt/compare/v1.2.1...v1.3.0) (2024-10-27)
+
+
+### Features
+
+* **homeassistant:** append textual steamid (steam_x:y:z) to the mqtt device name ([9193d1a](https://github.com/lupusbytes/cs2mqtt/commit/9193d1aa51a04dee3bf5ee67d5263e893de7ced6))
+* **homeassistant:** publish cs2mqtt as a bridge device; use it as via_device for game state devices ([98148ec](https://github.com/lupusbytes/cs2mqtt/commit/98148ece21312f85226f4277593c47d34e1b338f))
+
 ## [1.2.1](https://github.com/lupusbytes/cs2mqtt/compare/v1.2.0...v1.2.1) (2024-10-13)
 
 
