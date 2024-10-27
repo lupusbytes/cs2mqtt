@@ -9,13 +9,22 @@ public sealed class HomeAssistantDevicePublisher(
     IGameStateService gameStateService,
     IMqttClient mqttClient) : GameStateObserverService(gameStateService)
 {
+    private const string BridgeDeviceId = $"{Constants.ProjectName}_bridge";
+    private const string Manufacturer = "lupusbytes";
+
     private readonly ConcurrentDictionary<SteamId64, Device> devices = [];
     private readonly HashSet<SteamId64> publishedPlayerConfigs = [];
     private readonly HashSet<SteamId64> publishedPlayerStateConfigs = [];
     private readonly HashSet<SteamId64> publishedMapConfigs = [];
     private readonly HashSet<SteamId64> publishedRoundConfigs = [];
 
-    protected override Task ExecuteAsync(CancellationToken stoppingToken)
+    protected override async Task ExecuteAsync(CancellationToken stoppingToken)
+    {
+        await PublishBridgeDeviceAsync(stoppingToken);
+        await ProcessChannelsAsync(stoppingToken);
+    }
+
+    private Task ProcessChannelsAsync(CancellationToken stoppingToken)
         => Task.WhenAll(
             ProcessChannelAsync(
                 PlayerChannelReader,
@@ -67,7 +76,25 @@ public sealed class HomeAssistantDevicePublisher(
     private static Device CreateDevice(SteamId64 steamId) => new(
         Id: steamId.ToString(),
         Name: $"CS2 {steamId.ToTextualString()}",
-        Manufacturer: "lupusbytes",
+        Manufacturer: Manufacturer,
         Model: Constants.ProjectName,
-        SoftwareVersion: Constants.Version);
+        SoftwareVersion: Constants.Version,
+        ViaDevice: BridgeDeviceId);
+
+    private async Task PublishBridgeDeviceAsync(CancellationToken cancellationToken)
+    {
+        var bridgeDevice = new Device(
+            Id: BridgeDeviceId,
+            Name: "CS2 MQTT Bridge",
+            Manufacturer: Manufacturer,
+            Model: Constants.ProjectName,
+            SoftwareVersion: Constants.Version);
+
+        var discoveryMessages = new BridgeDiscoveryMessages(bridgeDevice);
+
+        foreach (var discoveryMessage in discoveryMessages)
+        {
+            await mqttClient.PublishAsync(discoveryMessage, cancellationToken);
+        }
+    }
 }
