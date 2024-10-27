@@ -66,7 +66,7 @@ public sealed class HomeAssistantDevicePublisher(
 
     private static Device CreateDevice(SteamId64 steamId) => new(
         Id: steamId.ToString(),
-        Name: "CS2",
+        Name: $"CS2 {steamId.ToTextualString()}",
         Manufacturer: "lupusbytes",
         Model: Constants.ProjectName,
         SoftwareVersion: Constants.Version);
