@@ -28,7 +28,8 @@ public static class EventExtensions
                 topic = $"{MqttConstants.BaseTopic}/{@event.SteamId}/round";
                 payload = r.Round is null ? string.Empty : JsonSerializer.Serialize(r.Round);
                 break;
-            default: throw new SwitchExpressionException();
+            default:
+                throw new SwitchExpressionException();
         }
 
         return new MqttMessage
