@@ -1,4 +1,3 @@
-using System.Diagnostics.CodeAnalysis;
 using Microsoft.Extensions.Logging;
 
 namespace LupusBytes.CS2.GameStateIntegration.Mqtt;
