@@ -59,8 +59,7 @@ public static class EndpointRouteBuilderExtensions
     }
 
     private static void RequireTokenAuthorization(RouteHandlerBuilder builder, string token)
-    {
-        builder.Add(b =>
+        => builder.Add(b =>
         {
             var originalHandler = b.RequestDelegate;
 
@@ -71,7 +70,6 @@ public static class EndpointRouteBuilderExtensions
 
             b.RequestDelegate = context => tokenHandler.InvokeAsync(context);
         });
-    }
 
     public static void MapIngestionDebugEndpoint(this IEndpointRouteBuilder app)
         => app.MapPost("/debug", async (HttpRequest request) =>
