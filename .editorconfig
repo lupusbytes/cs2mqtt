@@ -510,4 +510,3 @@ csharp_style_namespace_declarations = file_scoped:warning
 
 dotnet_diagnostic.CA2007.severity = none            # CA2007:Consider calling ConfigureAwait on the awaited task
 dotnet_diagnostic.MA0004.severity = none            # MA0004:Use Task.ConfigureAwait(false)
-dotnet_diagnostic.S1118.severity  = none            # S1118:Utility classes should not have public constructors (needed for minimal api tests)
