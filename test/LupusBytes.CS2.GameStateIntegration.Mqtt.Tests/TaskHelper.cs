@@ -1,6 +1,6 @@
 namespace LupusBytes.CS2.GameStateIntegration.Mqtt.Tests;
 
-public static class TaskHelper
+internal static class TaskHelper
 {
     public static TaskCompletionSource<bool> CompletionSourceFromTopicPublishment(
         IMqttClient mqttClient,
