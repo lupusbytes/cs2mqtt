@@ -1,0 +1,7 @@
+##########################################
+# Code Analyzers Rules
+##########################################
+[*.{cs,csx,cake}]
+dotnet_diagnostic.S1118.severity = none		# S1118: Utility classes should not have public constructors (needed for end to end tests)
+dotnet_diagnostic.CA1515.severity = none	# CA1515: Consider making public types internal (needed for end to end tests)
+
