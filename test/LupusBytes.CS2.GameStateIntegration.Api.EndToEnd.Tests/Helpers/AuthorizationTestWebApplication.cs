@@ -11,7 +11,7 @@ public sealed class AuthorizationTestWebApplication
 {
     public const string ExpectedToken = nameof(ExpectedToken);
 
-    private static void Main(string[] args)
+    private static void Main()
     {
         var builder = WebApplication.CreateBuilder();
         builder.Services.AddRouting();
