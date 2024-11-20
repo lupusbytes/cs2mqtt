@@ -1,5 +1,4 @@
 using System.Diagnostics.CodeAnalysis;
-using System.Text.Json;
 using LupusBytes.CS2.GameStateIntegration.Contracts;
 using Microsoft.AspNetCore.Mvc;
 
