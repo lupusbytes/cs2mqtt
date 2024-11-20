@@ -3,7 +3,7 @@ using Xunit.Sdk;
 
 namespace LupusBytes.CS2.GameStateIntegration.Api.EndToEnd.Tests.Helpers;
 
-public class PriorityOrderer : ITestCaseOrderer
+internal sealed class PriorityOrderer : ITestCaseOrderer
 {
     public const string Assembly = "LupusBytes.CS2.GameStateIntegration.Api.EndToEnd.Tests";
     public const string Name = $"{Assembly}.Helpers.{nameof(PriorityOrderer)}";
