@@ -2,10 +2,9 @@ using System.Collections.Concurrent;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using MQTTnet;
-using MQTTnet.Client;
 using MQTTnet.Formatter;
 using Polly;
-using IMqttNetClient = MQTTnet.Client.IMqttClient;
+using IMqttNetClient = MQTTnet.IMqttClient;
 
 namespace LupusBytes.CS2.GameStateIntegration.Mqtt;
 

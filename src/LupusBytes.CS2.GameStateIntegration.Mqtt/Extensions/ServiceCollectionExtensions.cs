@@ -2,7 +2,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using MQTTnet;
-using IMqttNetClient = MQTTnet.Client.IMqttClient;
+using IMqttNetClient = MQTTnet.IMqttClient;
 
 namespace LupusBytes.CS2.GameStateIntegration.Mqtt.Extensions;
 
@@ -12,7 +12,7 @@ public static class ServiceCollectionExtensions
     {
         // Register MQTTnet.Client.IMqttClient. This instance will be injected into our own MqttClient.
         // Creating it here, instead of instantiating it inside the class, will enable us to mock/substitute it for unit tests.
-        services.AddSingleton(new MqttFactory().CreateMqttClient());
+        services.AddSingleton(new MqttClientFactory().CreateMqttClient());
 
         // Get options
         var mqttOptions = new MqttOptions();

@@ -2,10 +2,9 @@ using System.Net;
 using System.Text;
 using Microsoft.Extensions.Logging.Abstractions;
 using MQTTnet;
-using MQTTnet.Client;
 using MQTTnet.Protocol;
 using MQTTnet.Server;
-using IMqttNetClient = MQTTnet.Client.IMqttClient;
+using IMqttNetClient = MQTTnet.IMqttClient;
 
 namespace LupusBytes.CS2.GameStateIntegration.Mqtt.Integration.Tests;
 
@@ -19,9 +18,11 @@ public class MqttClientTest
     public async Task Last_will_and_testament()
     {
         // Arrange
-        var factory = new MqttFactory();
-        using var testServer = await CreateTestServerAsync(factory);
-        using var testClient = await CreateTestClientAsync(factory);
+        var clientFactory = new MqttClientFactory();
+        var serverFactory = new MqttServerFactory();
+
+        using var testServer = await CreateTestServerAsync(serverFactory);
+        using var testClient = await CreateTestClientAsync(clientFactory);
 
         var tcs = new TaskCompletionSource<string>();
 
@@ -37,7 +38,12 @@ public class MqttClientTest
             UseTls = false,
             ClientId = "cs2mqtt",
         };
-        using var sut = new MqttClient(factory.CreateMqttClient(), options, NullLogger<MqttClient>.Instance);
+
+        using var sut = new MqttClient(
+            clientFactory.CreateMqttClient(),
+            options,
+            NullLogger<MqttClient>.Instance);
+
         await sut.StartAsync(CancellationToken.None);
 
         // Act
@@ -53,9 +59,11 @@ public class MqttClientTest
     public async Task PublishAsync_publishes_message(string topic, string payload)
     {
         // Arrange
-        var factory = new MqttFactory();
-        using var testServer = await CreateTestServerAsync(factory);
-        using var testClient = await CreateTestClientAsync(factory);
+        var clientFactory = new MqttClientFactory();
+        var serverFactory = new MqttServerFactory();
+
+        using var testServer = await CreateTestServerAsync(serverFactory);
+        using var testClient = await CreateTestClientAsync(clientFactory);
 
         var tcs = new TaskCompletionSource<string>();
 
@@ -71,7 +79,12 @@ public class MqttClientTest
             UseTls = false,
             ClientId = "cs2mqtt",
         };
-        using var sut = new MqttClient(factory.CreateMqttClient(), options, NullLogger<MqttClient>.Instance);
+
+        using var sut = new MqttClient(
+            clientFactory.CreateMqttClient(),
+            options,
+            NullLogger<MqttClient>.Instance);
+
         await sut.StartAsync(CancellationToken.None);
 
         // Act
@@ -85,18 +98,22 @@ public class MqttClientTest
     public async Task Connects_with_credentials(string username, string password)
     {
         // Arrange
-        var factory = new MqttFactory();
-        using var testServer = await CreateTestServerWithAuthenticationAsync(factory, username, password);
+        using var testServer = await CreateTestServerWithAuthenticationAsync(
+            new MqttServerFactory(),
+            username,
+            password);
 
-        var options = new MqttOptions
-        {
-            Host = ListenAddress,
-            Port = ListenPort,
-            Username = username,
-            Password = password,
-            UseTls = false,
-        };
-        using var sut = new MqttClient(factory.CreateMqttClient(), options, NullLogger<MqttClient>.Instance);
+        using var sut = new MqttClient(
+            new MqttClientFactory().CreateMqttClient(),
+            new MqttOptions
+            {
+                Host = ListenAddress,
+                Port = ListenPort,
+                Username = username,
+                Password = password,
+                UseTls = false,
+            },
+            NullLogger<MqttClient>.Instance);
 
         // Act & Assert
         var act = () => sut.StartAsync(CancellationToken.None);
@@ -117,7 +134,7 @@ public class MqttClientTest
         (await tcs.Task).Should().Be(expected);
     }
 
-    private static async Task<IMqttNetClient> CreateTestClientAsync(MqttFactory factory)
+    private static async Task<IMqttNetClient> CreateTestClientAsync(MqttClientFactory factory)
     {
         var client = factory.CreateMqttClient();
         var clientOptions = new MqttClientOptionsBuilder()
@@ -128,7 +145,7 @@ public class MqttClientTest
         return client;
     }
 
-    private static async Task<MqttServer> CreateTestServerAsync(MqttFactory factory)
+    private static async Task<MqttServer> CreateTestServerAsync(MqttServerFactory factory)
     {
         var serverOptions = new MqttServerOptionsBuilder()
             .WithDefaultEndpoint()
@@ -142,7 +159,7 @@ public class MqttClientTest
     }
 
     private static async Task<MqttServer> CreateTestServerWithAuthenticationAsync(
-        MqttFactory factory,
+        MqttServerFactory factory,
         string username,
         string password)
     {
@@ -171,7 +188,7 @@ public class MqttClientTest
 
         client.ApplicationMessageReceivedAsync += e =>
         {
-            onMessageReceived(Encoding.UTF8.GetString(e.ApplicationMessage.PayloadSegment));
+            onMessageReceived(Encoding.UTF8.GetString(e.ApplicationMessage.Payload));
             return Task.CompletedTask;
         };
 
