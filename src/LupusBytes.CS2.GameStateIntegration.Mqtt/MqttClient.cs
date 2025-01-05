@@ -3,6 +3,7 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using MQTTnet;
 using MQTTnet.Client;
+using MQTTnet.Formatter;
 using Polly;
 using IMqttNetClient = MQTTnet.Client.IMqttClient;
 
@@ -32,6 +33,7 @@ public sealed class MqttClient : IHostedService, IMqttClient, IDisposable
         var clientOptionsBuilder = new MqttClientOptionsBuilder()
             .WithTcpServer(options.Host, options.Port)
             .WithClientId(options.ClientId)
+            .WithProtocolVersion(ConvertProtocolVersion(options.ProtocolVersion))
             .WithTlsOptions(b => b.UseTls(options.UseTls))
             .WithWillTopic(MqttConstants.SystemAvailabilityTopic)
             .WithWillPayload("offline")
@@ -124,4 +126,15 @@ public sealed class MqttClient : IHostedService, IMqttClient, IDisposable
             ? ConnectAsync(ReconnectRetryCount, CancellationToken.None)
             : Task.CompletedTask;
     }
+
+    private static MqttProtocolVersion ConvertProtocolVersion(string mqttProtocolVersion)
+        => mqttProtocolVersion switch
+        {
+            "5.0.0" => MqttProtocolVersion.V500,
+            "3.1.1" => MqttProtocolVersion.V311,
+            "3.1.0" => MqttProtocolVersion.V310,
+            _ => throw new ArgumentException(
+                $"Unknown or unsupported MQTT protocol version: {mqttProtocolVersion}",
+                nameof(mqttProtocolVersion)),
+        };
 }

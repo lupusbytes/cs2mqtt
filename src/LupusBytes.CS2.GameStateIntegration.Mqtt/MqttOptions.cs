@@ -18,6 +18,12 @@ public class MqttOptions
     public int Port { get; set; } = 1883;
 
     /// <summary>
+    /// The MQTT protocol version to use when connection to the MQTT broker.
+    /// The version should be in SemVer format, such as "5.0.0", "3.1.1", or "3.1.0".
+    /// </summary>
+    public string ProtocolVersion { get; set; } = "5.0.0";
+
+    /// <summary>
     /// Whether to use SSL/TLS when connecting to the MQTT broker. The default setting is <see langword="false" />.
     /// </summary>
     public bool UseTls { get; set; }
