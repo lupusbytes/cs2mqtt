@@ -9,5 +9,28 @@
   },
   "extra-files": [
     "Directory.Build.props"
+  ],
+  "changelog-sections": [
+    {
+      "type": "feat",
+      "section": "New features"
+    },
+    {
+      "type": "fix",
+      "scope": "deps",
+      "section": "Upgrades"
+    },
+    {
+      "type": "fix",
+      "section": "Bug fixes"
+    },
+    {
+      "type": "perf",
+      "section": "Performance improvements"
+    },
+    {
+      "type": "revert",
+      "section": "Reverts"
+    }
   ]
 }
