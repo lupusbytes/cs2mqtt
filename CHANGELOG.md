@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.4.1](https://github.com/lupusbytes/cs2mqtt/compare/v1.4.0...v1.4.1) (2025-01-05)
+
+
+### Upgrades
+
+* **deps:** update dependency mqttnet to 5.0.1.1416 ([56223ca](https://github.com/lupusbytes/cs2mqtt/commit/56223ca45efb1493029cc0a1bff06e9d56a67045))
+
 ## [1.4.0](https://github.com/lupusbytes/cs2mqtt/compare/v1.3.0...v1.4.0) (2025-01-05)
 
 
