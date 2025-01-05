@@ -3,8 +3,7 @@ using System.Net.Sockets;
 using System.Text;
 using Microsoft.Extensions.Logging;
 using MQTTnet;
-using MQTTnet.Client;
-using IMqttNetClient = MQTTnet.Client.IMqttClient;
+using IMqttNetClient = MQTTnet.IMqttClient;
 
 namespace LupusBytes.CS2.GameStateIntegration.Mqtt.Tests;
 
@@ -46,7 +45,7 @@ public class MqttClientTest
         await mqttNetClient.Received(1).PublishAsync(
             Arg.Is<MqttApplicationMessage>(x =>
                 x.Topic == message.Topic &&
-                Encoding.UTF8.GetString(x.PayloadSegment.Array!, x.PayloadSegment.Offset, x.PayloadSegment.Count) == message.Payload &&
+                Encoding.UTF8.GetString(x.Payload) == message.Payload &&
                 x.Retain == message.RetainFlag),
             Arg.Is(cancellationToken));
     }
@@ -147,11 +146,7 @@ public class MqttClientTest
 
         // Assert
         await mqttNetClient.Received(messages.Count).PublishAsync(
-            Arg.Is<MqttApplicationMessage>(x =>
-                Encoding.UTF8.GetString(
-                    x.PayloadSegment.Array!,
-                    x.PayloadSegment.Offset,
-                    x.PayloadSegment.Count) == "Hello World"),
+            Arg.Is<MqttApplicationMessage>(x => Encoding.UTF8.GetString(x.Payload) == "Hello World"),
             Arg.Any<CancellationToken>());
     }
 
