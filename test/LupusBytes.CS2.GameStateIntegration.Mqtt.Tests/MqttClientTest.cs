@@ -1,6 +1,7 @@
 using System.Diagnostics.CodeAnalysis;
 using System.Net.Sockets;
 using System.Text;
+using Microsoft.Extensions.Logging;
 using MQTTnet;
 using MQTTnet.Client;
 using IMqttNetClient = MQTTnet.Client.IMqttClient;
@@ -9,6 +10,25 @@ namespace LupusBytes.CS2.GameStateIntegration.Mqtt.Tests;
 
 public class MqttClientTest
 {
+    [Theory]
+    [InlineAutoNSubstituteData("5")]
+    [InlineAutoNSubstituteData("4.0.0")]
+    [InlineAutoNSubstituteData("Foo")]
+    public void Constructor_throws_on_invalid_MQTT_protocol(
+        string protocolVersion,
+        IMqttNetClient mqttNetClient,
+        ILogger<MqttClient> logger)
+    {
+        // Arrange
+        var options = new MqttOptions
+        {
+            ProtocolVersion = protocolVersion,
+        };
+
+        // Act & Assert
+        Assert.Throws<ArgumentException>(() => new MqttClient(mqttNetClient, options, logger));
+    }
+
     [Theory, AutoNSubstituteData]
     public async Task PublishAsync_invokes_MQTTnet_PublishAsync(
         [Frozen] IMqttNetClient mqttNetClient,
