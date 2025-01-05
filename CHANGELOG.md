@@ -1,5 +1,17 @@
 # Changelog
 
+## [1.4.0](https://github.com/lupusbytes/cs2mqtt/compare/v1.3.0...v1.4.0) (2025-01-05)
+
+
+### New features
+
+* **mqtt:** add protocol version as an optional option ([85f2895](https://github.com/lupusbytes/cs2mqtt/commit/85f28956e5b860b3bbf33d455edde13fdf2c13e4))
+
+
+### Upgrades
+
+* **deps:** update dependency mqttnet from v4 to v5 ([2953184](https://github.com/lupusbytes/cs2mqtt/commit/29531841e2dc6aba0e1953749fedc4b9f930484b))
+
 ## [1.3.0](https://github.com/lupusbytes/cs2mqtt/compare/v1.2.1...v1.3.0) (2024-10-27)
 
 
