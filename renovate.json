@@ -1,9 +1,17 @@
 {
-    "$schema": "https://docs.renovatebot.com/renovate-schema.json",
-    "extends": [
-      "config:recommended"
-    ],
-    "ignorePresets": [
-      ":ignoreModulesAndTests"
-    ]
+  "$schema": "https://docs.renovatebot.com/renovate-schema.json",
+  "extends": [
+    "config:recommended"
+  ],
+  "ignorePresets": [
+    ":ignoreModulesAndTests"
+  ],
+  "packageRules": [
+    {
+      "description": "Use fix commit message prefix for updates in src directory",
+      "packagePatterns": ["*"],
+      "matchFileNames": ["src/**"],
+      "semanticCommitType": "fix"
+    }
+  ]
 }
