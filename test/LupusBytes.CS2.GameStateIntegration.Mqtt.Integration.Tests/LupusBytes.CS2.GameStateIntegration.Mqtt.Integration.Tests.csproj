@@ -10,8 +10,8 @@
     </PropertyGroup>
 
     <ItemGroup>
-        <PackageReference Include="MQTTnet" Version="5.0.0.1405" />
-        <PackageReference Include="MQTTnet.Server" Version="5.0.0.1405" />
+        <PackageReference Include="MQTTnet" Version="5.0.1.1416" />
+        <PackageReference Include="MQTTnet.Server" Version="5.0.1.1416" />
     </ItemGroup>
 
     <ItemGroup>
