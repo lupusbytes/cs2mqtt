@@ -16,6 +16,11 @@ jobs:
         with:
           fetch-depth: 0
 
+      - name: ⚙️ Set up .NET 9
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '9.0.x'
+
       - name: 🔁 Restore packages
         run: dotnet restore
 
