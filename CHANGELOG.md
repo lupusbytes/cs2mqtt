@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.5.0](https://github.com/lupusbytes/cs2mqtt/compare/v1.4.1...v1.5.0) (2025-01-08)
+
+
+### New features
+
+* upgrade to dotnet 9 ([219ff68](https://github.com/lupusbytes/cs2mqtt/commit/219ff6890a0083745bf60a78980031ba8d6447c4))
+
 ## [1.4.1](https://github.com/lupusbytes/cs2mqtt/compare/v1.4.0...v1.4.1) (2025-01-05)
 
 
