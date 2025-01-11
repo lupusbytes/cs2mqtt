@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.5.1](https://github.com/lupusbytes/cs2mqtt/compare/v1.5.0...v1.5.1) (2025-01-11)
+
+
+### Bug fixes
+
+* **homeassistant:** fix bridge device being connected via unnamed device ([aeff30a](https://github.com/lupusbytes/cs2mqtt/commit/aeff30a74f3298984c6d21a705be86f91b89b6e8))
+
 ## [1.5.0](https://github.com/lupusbytes/cs2mqtt/compare/v1.4.1...v1.5.0) (2025-01-08)
 
 
