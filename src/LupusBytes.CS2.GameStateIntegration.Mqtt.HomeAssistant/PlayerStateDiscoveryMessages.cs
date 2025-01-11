@@ -7,6 +7,7 @@ public class PlayerStateDiscoveryMessages(Device device) : MqttDiscoveryMessages
     private readonly Availability[] availability =
     [
         new($"{MqttConstants.BaseTopic}/{device.Id}/player-state/status"),
+        new($"{MqttConstants.BaseTopic}/{device.Id}/status"),
         new(MqttConstants.SystemAvailabilityTopic),
     ];
 

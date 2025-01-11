@@ -59,6 +59,8 @@ internal sealed class GameStateService : ObservableGameState, IGameStateService
         }
     }
 
+    private void OnProviderEvent(ProviderEvent value) => PushEvent(ProviderObservers, value);
+
     private void OnMapEvent(MapEvent value) => PushEvent(MapObservers, value);
 
     private void OnPlayerEvent(PlayerEvent value) => PushEvent(PlayerObservers, value);
@@ -95,6 +97,7 @@ internal sealed class GameStateService : ObservableGameState, IGameStateService
         gameStateSubscriptions.Remove(steamId, out _);
 
         // Send null events to all observers for this SteamID to overwrite their last buffer.
+        PushEvent(ProviderObservers, new ProviderEvent(steamId, Provider: null));
         PushEvent(MapObservers, new MapEvent(steamId, Map: null));
         PushEvent(RoundObservers, new RoundEvent(steamId, Round: null));
         PushEvent(PlayerObservers, new PlayerEvent(steamId, Player: null));
@@ -102,6 +105,7 @@ internal sealed class GameStateService : ObservableGameState, IGameStateService
     }
 
     private sealed class Subscription :
+        IObserver<ProviderEvent>,
         IObserver<MapEvent>,
         IObserver<PlayerEvent>,
         IObserver<PlayerStateEvent>,
@@ -117,12 +121,15 @@ internal sealed class GameStateService : ObservableGameState, IGameStateService
         {
             this.service = service;
             GameState = gameState;
+            var providerSub = GameState.Subscribe(this as IObserver<ProviderEvent>);
             var mapSub = GameState.Subscribe(this as IObserver<MapEvent>);
             var roundSub = GameState.Subscribe(this as IObserver<RoundEvent>);
             var playerSub = GameState.Subscribe(this as IObserver<PlayerEvent>);
             var playerStateSub = GameState.Subscribe(this as IObserver<PlayerStateEvent>);
-            subscriptions = [mapSub, roundSub, playerSub, playerStateSub];
+            subscriptions = [providerSub, mapSub, roundSub, playerSub, playerStateSub];
         }
+
+        public void OnNext(ProviderEvent value) => service.OnProviderEvent(value);
 
         public void OnNext(MapEvent value) => service.OnMapEvent(value);
 
