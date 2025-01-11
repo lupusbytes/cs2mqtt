@@ -11,4 +11,6 @@ public record BinarySensorConfig(
     [property: JsonPropertyName("entity_category")] string EntityCategory,
     [property: JsonPropertyName("payload_off")] string PayloadOff = "offline",
     [property: JsonPropertyName("payload_on")] string PayloadOn = "online",
-    [property: JsonPropertyName("value_template")] string ValueTemplate = "{{ value }}");
+    [property: JsonPropertyName("value_template")] string ValueTemplate = "{{ value }}",
+    [property: JsonPropertyName("availability"), JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+    IReadOnlyCollection<Availability>? Availability = null);

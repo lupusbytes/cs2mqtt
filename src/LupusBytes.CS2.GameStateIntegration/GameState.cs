@@ -75,6 +75,7 @@ internal sealed class GameState(SteamId64 steamId) : ObservableGameState, IGameS
 
     public void ProcessEvent(GameStateData data)
     {
+        PushEvent(ProviderObservers, new ProviderEvent(SteamId, data.Provider));
         Player = data.Player;
         Map = data.Map;
         Round = data.Round;

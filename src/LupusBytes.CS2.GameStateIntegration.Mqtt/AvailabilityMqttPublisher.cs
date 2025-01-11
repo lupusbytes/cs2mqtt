@@ -9,11 +9,13 @@ public sealed class AvailabilityMqttPublisher(
     IGameStateService gameStateService,
     IMqttClient mqttClient) : GameStateObserverService(gameStateService)
 {
+    private const string ProviderAvailabilityTopicSuffix = "status";
     private const string PlayerAvailabilityTopicSuffix = "player/status";
     private const string PlayerStateAvailabilityTopicSuffix = "player-state/status";
     private const string MapAvailabilityTopicSuffix = "map/status";
     private const string RoundAvailabilityTopicSuffix = "round/status";
 
+    private readonly HashSet<SteamId64> onlineProviders = [];
     private readonly HashSet<SteamId64> onlinePlayers = [];
     private readonly HashSet<SteamId64> onlinePlayerStates = [];
     private readonly HashSet<SteamId64> onlineMaps = [];
@@ -38,6 +40,7 @@ public sealed class AvailabilityMqttPublisher(
 
     protected override Task ExecuteAsync(CancellationToken stoppingToken)
         => Task.WhenAll(
+            ProcessChannelAsync(ProviderChannelReader, onlineProviders, ProviderAvailabilityTopicSuffix, ShouldBeOnline, stoppingToken),
             ProcessChannelAsync(PlayerChannelReader, onlinePlayers, PlayerAvailabilityTopicSuffix, ShouldBeOnline, stoppingToken),
             ProcessChannelAsync(PlayerStateChannelReader, onlinePlayerStates, PlayerStateAvailabilityTopicSuffix, ShouldBeOnline, stoppingToken),
             ProcessChannelAsync(MapChannelReader, onlineMaps, MapAvailabilityTopicSuffix, ShouldBeOnline, stoppingToken),
@@ -94,6 +97,7 @@ public sealed class AvailabilityMqttPublisher(
         }
     }
 
+    private static bool ShouldBeOnline(ProviderEvent @event) => @event.Provider is not null;
     private static bool ShouldBeOnline(PlayerEvent @event) => @event.Player is not null;
     private static bool ShouldBeOnline(PlayerStateEvent @event) => @event.PlayerState is not null;
     private static bool ShouldBeOnline(MapEvent @event) => @event.Map is not null;
@@ -114,6 +118,7 @@ public sealed class AvailabilityMqttPublisher(
 
         // Combine all sets into a single sequence with their respective topic suffixes
         var entries = onlinePlayers.Select(steamId => (steamId, PlayerAvailabilityTopicSuffix))
+            .Concat(onlineProviders.Select(steamId => (steamId, ProviderAvailabilityTopicSuffix)))
             .Concat(onlinePlayerStates.Select(steamId => (steamId, PlayerStateAvailabilityTopicSuffix)))
             .Concat(onlineMaps.Select(steamId => (steamId, MapAvailabilityTopicSuffix)))
             .Concat(onlineRounds.Select(steamId => (steamId, RoundAvailabilityTopicSuffix)));

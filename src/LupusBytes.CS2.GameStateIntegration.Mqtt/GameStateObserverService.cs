@@ -1,72 +1,38 @@
-using System.Diagnostics.CodeAnalysis;
 using System.Threading.Channels;
 using LupusBytes.CS2.GameStateIntegration.Events;
-using Microsoft.Extensions.Hosting;
 
 namespace LupusBytes.CS2.GameStateIntegration.Mqtt;
 
-public abstract class GameStateObserverService :
-    BackgroundService,
-    IObserver<PlayerEvent>,
-    IObserver<PlayerStateEvent>,
-    IObserver<MapEvent>,
-    IObserver<RoundEvent>
+/// <summary>
+/// This class sets up subscriptions for
+/// <see cref="PlayerEvent"/>,
+/// <see cref="PlayerStateEvent"/>,
+/// <see cref="MapEvent"/>,
+/// <see cref="RoundEvent"/> and
+/// <see cref="ProviderEvent"/>,
+/// on the given <see cref="IGameStateService"/> and re-transmits all the incoming events on matching <see cref="Channel"/>s.
+/// Use <see cref="GameStateWithoutProviderObserverService"/> if <see cref="ProviderEvent"/> is not needed.
+/// </summary>
+public abstract class GameStateObserverService
+    : GameStateWithoutProviderObserverService, IObserver<ProviderEvent>
 {
-    private static readonly BoundedChannelOptions ChannelOptions = new(1000)
-    {
-        SingleWriter = false,
-        SingleReader = true,
-        FullMode = BoundedChannelFullMode.DropOldest,
-    };
+    private readonly Channel<ProviderEvent> providerChannel;
+    private readonly IDisposable providerSubscription;
 
-    private readonly IDisposable[] subscriptions;
-    private readonly Channel<PlayerEvent> playerChannel;
-    private readonly Channel<PlayerStateEvent> playerStateChannel;
-    private readonly Channel<MapEvent> mapChannel;
-    private readonly Channel<RoundEvent> roundChannel;
-
-    protected ChannelReader<PlayerEvent> PlayerChannelReader => playerChannel.Reader;
-    protected ChannelReader<PlayerStateEvent> PlayerStateChannelReader => playerStateChannel.Reader;
-    protected ChannelReader<MapEvent> MapChannelReader => mapChannel.Reader;
-    protected ChannelReader<RoundEvent> RoundChannelReader => roundChannel.Reader;
+    protected ChannelReader<ProviderEvent> ProviderChannelReader => providerChannel.Reader;
 
     protected GameStateObserverService(IGameStateService gameStateService)
+        : base(gameStateService)
     {
-        playerChannel = Channel.CreateBounded<PlayerEvent>(ChannelOptions);
-        playerStateChannel = Channel.CreateBounded<PlayerStateEvent>(ChannelOptions);
-        mapChannel = Channel.CreateBounded<MapEvent>(ChannelOptions);
-        roundChannel = Channel.CreateBounded<RoundEvent>(ChannelOptions);
-
-        subscriptions =
-        [
-            gameStateService.Subscribe(this as IObserver<PlayerEvent>),
-            gameStateService.Subscribe(this as IObserver<PlayerStateEvent>),
-            gameStateService.Subscribe(this as IObserver<RoundEvent>),
-            gameStateService.Subscribe(this as IObserver<MapEvent>),
-        ];
+        providerChannel = Channel.CreateBounded<ProviderEvent>(ChannelOptions);
+        providerSubscription = gameStateService.Subscribe(this as IObserver<ProviderEvent>);
     }
 
-    public void OnNext(PlayerEvent value) => playerChannel.Writer.TryWrite(value);
-    public void OnNext(PlayerStateEvent value) => playerStateChannel.Writer.TryWrite(value);
-    public void OnNext(MapEvent value) => mapChannel.Writer.TryWrite(value);
-    public void OnNext(RoundEvent value) => roundChannel.Writer.TryWrite(value);
+    public void OnNext(ProviderEvent value) => providerChannel.Writer.TryWrite(value);
 
-    public void OnCompleted()
-    {
-    }
-
-    public void OnError(Exception error)
-    {
-    }
-
-    [SuppressMessage("Major Code Smell", "S3971:\"GC.SuppressFinalize\" should not be called", Justification = "False positive")]
     public override void Dispose()
     {
-        foreach (var subscription in subscriptions)
-        {
-            subscription.Dispose();
-        }
-
+        providerSubscription.Dispose();
         base.Dispose();
         GC.SuppressFinalize(this);
     }

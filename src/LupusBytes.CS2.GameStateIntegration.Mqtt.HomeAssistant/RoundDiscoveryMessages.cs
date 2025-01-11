@@ -7,6 +7,7 @@ public class RoundDiscoveryMessages(Device device) : MqttDiscoveryMessages
     private readonly Availability[] availability =
     [
         new($"{MqttConstants.BaseTopic}/{device.Id}/round/status"),
+        new($"{MqttConstants.BaseTopic}/{device.Id}/status"),
         new(MqttConstants.SystemAvailabilityTopic),
     ];
 
