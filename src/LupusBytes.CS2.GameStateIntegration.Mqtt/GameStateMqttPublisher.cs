@@ -9,17 +9,11 @@ public sealed class GameStateMqttPublisher(
     IMqttClient mqttClient) : GameStateObserverService(gameStateService)
 {
     protected override Task ExecuteAsync(CancellationToken stoppingToken)
-    {
-        var tasks = new[]
-        {
+        => Task.WhenAll(
             ProcessChannelAsync(PlayerChannelReader, stoppingToken),
             ProcessChannelAsync(PlayerStateChannelReader, stoppingToken),
             ProcessChannelAsync(MapChannelReader, stoppingToken),
-            ProcessChannelAsync(RoundChannelReader, stoppingToken),
-        };
-
-        return Task.WhenAll(tasks);
-    }
+            ProcessChannelAsync(RoundChannelReader, stoppingToken));
 
     private async Task ProcessChannelAsync<TEvent>(ChannelReader<TEvent> channelReader, CancellationToken cancellationToken)
         where TEvent : BaseEvent
