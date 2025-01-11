@@ -4,6 +4,7 @@ using LupusBytes.CS2.GameStateIntegration.Events;
 namespace LupusBytes.CS2.GameStateIntegration;
 
 public interface IGameStateService :
+    IObservable<ProviderEvent>,
     IObservable<MapEvent>,
     IObservable<PlayerEvent>,
     IObservable<PlayerStateEvent>,

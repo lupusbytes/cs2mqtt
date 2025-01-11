@@ -6,7 +6,7 @@ namespace LupusBytes.CS2.GameStateIntegration.Mqtt;
 
 public sealed class GameStateMqttPublisher(
     IGameStateService gameStateService,
-    IMqttClient mqttClient) : GameStateObserverService(gameStateService)
+    IMqttClient mqttClient) : GameStateWithoutProviderObserverService(gameStateService)
 {
     protected override Task ExecuteAsync(CancellationToken stoppingToken)
         => Task.WhenAll(

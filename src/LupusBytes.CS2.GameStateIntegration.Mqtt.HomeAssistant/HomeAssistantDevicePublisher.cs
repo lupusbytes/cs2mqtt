@@ -14,6 +14,7 @@ public sealed class HomeAssistantDevicePublisher(
     private const string Manufacturer = "lupusbytes";
 
     private readonly ConcurrentDictionary<SteamId64, Device> devices = [];
+    private readonly HashSet<SteamId64> publishedProviderConfigs = [];
     private readonly HashSet<SteamId64> publishedPlayerConfigs = [];
     private readonly HashSet<SteamId64> publishedPlayerStateConfigs = [];
     private readonly HashSet<SteamId64> publishedMapConfigs = [];
@@ -27,6 +28,11 @@ public sealed class HomeAssistantDevicePublisher(
 
     private Task ProcessChannelsAsync(CancellationToken stoppingToken)
         => Task.WhenAll(
+            ProcessChannelAsync(
+                ProviderChannelReader,
+                publishedProviderConfigs,
+                device => new ProviderDiscoveryMessages(device),
+                stoppingToken),
             ProcessChannelAsync(
                 PlayerChannelReader,
                 publishedPlayerConfigs,
