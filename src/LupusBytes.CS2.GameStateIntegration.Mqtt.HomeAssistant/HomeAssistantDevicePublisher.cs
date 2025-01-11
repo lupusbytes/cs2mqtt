@@ -54,21 +54,18 @@ public sealed class HomeAssistantDevicePublisher(
         CancellationToken cancellationToken)
         where TEvent : BaseEvent
     {
-        while (await channelReader.WaitToReadAsync(cancellationToken))
+        await foreach (var @event in channelReader.ReadAllAsync(cancellationToken))
         {
-            while (channelReader.TryRead(out var @event))
+            var device = devices.GetOrAdd(@event.SteamId, CreateDevice);
+
+            if (!publishedConfigSet.Add(@event.SteamId))
             {
-                var device = devices.GetOrAdd(@event.SteamId, CreateDevice);
+                continue;
+            }
 
-                if (!publishedConfigSet.Add(@event.SteamId))
-                {
-                    continue;
-                }
-
-                foreach (var discoveryMessage in discoveryMessages(device))
-                {
-                    await mqttClient.PublishAsync(discoveryMessage, cancellationToken);
-                }
+            foreach (var discoveryMessage in discoveryMessages(device))
+            {
+                await mqttClient.PublishAsync(discoveryMessage, cancellationToken);
             }
         }
     }
