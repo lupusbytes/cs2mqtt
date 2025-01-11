@@ -8,4 +8,4 @@ public record Device(
     [property: JsonPropertyName("manufacturer")] string Manufacturer,
     [property: JsonPropertyName("model")] string Model,
     [property: JsonPropertyName("sw_version")] string SoftwareVersion,
-    [property: JsonPropertyName("via_device")] string ViaDevice = "");
+    [property: JsonPropertyName("via_device"), JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)] string? ViaDevice = null);
