@@ -81,24 +81,21 @@ public sealed class AvailabilityMqttPublisher(
         CancellationToken cancellationToken)
         where TEvent : BaseEvent
     {
-        while (await channelReader.WaitToReadAsync(cancellationToken))
+        await foreach (var @event in channelReader.ReadAllAsync(cancellationToken))
         {
-            while (channelReader.TryRead(out var @event))
+            var isOnline = !onlineSet.Add(@event.SteamId);
+            var shouldBeOnline = shouldBeOnlineFunc(@event);
+
+            if (shouldBeOnline == isOnline)
             {
-                var isOnline = !onlineSet.Add(@event.SteamId);
-                var shouldBeOnline = shouldBeOnlineFunc(@event);
+                continue;
+            }
 
-                if (shouldBeOnline == isOnline)
-                {
-                    continue;
-                }
+            await SetAvailability(@event.SteamId, topicSuffix, shouldBeOnline, cancellationToken);
 
-                await SetAvailability(@event.SteamId, topicSuffix, shouldBeOnline, cancellationToken);
-
-                if (!shouldBeOnline)
-                {
-                    onlineSet.Remove(@event.SteamId);
-                }
+            if (!shouldBeOnline)
+            {
+                onlineSet.Remove(@event.SteamId);
             }
         }
     }

@@ -24,12 +24,9 @@ public sealed class GameStateMqttPublisher(
     private async Task ProcessChannelAsync<TEvent>(ChannelReader<TEvent> channelReader, CancellationToken cancellationToken)
         where TEvent : BaseEvent
     {
-        while (await channelReader.WaitToReadAsync(cancellationToken))
+        await foreach (var @event in channelReader.ReadAllAsync(cancellationToken))
         {
-            while (channelReader.TryRead(out var @event))
-            {
-                await mqttClient.PublishAsync(@event.ToMqttMessage(), cancellationToken);
-            }
+            await mqttClient.PublishAsync(@event.ToMqttMessage(), cancellationToken);
         }
     }
 }
