@@ -37,17 +37,11 @@ public sealed class AvailabilityMqttPublisher(
     }
 
     protected override Task ExecuteAsync(CancellationToken stoppingToken)
-    {
-        var tasks = new[]
-        {
+        => Task.WhenAll(
             ProcessChannelAsync(PlayerChannelReader, onlinePlayers, PlayerAvailabilityTopicSuffix, ShouldBeOnline, stoppingToken),
             ProcessChannelAsync(PlayerStateChannelReader, onlinePlayerStates, PlayerStateAvailabilityTopicSuffix, ShouldBeOnline, stoppingToken),
             ProcessChannelAsync(MapChannelReader, onlineMaps, MapAvailabilityTopicSuffix, ShouldBeOnline, stoppingToken),
-            ProcessChannelAsync(RoundChannelReader, onlineRounds, RoundAvailabilityTopicSuffix, ShouldBeOnline, stoppingToken),
-        };
-
-        return Task.WhenAll(tasks);
-    }
+            ProcessChannelAsync(RoundChannelReader, onlineRounds, RoundAvailabilityTopicSuffix, ShouldBeOnline, stoppingToken));
 
     private Task SetSystemAvailability(bool online, CancellationToken cancellationToken)
         => mqttClient.PublishAsync(
