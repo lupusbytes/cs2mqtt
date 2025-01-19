@@ -12,7 +12,6 @@ public sealed class Program
     private static void Main(string[] args)
     {
         var builder = WebApplication.CreateBuilder(args);
-        builder.Services.Configure<GameStateOptions>(builder.Configuration.GetSection(GameStateOptions.Section));
         builder.Services.AddGameStateService(builder.Configuration);
         builder.Services.AddMqttClient(builder.Configuration);
         builder.Services.AddHostedService<GameStateMqttPublisher>();
