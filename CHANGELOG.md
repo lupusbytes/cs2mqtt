@@ -1,5 +1,17 @@
 # Changelog
 
+## [1.6.0](https://github.com/lupusbytes/cs2mqtt/compare/v1.5.2...v1.6.0) (2025-01-20)
+
+
+### New features
+
+* **api:** add healthcheck endpoints /health and /alive ([ad9c6cd](https://github.com/lupusbytes/cs2mqtt/commit/ad9c6cd1b4317d78344278ca38840607c7b4e590))
+
+
+### Bug fixes
+
+* remove duplicate binding of gamestate options ([308821d](https://github.com/lupusbytes/cs2mqtt/commit/308821d7c7473ecdc5ee369c8fdf24d4e3140044))
+
 ## [1.5.2](https://github.com/lupusbytes/cs2mqtt/compare/v1.5.1...v1.5.2) (2025-01-14)
 
 
