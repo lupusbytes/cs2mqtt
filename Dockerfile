@@ -10,6 +10,7 @@ COPY src/LupusBytes.CS2.GameStateIntegration/*.csproj ./src/LupusBytes.CS2.GameS
 COPY src/LupusBytes.CS2.GameStateIntegration.Api.Endpoints/*.csproj ./src/LupusBytes.CS2.GameStateIntegration.Api.Endpoints/
 COPY src/LupusBytes.CS2.GameStateIntegration.Contracts/*.csproj ./src/LupusBytes.CS2.GameStateIntegration.Contracts/
 COPY src/LupusBytes.CS2.GameStateIntegration.Mqtt/*.csproj ./src/LupusBytes.CS2.GameStateIntegration.Mqtt/
+COPY src/LupusBytes.CS2.GameStateIntegration.Mqtt.HealthChecks/*.csproj ./src/LupusBytes.CS2.GameStateIntegration.Mqtt.HealthChecks/
 COPY src/LupusBytes.CS2.GameStateIntegration.Mqtt.HomeAssistant/*.csproj ./src/LupusBytes.CS2.GameStateIntegration.Mqtt.HomeAssistant/
 
 # Restore as distinct layer
