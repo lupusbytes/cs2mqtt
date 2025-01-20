@@ -1,0 +1,14 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <TargetFramework>net9.0</TargetFramework>
+        <ImplicitUsings>enable</ImplicitUsings>
+        <Nullable>enable</Nullable>
+        <IsPackable>false</IsPackable>
+    </PropertyGroup>
+
+    <ItemGroup>
+      <ProjectReference Include="..\..\src\LupusBytes.CS2.GameStateIntegration.Mqtt.HealthChecks\LupusBytes.CS2.GameStateIntegration.Mqtt.HealthChecks.csproj" />
+    </ItemGroup>
+
+</Project>

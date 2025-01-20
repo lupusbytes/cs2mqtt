@@ -1,5 +1,4 @@
 using System.Reflection;
-using LupusBytes.CS2.GameStateIntegration.Api.EndToEnd.Tests.Fakes;
 using LupusBytes.CS2.GameStateIntegration.Mqtt;
 using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.Extensions.Configuration;
@@ -12,6 +11,8 @@ namespace LupusBytes.CS2.GameStateIntegration.Api.EndToEnd.Tests.Helpers;
 public class TestWebApplicationFactory<TProgram> : WebApplicationFactory<TProgram>
     where TProgram : class
 {
+    public IMqttClient MqttClient { get; private set; } = null!;
+
     protected override IHost CreateHost(IHostBuilder builder)
     {
         builder.ConfigureHostConfiguration(config =>
@@ -19,12 +20,12 @@ public class TestWebApplicationFactory<TProgram> : WebApplicationFactory<TProgra
             config.AddJsonFile("appsettings.EndToEnd.json", optional: false, reloadOnChange: true);
         });
 
-        builder.ConfigureServices(ReplaceMqttClientWithFake);
+        builder.ConfigureServices(SubstituteMqttClient);
 
         return base.CreateHost(builder);
     }
 
-    private static void ReplaceMqttClientWithFake(IServiceCollection services)
+    private void SubstituteMqttClient(IServiceCollection services)
     {
         // Stop MqttClient from being registered as a HostedService
         var descriptor = services.FirstOrDefault(descriptor =>
@@ -36,9 +37,10 @@ public class TestWebApplicationFactory<TProgram> : WebApplicationFactory<TProgra
             services.Remove(descriptor);
         }
 
-        // Replace MqttClient registrations with our fake.
+        // Replace MqttClient registrations with our mocked instance.
         services.RemoveAll<MqttClient>();
         services.RemoveAll<IMqttClient>();
-        services.AddSingleton<IMqttClient>(new FakeMqttClient());
+        MqttClient = Substitute.For<IMqttClient>();
+        services.AddSingleton(MqttClient);
     }
 }

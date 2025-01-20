@@ -26,6 +26,10 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LupusBytes.CS2.GameStateInt
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LupusBytes.CS2.GameStateIntegration.Contracts.Tests", "test\LupusBytes.CS2.GameStateIntegration.Contracts.Tests\LupusBytes.CS2.GameStateIntegration.Contracts.Tests.csproj", "{C55E5FE5-ED0D-4108-9771-311E7BE383D1}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LupusBytes.CS2.GameStateIntegration.Mqtt.HealthChecks", "src\LupusBytes.CS2.GameStateIntegration.Mqtt.HealthChecks\LupusBytes.CS2.GameStateIntegration.Mqtt.HealthChecks.csproj", "{96F73B32-FA17-4014-B828-852199888D9E}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LupusBytes.CS2.GameStateIntegration.Mqtt.HealthChecks.Tests", "test\LupusBytes.CS2.GameStateIntegration.Mqtt.HealthChecks.Tests\LupusBytes.CS2.GameStateIntegration.Mqtt.HealthChecks.Tests.csproj", "{7F5D4083-F987-4E77-96BA-2E04F8FA933D}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -76,6 +80,14 @@ Global
 		{C55E5FE5-ED0D-4108-9771-311E7BE383D1}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{C55E5FE5-ED0D-4108-9771-311E7BE383D1}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{C55E5FE5-ED0D-4108-9771-311E7BE383D1}.Release|Any CPU.Build.0 = Release|Any CPU
+		{96F73B32-FA17-4014-B828-852199888D9E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{96F73B32-FA17-4014-B828-852199888D9E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{96F73B32-FA17-4014-B828-852199888D9E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{96F73B32-FA17-4014-B828-852199888D9E}.Release|Any CPU.Build.0 = Release|Any CPU
+		{7F5D4083-F987-4E77-96BA-2E04F8FA933D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{7F5D4083-F987-4E77-96BA-2E04F8FA933D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{7F5D4083-F987-4E77-96BA-2E04F8FA933D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{7F5D4083-F987-4E77-96BA-2E04F8FA933D}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
 		{805EDDA1-F961-4B51-AB07-3F4F3A0D20D4} = {36655383-D743-4AC6-9E7D-3BFF9BDD69B6}
@@ -89,5 +101,7 @@ Global
 		{65889B71-723B-4556-B052-1E0905FA8AA4} = {E8A90952-2F60-4324-9046-7CDCF150268E}
 		{11311FEE-448E-4719-8E93-92741F454F12} = {E8A90952-2F60-4324-9046-7CDCF150268E}
 		{C55E5FE5-ED0D-4108-9771-311E7BE383D1} = {E8A90952-2F60-4324-9046-7CDCF150268E}
+		{96F73B32-FA17-4014-B828-852199888D9E} = {36655383-D743-4AC6-9E7D-3BFF9BDD69B6}
+		{7F5D4083-F987-4E77-96BA-2E04F8FA933D} = {E8A90952-2F60-4324-9046-7CDCF150268E}
 	EndGlobalSection
 EndGlobal

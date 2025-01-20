@@ -46,6 +46,8 @@ public sealed class MqttClient : IHostedService, IMqttClient, IDisposable
         clientOptions = clientOptionsBuilder.Build();
     }
 
+    public bool IsConnected => mqttNetClient.IsConnected;
+
     public Task StartAsync(CancellationToken cancellationToken)
     {
         shutdownRequested = false;
