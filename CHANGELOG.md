@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.6.1](https://github.com/lupusbytes/cs2mqtt/compare/v1.6.0...v1.6.1) (2025-02-06)
+
+
+### Upgrades
+
+* **deps:** update dependency polly to 8.5.2 ([71f125c](https://github.com/lupusbytes/cs2mqtt/commit/71f125c32e323f1e24e5db8877123a4f86b357a0))
+
 ## [1.6.0](https://github.com/lupusbytes/cs2mqtt/compare/v1.5.2...v1.6.0) (2025-01-20)
 
 
