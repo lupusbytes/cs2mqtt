@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.6.2](https://github.com/lupusbytes/cs2mqtt/compare/v1.6.1...v1.6.2) (2025-02-11)
+
+
+### Upgrades
+
+* **deps:** update dotnet packages to 9.0.2 ([a74f2f4](https://github.com/lupusbytes/cs2mqtt/commit/a74f2f455e690e6b40750e7319d4753efc4d173b))
+
 ## [1.6.1](https://github.com/lupusbytes/cs2mqtt/compare/v1.6.0...v1.6.1) (2025-02-06)
 
 
