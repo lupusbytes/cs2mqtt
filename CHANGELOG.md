@@ -1,5 +1,13 @@
 # Changelog
 
+## [1.6.6](https://github.com/lupusbytes/cs2mqtt/compare/v1.6.5...v1.6.6) (2025-06-12)
+
+
+### Upgrades
+
+* **deps:** update dependency polly to 8.6.0 ([687880b](https://github.com/lupusbytes/cs2mqtt/commit/687880b0ad2aa6628df2aa8c1a71711aa0d94612))
+* **deps:** update dotnet monorepo to 9.0.6 ([33975e4](https://github.com/lupusbytes/cs2mqtt/commit/33975e48611ebb89176f64c1f609b996b751030b))
+
 ## [1.6.5](https://github.com/lupusbytes/cs2mqtt/compare/v1.6.4...v1.6.5) (2025-05-15)
 
 
