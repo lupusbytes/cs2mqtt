@@ -1,4 +1,5 @@
 using System.Collections.Concurrent;
+using System.Diagnostics.CodeAnalysis;
 using System.Threading.Channels;
 using LupusBytes.CS2.GameStateIntegration.Contracts;
 using LupusBytes.CS2.GameStateIntegration.Events;
@@ -47,6 +48,10 @@ public sealed class HomeAssistantDevicePublisher(
                 device => new RoundDiscoveryMessages(device),
                 stoppingToken));
 
+    [SuppressMessage(
+        "Minor Code Smell",
+        "S3267:Loops should be simplified with \"LINQ\" expressions",
+        Justification = "To be fixed when upgrading to .NET 10 which contains System.Linq.AsyncEnumerable")]
     private async Task ProcessChannelAsync<TEvent>(
         ChannelReader<TEvent> channelReader,
         HashSet<SteamId64> publishedConfigSet,
