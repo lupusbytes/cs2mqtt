@@ -53,3 +53,4 @@ dotnet_diagnostic.SA1133.severity = none            # https://github.com/atc-net
 # Custom - Code Analyzers Rules
 ##########################################
 dotnet_diagnostic.CA2234.severity = none            # Pass system uri objects instead of strings
+dotnet_diagnostic.xUnit1051.severity = none         # Calls to methods which accept CancellationToken should use TestContext.Current.CancellationToken
