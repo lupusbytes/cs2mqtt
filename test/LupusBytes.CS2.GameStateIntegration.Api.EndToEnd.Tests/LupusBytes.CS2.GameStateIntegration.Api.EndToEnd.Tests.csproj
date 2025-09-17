@@ -12,6 +12,7 @@
 
     <ItemGroup>
         <PackageReference Include="Microsoft.AspNetCore.Mvc.Testing" Version="9.0.9" />
+        <PackageReference Include="Xunit.v3.Priority" Version="1.1.18" />
     </ItemGroup>
 
     <ItemGroup>

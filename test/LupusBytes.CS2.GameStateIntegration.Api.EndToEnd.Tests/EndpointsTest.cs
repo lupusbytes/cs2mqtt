@@ -4,17 +4,18 @@ using System.Text;
 using LupusBytes.CS2.GameStateIntegration.Api.EndToEnd.Tests.Helpers;
 using LupusBytes.CS2.GameStateIntegration.Contracts;
 using LupusBytes.CS2.GameStateIntegration.Contracts.Enums;
+using Xunit.v3.Priority;
 
 namespace LupusBytes.CS2.GameStateIntegration.Api.EndToEnd.Tests;
 
 [Collection("REST API")]
-[TestCaseOrderer(PriorityOrderer.Name, PriorityOrderer.Assembly)]
+[TestCaseOrderer(typeof(PriorityOrderer))]
 public class EndpointsTest(TestWebApplicationFactory<Program> factory)
     : IClassFixture<TestWebApplicationFactory<Program>>
 {
     private readonly HttpClient httpClient = factory.CreateClient();
 
-    [Fact, TestPriority(1)]
+    [Fact, Priority(1)]
     public async Task Get_player_returns_404()
     {
         // Act
@@ -24,7 +25,7 @@ public class EndpointsTest(TestWebApplicationFactory<Program> factory)
         response.Should().HaveStatusCode(HttpStatusCode.NotFound);
     }
 
-    [Fact, TestPriority(2)]
+    [Fact, Priority(2)]
     public async Task Get_map_returns_404()
     {
         // Act
@@ -34,7 +35,7 @@ public class EndpointsTest(TestWebApplicationFactory<Program> factory)
         response.Should().HaveStatusCode(HttpStatusCode.NotFound);
     }
 
-    [Fact, TestPriority(3)]
+    [Fact, Priority(3)]
     public async Task Get_round_returns_404()
     {
         // Act
@@ -44,7 +45,7 @@ public class EndpointsTest(TestWebApplicationFactory<Program> factory)
         response.Should().HaveStatusCode(HttpStatusCode.NotFound);
     }
 
-    [Fact, TestPriority(4)]
+    [Fact, Priority(4)]
     public async Task Post_GameStateData_returns_204()
     {
         // Arrange
@@ -110,7 +111,7 @@ public class EndpointsTest(TestWebApplicationFactory<Program> factory)
         response.StatusCode.Should().Be(HttpStatusCode.NoContent);
     }
 
-    [Fact, TestPriority(6)]
+    [Fact, Priority(6)]
     public async Task Get_player_returns_200_with_player()
     {
         // Act
@@ -136,7 +137,7 @@ public class EndpointsTest(TestWebApplicationFactory<Program> factory)
             });
     }
 
-    [Fact, TestPriority(6)]
+    [Fact, Priority(6)]
     public async Task Get_map_returns_200_with_map()
     {
         // Act
@@ -155,7 +156,7 @@ public class EndpointsTest(TestWebApplicationFactory<Program> factory)
                 CT: new TeamMapDetails(2, 3, 1, 0)));
     }
 
-    [Fact, TestPriority(7)]
+    [Fact, Priority(7)]
     public async Task Get_round_returns_200_with_round()
     {
         // Act

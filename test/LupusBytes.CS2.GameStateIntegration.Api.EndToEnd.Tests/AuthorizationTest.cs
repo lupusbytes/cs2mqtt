@@ -4,8 +4,8 @@ using LupusBytes.CS2.GameStateIntegration.Api.EndToEnd.Tests.Helpers;
 
 namespace LupusBytes.CS2.GameStateIntegration.Api.EndToEnd.Tests;
 
-public class AuthorizationTest(TestWebApplicationFactory<AuthorizationTestWebApplication> factory)
-    : IClassFixture<TestWebApplicationFactory<AuthorizationTestWebApplication>>
+public class AuthorizationTest(AuthorizationTestWebApplicationFactory factory)
+    : IClassFixture<AuthorizationTestWebApplicationFactory>
 {
     private const string ProviderJsonObject =
         """
@@ -28,7 +28,7 @@ public class AuthorizationTest(TestWebApplicationFactory<AuthorizationTestWebApp
                                 {
                                   "provider": {{ProviderJsonObject}},
                                   "auth": {
-                                    "token": "{{AuthorizationTestWebApplication.ExpectedToken}}"
+                                    "token": "{{AuthorizationTestWebApplicationFactory.ExpectedToken}}"
                                   }
                                 }
                               """;
