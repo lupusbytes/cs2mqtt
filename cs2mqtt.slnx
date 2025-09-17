@@ -1,0 +1,19 @@
+<Solution>
+  <Folder Name="/src/">
+    <Project Path="src/LupusBytes.CS2.GameStateIntegration.Api.Endpoints/LupusBytes.CS2.GameStateIntegration.Api.Endpoints.csproj" />
+    <Project Path="src/LupusBytes.CS2.GameStateIntegration.Api/LupusBytes.CS2.GameStateIntegration.Api.csproj" />
+    <Project Path="src/LupusBytes.CS2.GameStateIntegration.Contracts/LupusBytes.CS2.GameStateIntegration.Contracts.csproj" />
+    <Project Path="src/LupusBytes.CS2.GameStateIntegration.Mqtt.HealthChecks/LupusBytes.CS2.GameStateIntegration.Mqtt.HealthChecks.csproj" />
+    <Project Path="src/LupusBytes.CS2.GameStateIntegration.Mqtt.HomeAssistant/LupusBytes.CS2.GameStateIntegration.Mqtt.HomeAssistant.csproj" />
+    <Project Path="src/LupusBytes.CS2.GameStateIntegration.Mqtt/LupusBytes.CS2.GameStateIntegration.Mqtt.csproj" />
+    <Project Path="src/LupusBytes.CS2.GameStateIntegration/LupusBytes.CS2.GameStateIntegration.csproj" />
+  </Folder>
+  <Folder Name="/test/">
+    <Project Path="test/LupusBytes.CS2.GameStateIntegration.Api.EndToEnd.Tests/LupusBytes.CS2.GameStateIntegration.Api.EndToEnd.Tests.csproj" />
+    <Project Path="test/LupusBytes.CS2.GameStateIntegration.Contracts.Tests/LupusBytes.CS2.GameStateIntegration.Contracts.Tests.csproj" />
+    <Project Path="test/LupusBytes.CS2.GameStateIntegration.Mqtt.HealthChecks.Tests/LupusBytes.CS2.GameStateIntegration.Mqtt.HealthChecks.Tests.csproj" />
+    <Project Path="test/LupusBytes.CS2.GameStateIntegration.Mqtt.Integration.Tests/LupusBytes.CS2.GameStateIntegration.Mqtt.Integration.Tests.csproj" />
+    <Project Path="test/LupusBytes.CS2.GameStateIntegration.Mqtt.Tests/LupusBytes.CS2.GameStateIntegration.Mqtt.Tests.csproj" />
+    <Project Path="test/LupusBytes.CS2.GameStateIntegration.Tests/LupusBytes.CS2.GameStateIntegration.Tests.csproj" />
+  </Folder>
+</Solution>
