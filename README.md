@@ -114,7 +114,7 @@ Once you have located the correct path, create a new file there called **gamesta
  "uri" "http://127.0.0.1:5000"
  "timeout" "5.0"
  "buffer"  "0.1"
- "throttle" "0.5"
+ "throttle" "0.1"
  "heartbeat" "60.0"
  "data"
  {
