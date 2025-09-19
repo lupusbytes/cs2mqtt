@@ -1,0 +1,24 @@
+configuration:
+  MQTT__Host: 
+    name: MQTT Host
+    description: MQTT Server Host/IP - If you're running an MQTT broker outside of your HA instance, replace homeassistant.local with the broker's host/IP.
+  MQTT__Port:
+    name: MQTT Port
+    description: MQTT broker port
+  MQTT__UseTLS:
+    name: Use TLS
+    description: "Set to true if your broker uses TLS (optional, default: false)"
+  MQTT__Username:
+    name: MQTT Username
+    description: MQTT client username, leave blank if auth is disabled
+  MQTT__Password: 
+    name: MQTT Password
+    description: MQTT client password, leave blank if auth is disabled
+  MQTT__ClientId: 
+    name: MQTT Client ID
+    description: Optional
+  MQTT__ProtocolVersion:
+    name: MQTT Protocol Version
+    description: Optional, default is 5.0.0
+network:
+  8080/tcp: Game State API port (needs to match the port in your CS2 cfg)
