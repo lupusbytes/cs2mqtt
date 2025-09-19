@@ -8,7 +8,12 @@
     }
   },
   "extra-files": [
-    "Directory.Build.props"
+    "Directory.Build.props",
+    {
+      "path": "ha-addon/config.json",
+      "type": "json",
+      "jsonpath": "$.version"
+    }
   ],
   "changelog-sections": [
     {
