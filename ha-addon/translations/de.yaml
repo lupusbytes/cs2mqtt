@@ -1,0 +1,24 @@
+configuration:
+  MQTT__Host: 
+    name: MQTT Host
+    description: MQTT Server Host/IP - Falls ein Broker außerhalb von Home Assistant läuft, hier homeassistant.local durch Host/IP ersetzen
+  MQTT__Port:
+    name: MQTT Port
+    description: MQTT Broker Port
+  MQTT__UseTLS:
+    name: Use TLS
+    description: Aktivieren, wenn der Broker SSL verwendet (optional, standardmäßig deaktiviert)
+  MQTT__Username:
+    name: MQTT Username
+    description: MQTT Client Nutzername, leer lassen falls Authentifizierung deaktiviert ist.
+  MQTT__Password: 
+    name: MQTT Passwort
+    description: MQTT Client Passwort, leer lassen falls Authentifizierung deaktiviert ist.
+  MQTT__ClientId: 
+    name: MQTT Client ID
+    description: Optional
+  MQTT__ProtocolVersion:
+    name: MQTT Protokollversion
+    description: Optional, Standard ist 5.0.0
+network:
+  8080/tcp: Game State API Port (muss in der CS2 cfg übereinstimmen)

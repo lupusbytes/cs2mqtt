@@ -96,6 +96,14 @@ services:
 >⚠️ Make sure you replace the host, username, and password with values matching your setup, and that the MQTT client is not also used by another application.  
 If the broker is configured to allow anonymous access, the username and password can be omitted.
 
+## Running **cs2mqtt** as Home Assistant Add-On
+
+[![Open your Home Assistant instance and show the add add-on repository dialog with a specific repository URL pre-filled.](https://my.home-assistant.io/badges/supervisor_add_addon_repository.svg)](https://my.home-assistant.io/redirect/supervisor_add_addon_repository/?repository_url=https%3A%2F%2Fgithub.com%2Flupusbytes%2Fcs2mqtt)
+
+Add this repo as an add-on repository via the button above or manually by going to the Add-On Store, clicking on the top right hamburger menu, selecting Repositories and adding `https://github.com/lupusbytes/cs2mqtt`.
+
+Configure the addon just like you would for docker compose. Follow the step below to add the gamestate config to your CS2 directory but make sure to replace the `uri` with your HomeAssistant server IP and the port you configured.
+
 ### Connecting **Counter-Strike 2** to **cs2mqtt**
 
 To make **Counter-Strike 2** send game state data to **cs2mqtt**, you need to create a config file within the game's directory.
