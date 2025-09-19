@@ -84,7 +84,7 @@ public sealed class MqttClient : IHostedService, IMqttClient, IDisposable
         .Handle<Exception>()
         .WaitAndRetryAsync(
             retryCount,
-            sleepDurationProvider: attempt => TimeSpan.FromSeconds(Math.Pow(2.5, attempt)),
+            sleepDurationProvider: attempt => options.ReconnectDelayProvider(attempt),
             onRetry: (_, timeSpan, currentAttempt, _)
                 => logger.ConnectionToMqttBrokerFailed(
                     options.Host,
