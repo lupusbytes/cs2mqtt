@@ -1,0 +1,6 @@
+name: "cs2mqtt Repository"
+url: "https://github.com/davidramiro/cs2mqtt"
+maintainer: "davidramiro"
+addons:
+  cs2mqtt:
+    repository: ha-addon
