@@ -10,4 +10,7 @@ public record SensorConfig(
     [property: JsonPropertyName("icon")] string Icon,
     [property: JsonPropertyName("device")] Device Device,
     [property: JsonPropertyName("availability")] IReadOnlyCollection<Availability> Availability,
-    [property: JsonPropertyName("availability_mode")] string AvailabilityMode = "all");
+    [property: JsonPropertyName("availability_mode")] string AvailabilityMode = "all",
+    [property: JsonPropertyName("unit_of_measurement")]
+    [property: JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
+    string? UnitOfMeasurement = null);
