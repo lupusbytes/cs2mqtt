@@ -3,6 +3,7 @@ using System.Net.Sockets;
 using System.Text;
 using Microsoft.Extensions.Logging;
 using MQTTnet;
+using MQTTnet.Adapter;
 using IMqttNetClient = MQTTnet.IMqttClient;
 
 namespace LupusBytes.CS2.GameStateIntegration.Mqtt.Tests;
@@ -57,6 +58,9 @@ public class MqttClientTest
         CancellationToken cancellationToken,
         MqttClient sut)
     {
+        // Arrange
+        ArrangeConnectResultCode(mqttNetClient, MqttClientConnectResultCode.Success);
+
         // Act
         await sut.StartAsync(cancellationToken);
 
@@ -68,6 +72,23 @@ public class MqttClientTest
                 ((MqttClientTcpOptions)x.ChannelOptions).RemoteEndpoint.ToString() == $"Unspecified/{options.Host}:{options.Port}" &&
                 x.ChannelOptions.TlsOptions.UseTls == options.UseTls),
             Arg.Is(cancellationToken));
+    }
+
+    [Theory]
+    [MemberAutoNSubstituteData(nameof(AllFailureCodes))]
+    public Task StartAsync_throws_if_connect_result_not_success(
+        MqttClientConnectResultCode resultCode,
+        [Frozen] IMqttNetClient mqttNetClient,
+        [Frozen] MqttOptions options,
+        MqttClient sut)
+    {
+        // Arrange
+        ArrangeConnectResultCode(mqttNetClient, resultCode);
+        options.ReconnectDelayProvider = _ => TimeSpan.FromMilliseconds(1);
+
+        // Act & Assert
+        return Assert.ThrowsAsync<MqttConnectingFailedException>(
+            () => sut.StartAsync(CancellationToken.None));
     }
 
     [Theory, AutoNSubstituteData]
@@ -90,6 +111,7 @@ public class MqttClientTest
         MqttClient sut)
     {
         // Arrange
+        ArrangeConnectResultCode(mqttNetClient, MqttClientConnectResultCode.Success);
         await sut.StartAsync(cancellationToken);
         mqttNetClient.IsConnected.Returns(false);
 
@@ -172,5 +194,27 @@ public class MqttClientTest
 
         // Assert
         return mqttNetClient.Received(1).ConnectAsync(Arg.Any<MqttClientOptions>(), Arg.Any<CancellationToken>());
+    }
+
+    public static TheoryData<MqttClientConnectResultCode> AllFailureCodes
+        => new(Enum.GetValues<MqttClientConnectResultCode>().Where(c => c != MqttClientConnectResultCode.Success));
+
+    /// <summary>
+    /// IMqttNetClient.ConnectAsync returns a MqttClientConnectResult,
+    /// which our system under test uses to validate that the connection is successfully established.
+    /// This result object only has internal setters for all the properties, so this helper method
+    /// can be used to leverage reflection to set the ResultCode that is checked in sut.StartAsync(...);
+    /// </summary>
+    private static void ArrangeConnectResultCode(IMqttNetClient mqttNetClient, MqttClientConnectResultCode code)
+    {
+        var result = new MqttClientConnectResult();
+
+        typeof(MqttClientConnectResult)
+            .GetProperty(nameof(MqttClientConnectResult.ResultCode))!
+            .SetValue(result, code);
+
+        mqttNetClient
+            .ConnectAsync(Arg.Any<MqttClientOptions>(), Arg.Any<CancellationToken>())
+            .Returns(result);
     }
 }

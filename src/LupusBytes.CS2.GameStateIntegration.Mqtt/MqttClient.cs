@@ -1,7 +1,9 @@
 using System.Collections.Concurrent;
+using System.Globalization;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using MQTTnet;
+using MQTTnet.Adapter;
 using MQTTnet.Formatter;
 using Polly;
 using IMqttNetClient = MQTTnet.IMqttClient;
@@ -96,7 +98,16 @@ public sealed class MqttClient : IHostedService, IMqttClient, IDisposable
             async token =>
             {
                 logger.ConnectingToMqttBroker(options.Host, options.Port);
-                await mqttNetClient.ConnectAsync(clientOptions, token);
+
+                var result = await mqttNetClient.ConnectAsync(clientOptions, token);
+
+                if (result.ResultCode is not MqttClientConnectResultCode.Success)
+                {
+                    throw new MqttConnectingFailedException(
+                        $"Failed to connect to MQTT broker {options.Host}:{options.Port.ToString(CultureInfo.InvariantCulture)}. " +
+                        $"Result code: {result.ResultCode}",
+                        innerException: null);
+                }
             },
             cancellationToken);
 
