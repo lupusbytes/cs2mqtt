@@ -57,7 +57,8 @@ public class MapDiscoveryMessages(Device device) : MqttDiscoveryMessages
         ValueTemplate: ValueTemplate.JsonPropertyValue("round"),
         Icon: "mdi:counter",
         device,
-        Availability: availability));
+        Availability: availability,
+        UnitOfMeasurement: "rounds"));
 
     private MqttMessage TScoreDiscoveryMessage => CreateMqttMessage(new SensorConfig(
         Name: "Team T Score",
@@ -66,7 +67,8 @@ public class MapDiscoveryMessages(Device device) : MqttDiscoveryMessages
         ValueTemplate: ValueTemplate.NestedJsonPropertyValue("team_t", "score"),
         Icon: "mdi:account-group",
         device,
-        Availability: availability));
+        Availability: availability,
+        UnitOfMeasurement: "rounds"));
 
     private MqttMessage CTScoreDiscoveryMessage => CreateMqttMessage(new SensorConfig(
         Name: "Team CT Score",
@@ -75,5 +77,6 @@ public class MapDiscoveryMessages(Device device) : MqttDiscoveryMessages
         ValueTemplate: ValueTemplate.NestedJsonPropertyValue("team_ct", "score"),
         Icon: "mdi:account-group-outline",
         device,
-        Availability: availability));
+        Availability: availability,
+        UnitOfMeasurement: "rounds"));
 }

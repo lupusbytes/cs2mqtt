@@ -34,7 +34,8 @@ public class PlayerStateDiscoveryMessages(Device device) : MqttDiscoveryMessages
         ValueTemplate: ValueTemplate.JsonPropertyValue("health"),
         Icon: "mdi:medical-bag",
         device,
-        Availability: availability));
+        Availability: availability,
+        UnitOfMeasurement: "%"));
 
     private MqttMessage ArmorDiscoveryMessage => CreateMqttMessage(new SensorConfig(
         Name: "Armor",
@@ -43,7 +44,8 @@ public class PlayerStateDiscoveryMessages(Device device) : MqttDiscoveryMessages
         ValueTemplate: ValueTemplate.JsonPropertyValue("armor"),
         Icon: "mdi:shield",
         device,
-        Availability: availability));
+        Availability: availability,
+        UnitOfMeasurement: "%"));
 
     private MqttMessage HelmetDiscoveryMessage => CreateMqttMessage(new SensorConfig(
         Name: "Helmet",
@@ -88,7 +90,8 @@ public class PlayerStateDiscoveryMessages(Device device) : MqttDiscoveryMessages
         ValueTemplate: ValueTemplate.JsonPropertyValue("money"),
         Icon: "mdi:currency-usd",
         device,
-        Availability: availability));
+        Availability: availability,
+        UnitOfMeasurement: "$"));
 
     private MqttMessage RoundKillsDiscoveryMessage => CreateMqttMessage(new SensorConfig(
         Name: "Round kills",
@@ -97,7 +100,8 @@ public class PlayerStateDiscoveryMessages(Device device) : MqttDiscoveryMessages
         ValueTemplate: ValueTemplate.JsonPropertyValue("round_kills"),
         Icon: "mdi:account-alert",
         device,
-        Availability: availability));
+        Availability: availability,
+        UnitOfMeasurement: "kills"));
 
     private MqttMessage RoundHeadshotsDiscoveryMessage => CreateMqttMessage(new SensorConfig(
         Name: "Round headshots",
@@ -106,7 +110,8 @@ public class PlayerStateDiscoveryMessages(Device device) : MqttDiscoveryMessages
         ValueTemplate: ValueTemplate.JsonPropertyValue("round_killhs"),
         Icon: "mdi:head-alert",
         device,
-        Availability: availability));
+        Availability: availability,
+        UnitOfMeasurement: "kills"));
 
     private MqttMessage EquipmentValueDiscoveryMessage => CreateMqttMessage(new SensorConfig(
         Name: "Equipment value",
@@ -115,5 +120,6 @@ public class PlayerStateDiscoveryMessages(Device device) : MqttDiscoveryMessages
         ValueTemplate: ValueTemplate.JsonPropertyValue("equip_value"),
         Icon: "mdi:currency-usd",
         device,
-        Availability: availability));
+        Availability: availability,
+        UnitOfMeasurement: "$"));
 }
