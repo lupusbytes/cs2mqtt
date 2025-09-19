@@ -2,13 +2,13 @@
 
 Configure the addon as follows:
 
--   `MQTT__Host`: MQTT Server - If you're running an MQTT broker outside of your HA instance, replace homeassistant.local with the broker's host/IP.
--   `MQTT__Port`: MQTT broker port
--   `MQTT__UseTLS`: Set to true if your broker uses TLS (optional, default: false)
--   `MQTT__Username`: MQTT client username (optional)
--   `MQTT__Password`: MQTT client password (optional)
--   `MQTT__ClientId`: MQTT client ID (optional)
--   `MQTT__ProtocolVersion`: Allowed values are 3.1.0, 3.1.1, or 5.0.0 (optional, default: 5.0.0)
+-   `MQTT Host`: MQTT Server - If you're running an MQTT broker outside of your HA instance, replace homeassistant.local with the broker's host/IP.
+-   `MQTT Port`: MQTT broker port
+-   `Use TLS`: Set to true if your broker uses TLS (optional, default: false)
+-   `MQTT Username`: MQTT client username (optional)
+-   `MQTT Password`: MQTT client password (optional)
+-   `MQTT Client ID`: MQTT client ID (optional)
+-   `MQTT Protocol Version`: Allowed values are 3.1.0, 3.1.1, or 5.0.0 (optional, default: 5.0.0)
 
 ### Connecting **Counter-Strike 2** to **cs2mqtt**
 
