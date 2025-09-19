@@ -1,14 +1,19 @@
 {
   "name": "cs2mqtt",
-  "version": "1.6.9",
+  "version": "1.7.0",
   "slug": "cs2mqtt",
   "description": "Counter-Strike 2 Game State Integration to MQTT bridge",
   "url": "https://github.com/lupusbytes/cs2mqtt",
   "startup": "application",
-  "services": ["mqtt:need"],
+  "services": [
+    "mqtt:need"
+  ],
   "hassio_api": true,
   "panel_icon": "mdi:pistol",
-  "arch": ["aarch64", "amd64"],
+  "arch": [
+    "aarch64",
+    "amd64"
+  ],
   "timeout": 30,
   "legacy": true,
   "ports": {

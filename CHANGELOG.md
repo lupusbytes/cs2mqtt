@@ -1,5 +1,18 @@
 # Changelog
 
+## [1.7.0](https://github.com/lupusbytes/cs2mqtt/compare/v1.6.9...v1.7.0) (2025-09-19)
+
+
+### New features
+
+* **homeassistant:** add unit of measurement to various sensors ([f520b83](https://github.com/lupusbytes/cs2mqtt/commit/f520b8319fe9f099a4f1292b1512894046ba6cb5))
+* **homeassistant:** enable installing cs2mqtt as an add-on via repository ([06e5f1f](https://github.com/lupusbytes/cs2mqtt/commit/06e5f1f50db13d611fdf440406952a492fbc4f4e))
+
+
+### Bug fixes
+
+* **mqtt:** throw exception when authentication fails ([d0177b6](https://github.com/lupusbytes/cs2mqtt/commit/d0177b6600981a9ddafeced81a2f77aaefde114a))
+
 ## [1.6.9](https://github.com/lupusbytes/cs2mqtt/compare/v1.6.8...v1.6.9) (2025-09-16)
 
 
