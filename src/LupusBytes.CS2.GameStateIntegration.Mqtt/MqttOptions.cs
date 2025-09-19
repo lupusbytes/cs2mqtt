@@ -42,4 +42,9 @@ public class MqttOptions
     /// The client ID to use when connecting to the MQTT broker.
     /// </summary>
     public string ClientId { get; set; } = Constants.ProjectName;
+
+    /// <summary>
+    /// Function that determines the delay between reconnect attempts, given the current attempt number.
+    /// </summary>
+    internal Func<int, TimeSpan> ReconnectDelayProvider { get; set; } = attempt => TimeSpan.FromSeconds(Math.Pow(2.5, attempt));
 }
