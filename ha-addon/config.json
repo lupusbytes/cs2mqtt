@@ -19,17 +19,17 @@
   },
   "options": {
     "MQTT__Host": "homeassistant.local",
-    "MQTT__Port": "1883",
+    "MQTT__Port": 1883,
     "MQTT__UseTLS": false,
-    "MQTT__Username": "c2m",
-    "MQTT__Password": "password",
-    "MQTT__ClientId": "cs2mqtt",
+    "MQTT__Username": "",
+    "MQTT__Password": "",
+    "MQTT__ClientId": "",
     "MQTT__ProtocolVersion": "5.0.0"
   },
   "schema": {
     "MQTT__Host": "str",
     "MQTT__Port": "int",
-    "MQTT__UseTLS": "bool?",
+    "MQTT__UseTLS": "bool",
     "MQTT__Username": "str?",
     "MQTT__Password": "password?",
     "MQTT__ClientId": "str?",
