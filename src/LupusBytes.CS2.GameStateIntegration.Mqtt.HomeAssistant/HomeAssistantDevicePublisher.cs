@@ -6,18 +6,33 @@ using LupusBytes.CS2.GameStateIntegration.Events;
 
 namespace LupusBytes.CS2.GameStateIntegration.Mqtt.HomeAssistant;
 
-public sealed class HomeAssistantDevicePublisher(
-    IGameStateService gameStateService,
-    IMqttClient mqttClient) : GameStateObserverService(gameStateService)
+public sealed class HomeAssistantDevicePublisher : GameStateObserverService, IObserver<ProviderEvent>
 {
     private const string BridgeDeviceId = $"{Constants.ProjectName}_bridge";
     private const string Manufacturer = "lupusbytes";
 
+    private readonly IMqttClient mqttClient;
+
+    private readonly Channel<ProviderEvent> providerChannel = Channel.CreateUnbounded<ProviderEvent>();
+    private readonly IDisposable providerSubscription;
+
     private readonly ConcurrentDictionary<SteamId64, Device> devices = [];
+    private readonly HashSet<SteamId64> publishedProviderConfigs = [];
     private readonly HashSet<SteamId64> publishedPlayerConfigs = [];
     private readonly HashSet<SteamId64> publishedPlayerStateConfigs = [];
     private readonly HashSet<SteamId64> publishedMapConfigs = [];
     private readonly HashSet<SteamId64> publishedRoundConfigs = [];
+
+    public HomeAssistantDevicePublisher(
+        IGameStateService gameStateService,
+        IMqttClient mqttClient)
+        : base(gameStateService)
+    {
+        this.mqttClient = mqttClient;
+        providerSubscription = gameStateService.Subscribe(this as IObserver<ProviderEvent>);
+    }
+
+    public void OnNext(ProviderEvent value) => providerChannel.Writer.TryWrite(value);
 
     protected override async Task ExecuteAsync(CancellationToken stoppingToken)
     {
@@ -27,6 +42,11 @@ public sealed class HomeAssistantDevicePublisher(
 
     private Task ProcessChannelsAsync(CancellationToken stoppingToken)
         => Task.WhenAll(
+            ProcessChannelAsync(
+                providerChannel.Reader,
+                publishedProviderConfigs,
+                device => new ProviderDiscoveryMessages(device),
+                stoppingToken),
             ProcessChannelAsync(
                 PlayerChannelReader,
                 publishedPlayerConfigs,
@@ -98,5 +118,11 @@ public sealed class HomeAssistantDevicePublisher(
         {
             await mqttClient.PublishAsync(discoveryMessage, cancellationToken);
         }
+    }
+
+    public override void Dispose()
+    {
+        providerSubscription.Dispose();
+        base.Dispose();
     }
 }

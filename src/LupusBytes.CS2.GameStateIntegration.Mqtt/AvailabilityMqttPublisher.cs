@@ -5,19 +5,33 @@ using LupusBytes.CS2.GameStateIntegration.Events;
 
 namespace LupusBytes.CS2.GameStateIntegration.Mqtt;
 
-public sealed class AvailabilityMqttPublisher(
-    IGameStateService gameStateService,
-    IMqttClient mqttClient) : GameStateObserverService(gameStateService)
+public sealed class AvailabilityMqttPublisher : GameStateObserverService, IObserver<ProviderEvent>
 {
+    private const string ProviderAvailabilityTopicSuffix = "status";
     private const string PlayerAvailabilityTopicSuffix = "player/status";
     private const string PlayerStateAvailabilityTopicSuffix = "player-state/status";
     private const string MapAvailabilityTopicSuffix = "map/status";
     private const string RoundAvailabilityTopicSuffix = "round/status";
 
+    private readonly IMqttClient mqttClient;
+
+    private readonly Channel<ProviderEvent> providerChannel = Channel.CreateUnbounded<ProviderEvent>();
+    private readonly IDisposable providerSubscription;
+
+    private readonly HashSet<SteamId64> onlineProviders = [];
     private readonly HashSet<SteamId64> onlinePlayers = [];
     private readonly HashSet<SteamId64> onlinePlayerStates = [];
     private readonly HashSet<SteamId64> onlineMaps = [];
     private readonly HashSet<SteamId64> onlineRounds = [];
+
+    public AvailabilityMqttPublisher(
+        IGameStateService gameStateService,
+        IMqttClient mqttClient)
+        : base(gameStateService)
+    {
+        this.mqttClient = mqttClient;
+        providerSubscription = gameStateService.Subscribe(this as IObserver<ProviderEvent>);
+    }
 
     public override async Task StartAsync(CancellationToken cancellationToken)
     {
@@ -36,8 +50,11 @@ public sealed class AvailabilityMqttPublisher(
         await SetSystemAvailability(online: false, cancellationToken);
     }
 
+    public void OnNext(ProviderEvent value) => providerChannel.Writer.TryWrite(value);
+
     protected override Task ExecuteAsync(CancellationToken stoppingToken)
         => Task.WhenAll(
+            ProcessChannelAsync(providerChannel.Reader, onlineProviders, ProviderAvailabilityTopicSuffix, ShouldBeOnline, stoppingToken),
             ProcessChannelAsync(PlayerChannelReader, onlinePlayers, PlayerAvailabilityTopicSuffix, ShouldBeOnline, stoppingToken),
             ProcessChannelAsync(PlayerStateChannelReader, onlinePlayerStates, PlayerStateAvailabilityTopicSuffix, ShouldBeOnline, stoppingToken),
             ProcessChannelAsync(MapChannelReader, onlineMaps, MapAvailabilityTopicSuffix, ShouldBeOnline, stoppingToken),
@@ -94,6 +111,7 @@ public sealed class AvailabilityMqttPublisher(
         }
     }
 
+    private static bool ShouldBeOnline(ProviderEvent @event) => @event.Provider is not null;
     private static bool ShouldBeOnline(PlayerEvent @event) => @event.Player is not null;
     private static bool ShouldBeOnline(PlayerStateEvent @event) => @event.PlayerState is not null;
     private static bool ShouldBeOnline(MapEvent @event) => @event.Map is not null;
@@ -114,6 +132,7 @@ public sealed class AvailabilityMqttPublisher(
 
         // Combine all sets into a single sequence with their respective topic suffixes
         var entries = onlinePlayers.Select(steamId => (steamId, PlayerAvailabilityTopicSuffix))
+            .Concat(onlineProviders.Select(steamId => (steamId, ProviderAvailabilityTopicSuffix)))
             .Concat(onlinePlayerStates.Select(steamId => (steamId, PlayerStateAvailabilityTopicSuffix)))
             .Concat(onlineMaps.Select(steamId => (steamId, MapAvailabilityTopicSuffix)))
             .Concat(onlineRounds.Select(steamId => (steamId, RoundAvailabilityTopicSuffix)));
@@ -126,5 +145,11 @@ public sealed class AvailabilityMqttPublisher(
         workerBlock.Complete();
 
         return workerBlock.Completion;
+    }
+
+    public override void Dispose()
+    {
+        providerSubscription.Dispose();
+        base.Dispose();
     }
 }
