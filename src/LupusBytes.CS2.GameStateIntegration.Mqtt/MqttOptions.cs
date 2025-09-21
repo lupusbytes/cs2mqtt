@@ -46,5 +46,15 @@ public class MqttOptions
     /// <summary>
     /// Function that determines the delay between reconnect attempts, given the current attempt number.
     /// </summary>
-    internal Func<int, TimeSpan> ReconnectDelayProvider { get; set; } = attempt => TimeSpan.FromSeconds(Math.Pow(2.5, attempt));
+    internal Func<int, TimeSpan> RetryDelayProvider { get; set; } = attempt => TimeSpan.FromSeconds(Math.Pow(2.5, attempt));
+
+    /// <summary>
+    /// The number of times to retry connecting initially before giving up.
+    /// </summary>
+    internal int ConnectRetryCount { get; set; } = 3;
+
+    /// <summary>
+    /// The number of times to retry reconnecting after a connection has been lost.
+    /// </summary>
+    internal int ReconnectRetryCount { get; set; } = 5;
 }

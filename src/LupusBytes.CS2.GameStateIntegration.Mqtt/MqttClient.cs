@@ -1,20 +1,17 @@
 using System.Collections.Concurrent;
+using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using MQTTnet;
 using MQTTnet.Adapter;
 using MQTTnet.Formatter;
-using Polly;
 using IMqttNetClient = MQTTnet.IMqttClient;
 
 namespace LupusBytes.CS2.GameStateIntegration.Mqtt;
 
 public sealed class MqttClient : IHostedService, IMqttClient, IDisposable
 {
-    private const int ConnectRetryCount = 3;
-    private const int ReconnectRetryCount = 5;
-
     private readonly MqttOptions options;
     private readonly MqttClientOptions clientOptions;
     private readonly ILogger<MqttClient> logger;
@@ -53,7 +50,7 @@ public sealed class MqttClient : IHostedService, IMqttClient, IDisposable
     public Task StartAsync(CancellationToken cancellationToken)
     {
         shutdownRequested = false;
-        return ConnectAsync(ConnectRetryCount, cancellationToken);
+        return ConnectAsync(options.ConnectRetryCount, cancellationToken);
     }
 
     public Task StopAsync(CancellationToken cancellationToken)
@@ -82,34 +79,44 @@ public sealed class MqttClient : IHostedService, IMqttClient, IDisposable
 
     public void Dispose() => mqttNetClient.Dispose();
 
-    private Task ConnectAsync(int retryCount, CancellationToken cancellationToken = default) => Policy
-        .Handle<Exception>()
-        .WaitAndRetryAsync(
-            retryCount,
-            sleepDurationProvider: attempt => options.ReconnectDelayProvider(attempt),
-            onRetry: (_, timeSpan, currentAttempt, _)
-                => logger.ConnectionToMqttBrokerFailed(
-                    options.Host,
-                    options.Port,
-                    currentAttempt,
-                    retryCount + 1,
-                    timeSpan.Seconds))
-        .ExecuteAsync(
-            async token =>
+    [SuppressMessage("Design", "CA1031:Do not catch general exception types", Justification = "By design.")]
+    private async Task ConnectAsync(int retryCount, CancellationToken cancellationToken = default)
+    {
+        // Ensure we always attempt to execute the loop at least once, even if the retryCount is negative
+        var allowedAttempts = Math.Max(1, retryCount + 1);
+
+        for (var attempt = 1; attempt <= allowedAttempts; attempt++)
+        {
+            try
             {
                 logger.ConnectingToMqttBroker(options.Host, options.Port);
 
-                var result = await mqttNetClient.ConnectAsync(clientOptions, token);
+                var result = await mqttNetClient.ConnectAsync(clientOptions, cancellationToken);
 
-                if (result.ResultCode is not MqttClientConnectResultCode.Success)
+                if (result.ResultCode is MqttClientConnectResultCode.Success)
                 {
-                    throw new MqttConnectingFailedException(
-                        $"Failed to connect to MQTT broker {options.Host}:{options.Port.ToString(CultureInfo.InvariantCulture)}. " +
-                        $"Result code: {result.ResultCode}",
-                        innerException: null);
+                    return;
                 }
-            },
-            cancellationToken);
+
+                throw new MqttConnectingFailedException(
+                    $"Failed to connect to MQTT broker {options.Host}:{options.Port.ToString(CultureInfo.InvariantCulture)}. " +
+                    $"Result code: {result.ResultCode}",
+                    innerException: null);
+            }
+            catch (Exception) when (attempt < allowedAttempts)
+            {
+                var delay = options.RetryDelayProvider(attempt);
+                logger.ConnectionToMqttBrokerFailed(
+                    options.Host,
+                    options.Port,
+                    attempt,
+                    allowedAttempts,
+                    delay.Seconds);
+
+                await Task.Delay(delay, cancellationToken);
+            }
+        }
+    }
 
     private Task OnConnected(MqttClientConnectedEventArgs arg)
     {
@@ -135,7 +142,7 @@ public sealed class MqttClient : IHostedService, IMqttClient, IDisposable
         logger.DisconnectedFromBroker(options.Host, options.Port);
 
         return !shutdownRequested
-            ? ConnectAsync(ReconnectRetryCount, CancellationToken.None)
+            ? ConnectAsync(options.ReconnectRetryCount)
             : Task.CompletedTask;
     }
 
