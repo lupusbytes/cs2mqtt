@@ -4,6 +4,8 @@ public class GameStateOptions
 {
     public const string Section = nameof(GameStateOptions);
 
+    public bool ProviderPlayerOnly { get; set; } = true;
+
     /// <summary>
     /// Counter-Strike 2 client authentication token.
     /// </summary>

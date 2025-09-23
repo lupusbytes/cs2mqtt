@@ -7,11 +7,13 @@ internal abstract class ObservableGameState :
     IObservable<MapEvent>,
     IObservable<PlayerEvent>,
     IObservable<PlayerStateEvent>,
+    IObservable<PlayerWithStateEvent>,
     IObservable<RoundEvent>
 {
     protected ISet<IObserver<MapEvent>> MapObservers { get; } = new HashSet<IObserver<MapEvent>>();
     protected ISet<IObserver<PlayerEvent>> PlayerObservers { get; } = new HashSet<IObserver<PlayerEvent>>();
     protected ISet<IObserver<PlayerStateEvent>> PlayerStateObservers { get; } = new HashSet<IObserver<PlayerStateEvent>>();
+    protected ISet<IObserver<PlayerWithStateEvent>> PlayerWithStateObservers { get; } = new HashSet<IObserver<PlayerWithStateEvent>>();
     protected ISet<IObserver<RoundEvent>> RoundObservers { get; } = new HashSet<IObserver<RoundEvent>>();
     protected ISet<IObserver<ProviderEvent>> ProviderObservers { get; } = new HashSet<IObserver<ProviderEvent>>();
 
@@ -31,6 +33,12 @@ internal abstract class ObservableGameState :
     {
         PlayerStateObservers.Add(observer);
         return new Unsubscriber<PlayerStateEvent>(PlayerStateObservers, observer);
+    }
+
+    public IDisposable Subscribe(IObserver<PlayerWithStateEvent> observer)
+    {
+        PlayerWithStateObservers.Add(observer);
+        return new Unsubscriber<PlayerWithStateEvent>(PlayerWithStateObservers, observer);
     }
 
     public IDisposable Subscribe(IObserver<RoundEvent> observer)

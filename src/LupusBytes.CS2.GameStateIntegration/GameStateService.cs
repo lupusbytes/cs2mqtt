@@ -1,15 +1,18 @@
 using System.Collections.Concurrent;
 using LupusBytes.CS2.GameStateIntegration.Contracts;
 using LupusBytes.CS2.GameStateIntegration.Events;
+using LupusBytes.CS2.GameStateIntegration.Extensions;
 
 namespace LupusBytes.CS2.GameStateIntegration;
 
 internal sealed class GameStateService : ObservableGameState, IGameStateService
 {
+    private readonly GameStateOptions options;
     private readonly ConcurrentDictionary<SteamId64, Subscription> gameStateSubscriptions;
 
     public GameStateService(GameStateOptions options)
     {
+        this.options = options;
         gameStateSubscriptions = new ConcurrentDictionary<SteamId64, Subscription>();
 
         // Start a periodic background task that will remove subscriptions that have stopped receiving events.
@@ -51,7 +54,8 @@ internal sealed class GameStateService : ObservableGameState, IGameStateService
         gameStateSubscription.LastActivity = DateTimeOffset.UtcNow;
     }
 
-    private static void PushEvent<T>(IEnumerable<IObserver<T>> observers, T @event)
+    private static void PushEvent<TEvent>(IEnumerable<IObserver<TEvent>> observers, TEvent @event)
+        where TEvent : BaseEvent
     {
         foreach (var observer in observers)
         {
@@ -63,9 +67,23 @@ internal sealed class GameStateService : ObservableGameState, IGameStateService
 
     private void OnMapEvent(MapEvent value) => PushEvent(MapObservers, value);
 
-    private void OnPlayerEvent(PlayerEvent value) => PushEvent(PlayerObservers, value);
+    private void OnPlayerEvent(PlayerWithStateEvent value)
+    {
+        if (value.Player is null)
+        {
+            PushEvent(PlayerObservers, new PlayerEvent(value.SteamId, Player: null));
+            PushEvent(PlayerStateObservers, new PlayerStateEvent(value.SteamId, PlayerState: null));
+            return;
+        }
 
-    private void OnPlayerStateEvent(PlayerStateEvent value) => PushEvent(PlayerStateObservers, value);
+        if (options.ProviderPlayerOnly && value.SteamId != value.Player.SteamId64)
+        {
+            return;
+        }
+
+        PushEvent(PlayerObservers, value.Player.ToPlayerEvent(value.SteamId));
+        PushEvent(PlayerStateObservers, value.Player.State.ToEvent(value.SteamId));
+    }
 
     private void OnRoundEvent(RoundEvent value) => PushEvent(RoundObservers, value);
 
@@ -107,8 +125,7 @@ internal sealed class GameStateService : ObservableGameState, IGameStateService
     private sealed class Subscription :
         IObserver<ProviderEvent>,
         IObserver<MapEvent>,
-        IObserver<PlayerEvent>,
-        IObserver<PlayerStateEvent>,
+        IObserver<PlayerWithStateEvent>,
         IObserver<RoundEvent>
     {
         private readonly GameStateService service;
@@ -124,18 +141,15 @@ internal sealed class GameStateService : ObservableGameState, IGameStateService
             var providerSub = GameState.Subscribe(this as IObserver<ProviderEvent>);
             var mapSub = GameState.Subscribe(this as IObserver<MapEvent>);
             var roundSub = GameState.Subscribe(this as IObserver<RoundEvent>);
-            var playerSub = GameState.Subscribe(this as IObserver<PlayerEvent>);
-            var playerStateSub = GameState.Subscribe(this as IObserver<PlayerStateEvent>);
-            subscriptions = [providerSub, mapSub, roundSub, playerSub, playerStateSub];
+            var playerSub = GameState.Subscribe(this as IObserver<PlayerWithStateEvent>);
+            subscriptions = [providerSub, mapSub, roundSub, playerSub];
         }
 
         public void OnNext(ProviderEvent value) => service.OnProviderEvent(value);
 
         public void OnNext(MapEvent value) => service.OnMapEvent(value);
 
-        public void OnNext(PlayerEvent value) => service.OnPlayerEvent(value);
-
-        public void OnNext(PlayerStateEvent value) => service.OnPlayerStateEvent(value);
+        public void OnNext(PlayerWithStateEvent value) => service.OnPlayerEvent(value);
 
         public void OnNext(RoundEvent value) => service.OnRoundEvent(value);
 

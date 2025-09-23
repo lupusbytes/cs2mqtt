@@ -7,8 +7,7 @@ public interface IGameState :
     IObservable<ProviderEvent>,
     IObservable<MapEvent>,
     IObservable<RoundEvent>,
-    IObservable<PlayerEvent>,
-    IObservable<PlayerStateEvent>
+    IObservable<PlayerWithStateEvent>
 {
     /// <summary>
     /// The SteamID of the game state provider.
