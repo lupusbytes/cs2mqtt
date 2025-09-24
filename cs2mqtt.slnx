@@ -10,6 +10,7 @@
   </Folder>
   <Folder Name="/test/">
     <Project Path="test/LupusBytes.CS2.GameStateIntegration.Api.EndToEnd.Tests/LupusBytes.CS2.GameStateIntegration.Api.EndToEnd.Tests.csproj" />
+    <Project Path="test/LupusBytes.CS2.GameStateIntegration.Api.Tests/LupusBytes.CS2.GameStateIntegration.Api.Tests.csproj" />
     <Project Path="test/LupusBytes.CS2.GameStateIntegration.Contracts.Tests/LupusBytes.CS2.GameStateIntegration.Contracts.Tests.csproj" />
     <Project Path="test/LupusBytes.CS2.GameStateIntegration.Mqtt.HealthChecks.Tests/LupusBytes.CS2.GameStateIntegration.Mqtt.HealthChecks.Tests.csproj" />
     <Project Path="test/LupusBytes.CS2.GameStateIntegration.Mqtt.Integration.Tests/LupusBytes.CS2.GameStateIntegration.Mqtt.Integration.Tests.csproj" />

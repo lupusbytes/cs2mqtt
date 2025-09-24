@@ -42,6 +42,7 @@ public class MqttClientTest
         using var sut = new MqttClient(
             clientFactory.CreateMqttClient(),
             options,
+            onFatalConnectionError: () => Task.CompletedTask,
             NullLogger<MqttClient>.Instance);
 
         await sut.StartAsync(CancellationToken.None);
@@ -83,6 +84,7 @@ public class MqttClientTest
         using var sut = new MqttClient(
             clientFactory.CreateMqttClient(),
             options,
+            onFatalConnectionError: () => Task.CompletedTask,
             NullLogger<MqttClient>.Instance);
 
         await sut.StartAsync(CancellationToken.None);
@@ -113,6 +115,7 @@ public class MqttClientTest
                 Password = password,
                 UseTls = false,
             },
+            onFatalConnectionError: () => Task.CompletedTask,
             NullLogger<MqttClient>.Instance);
 
         // Act & Assert

@@ -36,4 +36,10 @@ public static partial class Log
         Level = LogLevel.Error,
         Message = "Disconnected from MQTT broker {Host}:{Port}")]
     public static partial void DisconnectedFromBroker(this ILogger logger, string host, int port);
+
+    [LoggerMessage(
+        EventId = 1_05,
+        Level = LogLevel.Critical,
+        Message = "Failed to connect to MQTT broker {Host}:{Port} after {Attempts} attempts, giving up!")]
+    public static partial void ConnectionToMqttBrokerAttemptsExhausted(this ILogger logger, Exception ex, string host, int port, int attempts);
 }

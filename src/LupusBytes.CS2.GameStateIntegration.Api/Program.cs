@@ -14,7 +14,7 @@ public sealed class Program
     {
         var builder = WebApplication.CreateBuilder(args);
         builder.Services.AddGameStateService(builder.Configuration);
-        builder.Services.AddMqttClient(builder.Configuration);
+        builder.Services.AddMqttClient(builder.Configuration, onFatalConnectionError: sp => sp.GetStopApplicationTask());
         builder.Services.AddHostedService<GameStateMqttPublisher>();
         builder.Services.AddHostedService<AvailabilityMqttPublisher>();
         builder.Services.AddHostedService<HomeAssistantDevicePublisher>();

@@ -13,6 +13,7 @@ namespace LupusBytes.CS2.GameStateIntegration.Mqtt;
 public sealed class MqttClient : IHostedService, IMqttClient, IDisposable
 {
     private readonly MqttOptions options;
+    private readonly Func<Task> onFatalConnectionError;
     private readonly MqttClientOptions clientOptions;
     private readonly ILogger<MqttClient> logger;
     private readonly IMqttNetClient mqttNetClient;
@@ -20,11 +21,16 @@ public sealed class MqttClient : IHostedService, IMqttClient, IDisposable
     private ConcurrentDictionary<string, MqttMessage> backlog = new(StringComparer.Ordinal);
     private bool shutdownRequested;
 
-    public MqttClient(IMqttNetClient mqttNetClient, MqttOptions options, ILogger<MqttClient> logger)
+    public MqttClient(
+        IMqttNetClient mqttNetClient,
+        MqttOptions options,
+        Func<Task> onFatalConnectionError,
+        ILogger<MqttClient> logger)
     {
         this.mqttNetClient = mqttNetClient;
         this.mqttNetClient.ConnectedAsync += OnConnected;
         this.mqttNetClient.DisconnectedAsync += OnDisconnected;
+        this.onFatalConnectionError = onFatalConnectionError;
         this.options = options;
         this.logger = logger;
 
@@ -114,6 +120,16 @@ public sealed class MqttClient : IHostedService, IMqttClient, IDisposable
                     delay.Seconds);
 
                 await Task.Delay(delay, cancellationToken);
+            }
+            catch (Exception ex)
+            {
+                logger.ConnectionToMqttBrokerAttemptsExhausted(
+                    ex,
+                    options.Host,
+                    options.Port,
+                    attempt);
+
+                await onFatalConnectionError();
             }
         }
     }
