@@ -218,7 +218,7 @@ public class AvailabilityMqttPublisherTests
             topics.Add($"{MqttConstants.BaseTopic}/{steamId}/map/status");
             topics.Add($"{MqttConstants.BaseTopic}/{steamId}/round/status");
 
-            sut.OnNext(gameState.Player.ToEvent(steamId));
+            sut.OnNext(gameState.Player!.ToPlayerEvent(steamId));
             sut.OnNext(gameState.Player!.State.ToEvent(steamId));
             sut.OnNext(gameState.Map.ToEvent(steamId));
             sut.OnNext(gameState.Round.ToEvent(steamId));

@@ -31,9 +31,11 @@ public class GameStateServiceTest
         IObserver<PlayerStateEvent> playerStateObserver,
         IObserver<MapEvent> mapObserver,
         IObserver<RoundEvent> roundObserver,
+        GameStateOptions options,
         GameStateService sut)
     {
         // Arrange
+        options.ProviderPlayerOnly = false;
         sut.Subscribe(playerObserver);
         sut.Subscribe(playerStateObserver);
         sut.Subscribe(mapObserver);
@@ -78,9 +80,12 @@ public class GameStateServiceTest
         IObserver<PlayerStateEvent> playerStateObserver2,
         IObserver<MapEvent> mapObserver2,
         IObserver<RoundEvent> roundObserver2,
+        GameStateOptions options,
         GameStateService sut)
     {
         // Arrange
+        options.ProviderPlayerOnly = false;
+
         sut.Subscribe(playerObserver1);
         sut.Subscribe(playerStateObserver1);
         sut.Subscribe(mapObserver1);
@@ -140,9 +145,11 @@ public class GameStateServiceTest
         IObserver<PlayerStateEvent> playerStateObserver,
         IObserver<MapEvent> mapObserver,
         IObserver<RoundEvent> roundObserver,
+        [Frozen] GameStateOptions options,
         GameStateService sut)
     {
         // Arrange
+        options.ProviderPlayerOnly = false;
         var playerSubscription = sut.Subscribe(playerObserver);
         var playerStateSubscription = sut.Subscribe(playerStateObserver);
         var mapSubscription = sut.Subscribe(mapObserver);
