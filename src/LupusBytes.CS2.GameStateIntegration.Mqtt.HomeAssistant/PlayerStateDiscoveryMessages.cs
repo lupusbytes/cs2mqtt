@@ -70,20 +70,23 @@ public class PlayerStateDiscoveryMessages(Device device) : MqttDiscoveryMessages
         Name: "Smoked",
         UniqueId: $"{device.Id}_player-state_smoke",
         StateTopic: stateTopic,
-        ValueTemplate: ValueTemplate.JsonPropertyValue("smoked"),
+        ValueTemplate: ValueTemplate.JsonPropertyValueWithByteToPercentConversion("smoked"),
         Icon: "mdi:weather-fog",
         device,
         Availability: availability,
+        UnitOfMeasurement: "%",
         StateClass: StateClass.Measurement));
 
     private MqttMessage BurningDiscoveryMessage => CreateMqttMessage(new SensorConfig(
         Name: "Burning",
         UniqueId: $"{device.Id}_player-state_burning",
         StateTopic: stateTopic,
-        ValueTemplate: ValueTemplate.JsonPropertyValue("burning"),
+        ValueTemplate: ValueTemplate.JsonPropertyValueWithByteToPercentConversion("burning"),
         Icon: "mdi:fire-alert",
         device,
-        Availability: availability));
+        Availability: availability,
+        UnitOfMeasurement: "%",
+        StateClass: StateClass.Measurement));
 
     private MqttMessage MoneyDiscoveryMessage => CreateMqttMessage(new SensorConfig(
         Name: "Money",
