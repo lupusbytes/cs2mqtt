@@ -3,7 +3,6 @@ using System.Net.Sockets;
 using System.Text;
 using Microsoft.Extensions.Logging;
 using MQTTnet;
-using MQTTnet.Adapter;
 using NSubstitute.ExceptionExtensions;
 using IMqttNetClient = MQTTnet.IMqttClient;
 
