@@ -117,7 +117,7 @@ public sealed class MqttClient : IHostedService, IMqttClient, IDisposable
                     options.Port,
                     attempt,
                     allowedAttempts,
-                    delay.Seconds);
+                    Convert.ToInt32(delay.TotalSeconds));
 
                 await Task.Delay(delay, cancellationToken);
             }
