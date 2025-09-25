@@ -80,7 +80,7 @@ public sealed class AvailabilityMqttPublisher(
     {
         await foreach (var @event in channelReader.ReadAllAsync(cancellationToken))
         {
-            var isOnline = !onlineSet.Add(@event.SteamId);
+            var isOnline = onlineSet.Contains(@event.SteamId);
             var shouldBeOnline = shouldBeOnlineFunc(@event);
 
             if (shouldBeOnline == isOnline)
@@ -90,7 +90,11 @@ public sealed class AvailabilityMqttPublisher(
 
             await SetAvailability(@event.SteamId, topicSuffix, shouldBeOnline, cancellationToken);
 
-            if (!shouldBeOnline)
+            if (shouldBeOnline)
+            {
+                onlineSet.Add(@event.SteamId);
+            }
+            else
             {
                 onlineSet.Remove(@event.SteamId);
             }
