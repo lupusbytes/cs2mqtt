@@ -1,5 +1,21 @@
 # Changelog
 
+## [1.8.0](https://github.com/lupusbytes/cs2mqtt/compare/v1.7.0...v1.8.0) (2025-09-25)
+
+
+### New features
+
+* **homeassistant:** add cs2 game device connectivity sensor ([8c3b03c](https://github.com/lupusbytes/cs2mqtt/commit/8c3b03ce3c6683340838747ec4ea8bfc4c31c13a))
+* **homeassistant:** convert flashed sensor to boolean value ([2ba6cb0](https://github.com/lupusbytes/cs2mqtt/commit/2ba6cb0210fa06c8e90c9936a7427d7b9238fd76))
+* **homeassistant:** convert smoked and burning sensor measurements to percentage ([305a0fd](https://github.com/lupusbytes/cs2mqtt/commit/305a0fd1dfd9523c74f0b4e895521f9c5040c67d))
+* **homeassistant:** use state_class: 'measurement' for numerical sensor values ([c3b1808](https://github.com/lupusbytes/cs2mqtt/commit/c3b18082a5080891236f5e59106310cfe45e050f))
+
+
+### Bug fixes
+
+* **mqtt:** correctly log connection retry delay when wait is over 1 minute ([1f30728](https://github.com/lupusbytes/cs2mqtt/commit/1f307280ad909314af5c7283c4adea6999bcf309))
+* **mqtt:** ensure cs2mqtt shuts down after max reconnect attempts ([2d8c139](https://github.com/lupusbytes/cs2mqtt/commit/2d8c139e86c60c717414eb5be68e2805641726d7))
+
 ## [1.7.0](https://github.com/lupusbytes/cs2mqtt/compare/v1.6.9...v1.7.0) (2025-09-19)
 
 
