@@ -19,4 +19,7 @@ public static class ValueTemplate
 
     public static string JsonPropertyValueWithByteToPercentConversion(string propertyName)
         => $"{{{{ (value_json.{propertyName} | int * 100 / 255) | round(0) }}}}";
+
+    public static string JsonPropertyValueWithByteToBoolConversion(string propertyName)
+        => $"{{{{ value_json.{propertyName} | int > 0 }}}}";
 }
