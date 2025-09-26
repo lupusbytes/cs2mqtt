@@ -1,14 +1,13 @@
 using LupusBytes.CS2.GameStateIntegration.Contracts;
-using LupusBytes.CS2.GameStateIntegration.Events;
 
 namespace LupusBytes.CS2.GameStateIntegration;
 
 public interface IGameStateService :
-    IObservable<ProviderEvent>,
-    IObservable<MapEvent>,
-    IObservable<PlayerEvent>,
-    IObservable<PlayerStateEvent>,
-    IObservable<RoundEvent>
+    IObservable<StateUpdate<Provider>>,
+    IObservable<StateUpdate<Map>>,
+    IObservable<StateUpdate<Round>>,
+    IObservable<StateUpdate<Player>>,
+    IObservable<StateUpdate<PlayerState>>
 {
     public Map? GetMap(SteamId64 steamId);
     public Round? GetRound(SteamId64 steamId);

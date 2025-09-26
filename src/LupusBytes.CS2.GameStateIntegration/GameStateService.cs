@@ -1,6 +1,5 @@
 using System.Collections.Concurrent;
 using LupusBytes.CS2.GameStateIntegration.Contracts;
-using LupusBytes.CS2.GameStateIntegration.Events;
 
 namespace LupusBytes.CS2.GameStateIntegration;
 
@@ -51,23 +50,26 @@ internal sealed class GameStateService : ObservableGameState, IGameStateService
         gameStateSubscription.LastActivity = DateTimeOffset.UtcNow;
     }
 
-    private static void PushEvent<T>(IEnumerable<IObserver<T>> observers, T @event)
+    private static void PushState<TState>(
+        IEnumerable<IObserver<StateUpdate<TState>>> observers,
+        StateUpdate<TState> stateUpdate)
+        where TState : class
     {
         foreach (var observer in observers)
         {
-            observer.OnNext(@event);
+            observer.OnNext(stateUpdate);
         }
     }
 
-    private void OnProviderEvent(ProviderEvent value) => PushEvent(ProviderObservers, value);
+    private void OnStateUpdate(StateUpdate<Provider> stateUpdate) => PushStateUpdate(ProviderObservers, stateUpdate);
 
-    private void OnMapEvent(MapEvent value) => PushEvent(MapObservers, value);
+    private void OnStateUpdate(StateUpdate<Map> value) => PushStateUpdate(MapObservers, value);
 
-    private void OnPlayerEvent(PlayerEvent value) => PushEvent(PlayerObservers, value);
+    private void OnStateUpdate(StateUpdate<Player> value) => PushStateUpdate(PlayerObservers, value);
 
-    private void OnPlayerStateEvent(PlayerStateEvent value) => PushEvent(PlayerStateObservers, value);
+    private void OnStateUpdate(StateUpdate<PlayerState> value) => PushStateUpdate(PlayerStateObservers, value);
 
-    private void OnRoundEvent(RoundEvent value) => PushEvent(RoundObservers, value);
+    private void OnStateUpdate(StateUpdate<Round> value) => PushStateUpdate(RoundObservers, value);
 
     private async Task CleanupDeadSubscriptionsAsync(
         TimeSpan checkInterval,
@@ -96,20 +98,20 @@ internal sealed class GameStateService : ObservableGameState, IGameStateService
         // Remove the local subscription
         gameStateSubscriptions.Remove(steamId, out _);
 
-        // Send null events to all observers for this SteamID to overwrite their last buffer.
-        PushEvent(ProviderObservers, new ProviderEvent(steamId, Provider: null));
-        PushEvent(MapObservers, new MapEvent(steamId, Map: null));
-        PushEvent(RoundObservers, new RoundEvent(steamId, Round: null));
-        PushEvent(PlayerObservers, new PlayerEvent(steamId, Player: null));
-        PushEvent(PlayerStateObservers, new PlayerStateEvent(steamId, PlayerState: null));
+        // Send null states to all observers for this SteamID to overwrite their last buffer.
+        PushState(ProviderObservers, new StateUpdate<Provider>(steamId, State: null));
+        PushState(MapObservers, new StateUpdate<Map>(steamId, State: null));
+        PushState(RoundObservers, new StateUpdate<Round>(steamId, State: null));
+        PushState(PlayerObservers, new StateUpdate<Player>(steamId, State: null));
+        PushState(PlayerStateObservers, new StateUpdate<PlayerState>(steamId, State: null));
     }
 
     private sealed class Subscription :
-        IObserver<ProviderEvent>,
-        IObserver<MapEvent>,
-        IObserver<PlayerEvent>,
-        IObserver<PlayerStateEvent>,
-        IObserver<RoundEvent>
+        IObserver<StateUpdate<Provider>>,
+        IObserver<StateUpdate<Map>>,
+        IObserver<StateUpdate<Round>>,
+        IObserver<StateUpdate<Player>>,
+        IObserver<StateUpdate<PlayerState>>
     {
         private readonly GameStateService service;
         private readonly IDisposable[] subscriptions;
@@ -121,23 +123,23 @@ internal sealed class GameStateService : ObservableGameState, IGameStateService
         {
             this.service = service;
             GameState = gameState;
-            var providerSub = GameState.Subscribe(this as IObserver<ProviderEvent>);
-            var mapSub = GameState.Subscribe(this as IObserver<MapEvent>);
-            var roundSub = GameState.Subscribe(this as IObserver<RoundEvent>);
-            var playerSub = GameState.Subscribe(this as IObserver<PlayerEvent>);
-            var playerStateSub = GameState.Subscribe(this as IObserver<PlayerStateEvent>);
+            var providerSub = GameState.Subscribe(this as IObserver<StateUpdate<Provider>>);
+            var mapSub = GameState.Subscribe(this as IObserver<StateUpdate<Map>>);
+            var roundSub = GameState.Subscribe(this as IObserver<StateUpdate<Round>>);
+            var playerSub = GameState.Subscribe(this as IObserver<StateUpdate<Player>>);
+            var playerStateSub = GameState.Subscribe(this as IObserver<StateUpdate<PlayerState>>);
             subscriptions = [providerSub, mapSub, roundSub, playerSub, playerStateSub];
         }
 
-        public void OnNext(ProviderEvent value) => service.OnProviderEvent(value);
+        public void OnNext(StateUpdate<Provider> value) => service.OnStateUpdate(value);
 
-        public void OnNext(MapEvent value) => service.OnMapEvent(value);
+        public void OnNext(StateUpdate<Map> value) => service.OnStateUpdate(value);
 
-        public void OnNext(PlayerEvent value) => service.OnPlayerEvent(value);
+        public void OnNext(StateUpdate<Round> value) => service.OnStateUpdate(value);
 
-        public void OnNext(PlayerStateEvent value) => service.OnPlayerStateEvent(value);
+        public void OnNext(StateUpdate<Player> value) => service.OnStateUpdate(value);
 
-        public void OnNext(RoundEvent value) => service.OnRoundEvent(value);
+        public void OnNext(StateUpdate<PlayerState> value) => service.OnStateUpdate(value);
 
         public void OnCompleted()
         {
