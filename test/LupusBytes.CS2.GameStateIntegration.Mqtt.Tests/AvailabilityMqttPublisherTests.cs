@@ -59,6 +59,34 @@ public class AvailabilityMqttPublisherTests
     }
 
     [Theory, AutoNSubstituteData]
+    public async Task Publishes_player_as_online_after_player_was_initially_offline(
+        [Frozen] IMqttClient mqttClient,
+        SteamId64 steamId,
+        Player player,
+        AvailabilityMqttPublisher sut)
+    {
+        // Arrange
+        var topic = $"{MqttConstants.BaseTopic}/{steamId}/player/status";
+        var tcs = new TaskCompletionSource<bool>();
+        mqttClient
+            .When(x => x.PublishAsync(
+                Arg.Is<MqttMessage>(m => m.Topic == topic && m.Payload == "online"),
+                Arg.Any<CancellationToken>()))
+            .Do(_ => tcs.SetResult(true));
+
+        using var cts = TaskHelper.EnableCompletionSourceTimeout(tcs);
+        await sut.StartAsync(CancellationToken.None);
+
+        // Act
+        sut.OnNext(new PlayerEvent(steamId, Player: null));
+        sut.OnNext(new PlayerEvent(steamId, player));
+
+        // Assert
+        await tcs.Task;
+        await AssertAvailabilityPublishedOnTopic(mqttClient, topic);
+    }
+
+    [Theory, AutoNSubstituteData]
     public async Task Publishes_player_state_availability(
         [Frozen] IMqttClient mqttClient,
         SteamId64 steamId,
