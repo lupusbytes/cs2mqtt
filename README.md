@@ -123,7 +123,7 @@ Once you have located the correct path, create a new file there called **gamesta
  "timeout" "5.0"
  "buffer"  "0.1"
  "throttle" "0.1"
- "heartbeat" "60.0"
+ "heartbeat" "5.0"
  "data"
  {
    "provider"            "1" 
