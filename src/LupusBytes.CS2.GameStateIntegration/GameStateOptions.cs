@@ -19,4 +19,6 @@ public class GameStateOptions
     /// The amount of time to wait between each execution of the background task that attempts to find disconnected SteamIDs.
     /// </summary>
     public double TimeoutCleanupIntervalInSeconds { get; set; } = 15;
+
+    public bool IgnoreSpectatedPlayers { get; set; } = true;
 }

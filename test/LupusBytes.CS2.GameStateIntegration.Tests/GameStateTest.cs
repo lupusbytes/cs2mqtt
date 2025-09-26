@@ -6,8 +6,11 @@ namespace LupusBytes.CS2.GameStateIntegration.Tests;
 public class GameStateTest
 {
     [Theory, AutoData]
-    internal void ProcessEvent_sets_properties(GameStateData data, GameState sut)
+    internal void ProcessEvent_sets_properties(GameStateData data)
     {
+        // Arrange
+        var sut = new GameState(data.Provider!.SteamId64, ignoreSpectatedPlayers: false);
+
         // Act
         sut.ProcessEvent(data);
 
@@ -20,10 +23,10 @@ public class GameStateTest
     [Theory, AutoNSubstituteData]
     internal void ProcessEvent_sends_PlayerEvent_to_observers(
         GameStateData data,
-        IObserver<PlayerEvent> observer,
-        GameState sut)
+        IObserver<PlayerEvent> observer)
     {
         // Arrange
+        var sut = new GameState(data.Provider!.SteamId64, ignoreSpectatedPlayers: false);
         sut.Subscribe(observer);
 
         // Act
@@ -41,10 +44,10 @@ public class GameStateTest
     [Theory, AutoNSubstituteData]
     internal void ProcessEvent_sends_PlayerEvent_with_null_Player_to_observers(
         GameStateData data,
-        IObserver<PlayerEvent> observer,
-        GameState sut)
+        IObserver<PlayerEvent> observer)
     {
         // Arrange
+        var sut = new GameState(data.Provider!.SteamId64, ignoreSpectatedPlayers: false);
         sut.ProcessEvent(data); // Set initial properties
         data = data with { Player = null };
         sut.Subscribe(observer);
@@ -61,10 +64,10 @@ public class GameStateTest
     [Theory, AutoNSubstituteData]
     internal void ProcessEvent_sends_PlayerStateEvent_to_observers(
         GameStateData data,
-        IObserver<PlayerStateEvent> observer,
-        GameState sut)
+        IObserver<PlayerStateEvent> observer)
     {
         // Arrange
+        var sut = new GameState(data.Provider!.SteamId64, ignoreSpectatedPlayers: false);
         sut.Subscribe(observer);
 
         // Act
@@ -88,10 +91,10 @@ public class GameStateTest
     [Theory, AutoNSubstituteData]
     internal void ProcessEvent_sends_PlayerStateEvent_with_null_PlayerState_to_observers(
         GameStateData data,
-        IObserver<PlayerStateEvent> observer,
-        GameState sut)
+        IObserver<PlayerStateEvent> observer)
     {
         // Arrange
+        var sut = new GameState(data.Provider!.SteamId64, ignoreSpectatedPlayers: false);
         sut.ProcessEvent(data); // Set initial properties
         data = data with { Player = data.Player! with { State = null } };
         sut.Subscribe(observer);
@@ -216,15 +219,16 @@ public class GameStateTest
 
     [Theory, AutoNSubstituteData]
     internal void ProcessEvent_does_not_send_events_to_unsubscribed_observers(
+        SteamId64 steamId,
         GameStateData data1,
         GameStateData data2,
         IObserver<PlayerEvent> playerObserver,
         IObserver<PlayerStateEvent> playerStateObserver,
         IObserver<MapEvent> mapObserver,
-        IObserver<RoundEvent> roundObserver,
-        GameState sut)
+        IObserver<RoundEvent> roundObserver)
     {
         // Arrange
+        var sut = new GameState(steamId, ignoreSpectatedPlayers: false);
         var playerSubscription = sut.Subscribe(playerObserver);
         var playerStateSubscription = sut.Subscribe(playerStateObserver);
         var mapSubscription = sut.Subscribe(mapObserver);
@@ -255,10 +259,10 @@ public class GameStateTest
         IObserver<PlayerEvent> playerObserver2,
         IObserver<PlayerStateEvent> playerStateObserver2,
         IObserver<MapEvent> mapObserver2,
-        IObserver<RoundEvent> roundObserver2,
-        GameState sut)
+        IObserver<RoundEvent> roundObserver2)
     {
         // Arrange
+        var sut = new GameState(data.Provider!.SteamId64, ignoreSpectatedPlayers: false);
         sut.Subscribe(playerObserver1);
         sut.Subscribe(playerStateObserver1);
         sut.Subscribe(mapObserver1);

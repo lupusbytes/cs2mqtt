@@ -4,7 +4,7 @@ using LupusBytes.CS2.GameStateIntegration.Extensions;
 
 namespace LupusBytes.CS2.GameStateIntegration;
 
-internal sealed class GameState(SteamId64 steamId) : ObservableGameState, IGameState
+internal sealed class GameState(SteamId64 steamId, bool ignoreSpectatedPlayers) : ObservableGameState, IGameState
 {
     private Map? map;
     private Player? player;
@@ -38,14 +38,19 @@ internal sealed class GameState(SteamId64 steamId) : ObservableGameState, IGameS
             };
         private set
         {
-            var valuePlayer = value is null
+            if (ignoreSpectatedPlayers && value?.SteamId64 != steamId)
+            {
+                return;
+            }
+
+            var playerFromValue = value is null
                 ? null
                 : new Player(value.SteamId64, value.Name, value.Team, value.Activity);
 
-            if (player != valuePlayer)
+            if (player != playerFromValue)
             {
-                player = valuePlayer;
-                PushEvent(PlayerObservers, valuePlayer.ToEvent(SteamId));
+                player = playerFromValue;
+                PushEvent(PlayerObservers, playerFromValue.ToEvent(SteamId));
             }
 
             if (playerState == value?.State)
