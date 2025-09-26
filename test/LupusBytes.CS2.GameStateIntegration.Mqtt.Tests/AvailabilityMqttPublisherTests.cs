@@ -1,7 +1,5 @@
 using System.Collections.ObjectModel;
 using LupusBytes.CS2.GameStateIntegration.Contracts;
-using LupusBytes.CS2.GameStateIntegration.Events;
-using LupusBytes.CS2.GameStateIntegration.Extensions;
 
 namespace LupusBytes.CS2.GameStateIntegration.Mqtt.Tests;
 
@@ -51,7 +49,7 @@ public class AvailabilityMqttPublisherTests
         await sut.StartAsync(CancellationToken.None);
 
         // Act
-        sut.OnNext(new PlayerEvent(steamId, player));
+        sut.OnNext(new StateUpdate<Player>(steamId, player));
 
         // Assert
         await tcs.Task;
@@ -78,8 +76,8 @@ public class AvailabilityMqttPublisherTests
         await sut.StartAsync(CancellationToken.None);
 
         // Act
-        sut.OnNext(new PlayerEvent(steamId, Player: null));
-        sut.OnNext(new PlayerEvent(steamId, player));
+        sut.OnNext(new StateUpdate<Player>(steamId, State: null));
+        sut.OnNext(new StateUpdate<Player>(steamId, player));
 
         // Assert
         await tcs.Task;
@@ -100,7 +98,7 @@ public class AvailabilityMqttPublisherTests
         await sut.StartAsync(CancellationToken.None);
 
         // Act
-        sut.OnNext(new PlayerStateEvent(steamId, playerState));
+        sut.OnNext(new StateUpdate<PlayerState>(steamId, playerState));
 
         // Assert
         await tcs.Task;
@@ -121,7 +119,7 @@ public class AvailabilityMqttPublisherTests
         await sut.StartAsync(CancellationToken.None);
 
         // Act
-        sut.OnNext(new MapEvent(steamId, map));
+        sut.OnNext(new StateUpdate<Map>(steamId, map));
 
         // Assert
         await tcs.Task;
@@ -142,7 +140,7 @@ public class AvailabilityMqttPublisherTests
         await sut.StartAsync(CancellationToken.None);
 
         // Act
-        sut.OnNext(new RoundEvent(steamId, round));
+        sut.OnNext(new StateUpdate<Round>(steamId, round));
 
         // Assert
         await tcs.Task;
@@ -182,9 +180,9 @@ public class AvailabilityMqttPublisherTests
         await sut.StartAsync(CancellationToken.None);
 
         // Act
-        sut.OnNext(new PlayerEvent(steamId, player));
-        sut.OnNext(new PlayerEvent(steamId, Player: null));
-        sut.OnNext(new PlayerEvent(steamId, player));
+        sut.OnNext(new StateUpdate<Player>(steamId, player));
+        sut.OnNext(new StateUpdate<Player>(steamId, State: null));
+        sut.OnNext(new StateUpdate<Player>(steamId, player));
 
         // Assert
         await tcs.Task;
@@ -217,8 +215,8 @@ public class AvailabilityMqttPublisherTests
         await sut.StartAsync(CancellationToken.None);
 
         // Act
-        sut.OnNext(new RoundEvent(steamId, round1));
-        sut.OnNext(new RoundEvent(steamId, round2));
+        sut.OnNext(new StateUpdate<Round>(steamId, round1));
+        sut.OnNext(new StateUpdate<Round>(steamId, round2));
 
         // Assert
         await tcs.Task;
@@ -246,10 +244,10 @@ public class AvailabilityMqttPublisherTests
             topics.Add($"{MqttConstants.BaseTopic}/{steamId}/map/status");
             topics.Add($"{MqttConstants.BaseTopic}/{steamId}/round/status");
 
-            sut.OnNext(gameState.Player.ToEvent(steamId));
-            sut.OnNext(gameState.Player!.State.ToEvent(steamId));
-            sut.OnNext(gameState.Map.ToEvent(steamId));
-            sut.OnNext(gameState.Round.ToEvent(steamId));
+            sut.OnNext(new StateUpdate<Player>(steamId, gameState.Player));
+            sut.OnNext(new StateUpdate<PlayerState>(steamId, gameState.Player!.State));
+            sut.OnNext(new StateUpdate<Map>(steamId, gameState.Map));
+            sut.OnNext(new StateUpdate<Round>(steamId, gameState.Round));
         }
 
         // Act
