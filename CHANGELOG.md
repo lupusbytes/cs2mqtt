@@ -1,5 +1,17 @@
 # Changelog
 
+## [1.8.1](https://github.com/lupusbytes/cs2mqtt/compare/v1.8.0...v1.8.1) (2025-09-26)
+
+
+### Bug fixes
+
+* **mqtt:** fix availability bug preventing sensor from transitioning offline -&gt; online ([e2a50c7](https://github.com/lupusbytes/cs2mqtt/commit/e2a50c7237233c2a7b92ba81407a06091c288cf4))
+
+
+### Performance improvements
+
+* in the documentation for `gamestate_integration_cs2mqtt.cfg`, it originally had `"heartbeat" "60.0"`, but it turns out this value also determines how long cs2 waits before sending player game state data when joining a deathmatch game or when switching from free cam to spectating a player in a casual game and more. the new recommended value is `"heartbeat" "5.0"`. please update your existing configs as you see fit. ([6deb9d7](https://github.com/lupusbytes/cs2mqtt/commit/6deb9d7e56695e81e170855650d2b3ae3765e93d))
+
 ## [1.8.0](https://github.com/lupusbytes/cs2mqtt/compare/v1.7.0...v1.8.0) (2025-09-25)
 
 
