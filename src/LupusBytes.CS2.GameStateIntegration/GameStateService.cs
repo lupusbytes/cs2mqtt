@@ -5,11 +5,12 @@ namespace LupusBytes.CS2.GameStateIntegration;
 
 internal sealed class GameStateService : ObservableGameState, IGameStateService
 {
-    private readonly ConcurrentDictionary<SteamId64, Subscription> gameStateSubscriptions;
+    private readonly ConcurrentDictionary<SteamId64, Subscription> gameStateSubscriptions = new();
+    private readonly GameStateOptions options;
 
     public GameStateService(GameStateOptions options)
     {
-        gameStateSubscriptions = new ConcurrentDictionary<SteamId64, Subscription>();
+        this.options = options;
 
         // Start a periodic background task that will remove subscriptions that have stopped receiving events.
         // We do not receive any explicit events from Counter-Strike that we can use to determine that a provider has been disconnected.
@@ -43,7 +44,7 @@ internal sealed class GameStateService : ObservableGameState, IGameStateService
 
         var gameStateSubscription = gameStateSubscriptions.GetOrAdd(
             steamId64,
-            static (key, arg) => new Subscription(arg, new GameState(key)),
+            static (key, arg) => new Subscription(arg, new GameState(key, arg.options.IgnoreSpectatedPlayers)),
             this);
 
         gameStateSubscription.GameState.ProcessEvent(data);

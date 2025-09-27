@@ -20,6 +20,7 @@ public class GameStateServiceTest
 
     [Theory, AutoNSubstituteData]
     internal void ProcessEvent_sends_events_from_multiple_providers(
+        [Frozen] GameStateOptions options,
         Provider provider1,
         Provider provider2,
         GameStateData data1,
@@ -33,6 +34,7 @@ public class GameStateServiceTest
         GameStateService sut)
     {
         // Arrange
+        options.IgnoreSpectatedPlayers = false;
         sut.Subscribe(playerObserver);
         sut.Subscribe(playerStateObserver);
         sut.Subscribe(mapObserver);
@@ -68,6 +70,7 @@ public class GameStateServiceTest
 
     [Theory, AutoNSubstituteData]
     internal void ProcessEvent_sends_events_to_multiple_observers(
+        [Frozen] GameStateOptions options,
         GameStateData data,
         IObserver<StateUpdate<Player>> playerObserver1,
         IObserver<StateUpdate<PlayerState>> playerStateObserver1,
@@ -80,6 +83,7 @@ public class GameStateServiceTest
         GameStateService sut)
     {
         // Arrange
+        options.IgnoreSpectatedPlayers = false;
         sut.Subscribe(playerObserver1);
         sut.Subscribe(playerStateObserver1);
         sut.Subscribe(mapObserver1);
@@ -107,6 +111,7 @@ public class GameStateServiceTest
 
     [Theory, AutoNSubstituteData]
     internal void ProcessEvent_does_not_send_events_on_same_data(
+        [Frozen] GameStateOptions options,
         GameStateData data,
         IObserver<StateUpdate<Player>> playerObserver,
         IObserver<StateUpdate<PlayerState>> playerStateObserver,
@@ -115,6 +120,7 @@ public class GameStateServiceTest
         GameStateService sut)
     {
         // Arrange
+        options.IgnoreSpectatedPlayers = false;
         sut.ProcessEvent(data); // Set initial properties
         sut.Subscribe(playerObserver);
         sut.Subscribe(playerStateObserver);
@@ -133,6 +139,7 @@ public class GameStateServiceTest
 
     [Theory, AutoNSubstituteData]
     internal void ProcessEvent_does_not_send_events_to_unsubscribed_observers(
+        [Frozen] GameStateOptions options,
         GameStateData data1,
         GameStateData data2,
         IObserver<StateUpdate<Player>> playerObserver,
@@ -142,6 +149,7 @@ public class GameStateServiceTest
         GameStateService sut)
     {
         // Arrange
+        options.IgnoreSpectatedPlayers = false;
         var playerSubscription = sut.Subscribe(playerObserver);
         var playerStateSubscription = sut.Subscribe(playerStateObserver);
         var mapSubscription = sut.Subscribe(mapObserver);
@@ -164,12 +172,14 @@ public class GameStateServiceTest
 
     [Theory, AutoData]
     internal void GetPlayer_returns_Player_by_SteamId(
+        [Frozen] GameStateOptions options,
         GameStateData data1,
         GameStateData data2,
         GameStateData data3,
         GameStateService sut)
     {
         // Arrange
+        options.IgnoreSpectatedPlayers = false;
         sut.ProcessEvent(data1);
         sut.ProcessEvent(data2);
         sut.ProcessEvent(data3);
@@ -289,6 +299,7 @@ public class GameStateServiceTest
         {
             TimeoutInSeconds = 0.2,
             TimeoutCleanupIntervalInSeconds = 0.5,
+            IgnoreSpectatedPlayers = false,
         };
 
         var sut = new GameStateService(options);
@@ -306,7 +317,7 @@ public class GameStateServiceTest
         sut.GetPlayer(data.Provider!.SteamId64).Should().NotBeNull();
 
         // Wait 1 second to allow the background cleanup task to perform its work.
-        await Task.Delay(TimeSpan.FromSeconds(1));
+        await Task.Delay(TimeSpan.FromSeconds(1), TestContext.Current.CancellationToken);
 
         // After the wait, the background cleanup task should have removed the provider.
         sut.GetPlayer(data.Provider.SteamId64).Should().BeNull();

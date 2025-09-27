@@ -2,7 +2,7 @@ using LupusBytes.CS2.GameStateIntegration.Contracts;
 
 namespace LupusBytes.CS2.GameStateIntegration;
 
-internal sealed class GameState(SteamId64 steamId) : ObservableGameState, IGameState
+internal sealed class GameState(SteamId64 steamId, bool ignoreSpectatedPlayers) : ObservableGameState, IGameState
 {
     private Map? map;
     private Player? player;
@@ -36,6 +36,11 @@ internal sealed class GameState(SteamId64 steamId) : ObservableGameState, IGameS
             };
         private set
         {
+            if (ignoreSpectatedPlayers && value?.SteamId64 != steamId)
+            {
+                return;
+            }
+
             var valuePlayer = value is null
                 ? null
                 : new Player(value.SteamId64, value.Name, value.Team, value.Activity);
