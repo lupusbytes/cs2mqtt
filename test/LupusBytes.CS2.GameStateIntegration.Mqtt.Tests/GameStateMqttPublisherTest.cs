@@ -1,6 +1,5 @@
 using System.Text.Json;
 using LupusBytes.CS2.GameStateIntegration.Contracts;
-using LupusBytes.CS2.GameStateIntegration.Events;
 
 namespace LupusBytes.CS2.GameStateIntegration.Mqtt.Tests;
 
@@ -20,7 +19,7 @@ public class GameStateMqttPublisherTest
         await sut.StartAsync(CancellationToken.None);
 
         // Act
-        sut.OnNext(new PlayerEvent(steamId, player));
+        sut.OnNext(new StateUpdate<Player>(steamId, player));
 
         // Assert
         await tcs.Task;
@@ -42,7 +41,7 @@ public class GameStateMqttPublisherTest
         await sut.StartAsync(CancellationToken.None);
 
         // Act
-        sut.OnNext(new PlayerStateEvent(steamId, playerState));
+        sut.OnNext(new StateUpdate<PlayerState>(steamId, playerState));
 
         // Assert
         await tcs.Task;
@@ -64,7 +63,7 @@ public class GameStateMqttPublisherTest
         await sut.StartAsync(CancellationToken.None);
 
         // Act
-        sut.OnNext(new MapEvent(steamId, map));
+        sut.OnNext(new StateUpdate<Map>(steamId, map));
 
         // Assert
         await tcs.Task;
@@ -86,7 +85,7 @@ public class GameStateMqttPublisherTest
         await sut.StartAsync(CancellationToken.None);
 
         // Act
-        sut.OnNext(new RoundEvent(steamId, round));
+        sut.OnNext(new StateUpdate<Round>(steamId, round));
 
         // Assert
         await tcs.Task;

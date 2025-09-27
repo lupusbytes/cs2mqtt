@@ -1,6 +1,4 @@
 using LupusBytes.CS2.GameStateIntegration.Contracts;
-using LupusBytes.CS2.GameStateIntegration.Events;
-using LupusBytes.CS2.GameStateIntegration.Extensions;
 
 namespace LupusBytes.CS2.GameStateIntegration;
 
@@ -24,7 +22,7 @@ internal sealed class GameState(SteamId64 steamId) : ObservableGameState, IGameS
             }
 
             round = value;
-            PushEvent(RoundObservers, value.ToEvent(SteamId));
+            PushStateUpdate(RoundObservers, new StateUpdate<Round>(SteamId, round));
         }
     }
 
@@ -45,7 +43,7 @@ internal sealed class GameState(SteamId64 steamId) : ObservableGameState, IGameS
             if (player != valuePlayer)
             {
                 player = valuePlayer;
-                PushEvent(PlayerObservers, valuePlayer.ToEvent(SteamId));
+                PushStateUpdate(PlayerObservers, new StateUpdate<Player>(SteamId, valuePlayer));
             }
 
             if (playerState == value?.State)
@@ -54,7 +52,7 @@ internal sealed class GameState(SteamId64 steamId) : ObservableGameState, IGameS
             }
 
             playerState = value?.State;
-            PushEvent(PlayerStateObservers, playerState.ToEvent(SteamId));
+            PushStateUpdate(PlayerStateObservers, new StateUpdate<PlayerState>(SteamId, playerState));
         }
     }
 
@@ -69,24 +67,15 @@ internal sealed class GameState(SteamId64 steamId) : ObservableGameState, IGameS
             }
 
             map = value;
-            PushEvent(MapObservers, value.ToEvent(SteamId));
+            PushStateUpdate(MapObservers, new StateUpdate<Map>(SteamId, map));
         }
     }
 
     public void ProcessEvent(GameStateData data)
     {
-        PushEvent(ProviderObservers, new ProviderEvent(SteamId, data.Provider));
+        PushStateUpdate(ProviderObservers, new StateUpdate<Provider>(SteamId, data.Provider));
         Player = data.Player;
         Map = data.Map;
         Round = data.Round;
-    }
-
-    private static void PushEvent<TEvent>(IEnumerable<IObserver<TEvent>> observers, TEvent @event)
-        where TEvent : BaseEvent
-    {
-        foreach (var observer in observers)
-        {
-            observer.OnNext(@event);
-        }
     }
 }

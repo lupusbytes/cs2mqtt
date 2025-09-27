@@ -1,52 +1,58 @@
-using LupusBytes.CS2.GameStateIntegration.Events;
+using LupusBytes.CS2.GameStateIntegration.Contracts;
 
 namespace LupusBytes.CS2.GameStateIntegration;
 
 internal abstract class ObservableGameState :
-    IObservable<ProviderEvent>,
-    IObservable<MapEvent>,
-    IObservable<PlayerEvent>,
-    IObservable<PlayerStateEvent>,
-    IObservable<RoundEvent>
+    IObservable<StateUpdate<Provider>>,
+    IObservable<StateUpdate<Map>>,
+    IObservable<StateUpdate<Round>>,
+    IObservable<StateUpdate<Player>>,
+    IObservable<StateUpdate<PlayerState>>
 {
-    protected ISet<IObserver<MapEvent>> MapObservers { get; } = new HashSet<IObserver<MapEvent>>();
-    protected ISet<IObserver<PlayerEvent>> PlayerObservers { get; } = new HashSet<IObserver<PlayerEvent>>();
-    protected ISet<IObserver<PlayerStateEvent>> PlayerStateObservers { get; } = new HashSet<IObserver<PlayerStateEvent>>();
-    protected ISet<IObserver<RoundEvent>> RoundObservers { get; } = new HashSet<IObserver<RoundEvent>>();
-    protected ISet<IObserver<ProviderEvent>> ProviderObservers { get; } = new HashSet<IObserver<ProviderEvent>>();
+    protected ISet<IObserver<StateUpdate<Provider>>> ProviderObservers { get; } = new HashSet<IObserver<StateUpdate<Provider>>>();
+    protected ISet<IObserver<StateUpdate<Map>>> MapObservers { get; } = new HashSet<IObserver<StateUpdate<Map>>>();
+    protected ISet<IObserver<StateUpdate<Round>>> RoundObservers { get; } = new HashSet<IObserver<StateUpdate<Round>>>();
+    protected ISet<IObserver<StateUpdate<Player>>> PlayerObservers { get; } = new HashSet<IObserver<StateUpdate<Player>>>();
+    protected ISet<IObserver<StateUpdate<PlayerState>>> PlayerStateObservers { get; } = new HashSet<IObserver<StateUpdate<PlayerState>>>();
 
-    public IDisposable Subscribe(IObserver<MapEvent> observer)
+    public IDisposable Subscribe(IObserver<StateUpdate<Provider>> observer)
+        => Subscribe(ProviderObservers, observer);
+
+    public IDisposable Subscribe(IObserver<StateUpdate<Map>> observer)
+        => Subscribe(MapObservers, observer);
+
+    public IDisposable Subscribe(IObserver<StateUpdate<Round>> observer)
+        => Subscribe(RoundObservers, observer);
+
+    public IDisposable Subscribe(IObserver<StateUpdate<Player>> observer)
+        => Subscribe(PlayerObservers, observer);
+
+    public IDisposable Subscribe(IObserver<StateUpdate<PlayerState>> observer)
+        => Subscribe(PlayerStateObservers, observer);
+
+    private static Unsubscriber<StateUpdate<TState>> Subscribe<TState>(
+        ISet<IObserver<StateUpdate<TState>>> observers,
+        IObserver<StateUpdate<TState>> observer)
+        where TState : class
     {
-        MapObservers.Add(observer);
-        return new Unsubscriber<MapEvent>(MapObservers, observer);
+        observers.Add(observer);
+        return new Unsubscriber<StateUpdate<TState>>(observers, observer);
     }
 
-    public IDisposable Subscribe(IObserver<PlayerEvent> observer)
+    protected static void PushStateUpdate<TState>(
+        ISet<IObserver<StateUpdate<TState>>> observers,
+        StateUpdate<TState> stateUpdate)
+        where TState : class
     {
-        PlayerObservers.Add(observer);
-        return new Unsubscriber<PlayerEvent>(PlayerObservers, observer);
+        foreach (var observer in observers)
+        {
+            observer.OnNext(stateUpdate);
+        }
     }
 
-    public IDisposable Subscribe(IObserver<PlayerStateEvent> observer)
-    {
-        PlayerStateObservers.Add(observer);
-        return new Unsubscriber<PlayerStateEvent>(PlayerStateObservers, observer);
-    }
-
-    public IDisposable Subscribe(IObserver<RoundEvent> observer)
-    {
-        RoundObservers.Add(observer);
-        return new Unsubscriber<RoundEvent>(RoundObservers, observer);
-    }
-
-    public IDisposable Subscribe(IObserver<ProviderEvent> observer)
-    {
-        ProviderObservers.Add(observer);
-        return new Unsubscriber<ProviderEvent>(ProviderObservers, observer);
-    }
-
-    private sealed class Unsubscriber<TEvent>(ISet<IObserver<TEvent>> observers, IObserver<TEvent> observer) : IDisposable
-        where TEvent : BaseEvent
+    private sealed class Unsubscriber<TState>(
+        ISet<IObserver<TState>> observers,
+        IObserver<TState> observer) : IDisposable
     {
         public void Dispose() => observers.Remove(observer);
     }

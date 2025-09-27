@@ -1,5 +1,4 @@
 using LupusBytes.CS2.GameStateIntegration.Contracts;
-using LupusBytes.CS2.GameStateIntegration.Events;
 
 namespace LupusBytes.CS2.GameStateIntegration.Tests;
 
@@ -18,9 +17,9 @@ public class GameStateTest
     }
 
     [Theory, AutoNSubstituteData]
-    internal void ProcessEvent_sends_PlayerEvent_to_observers(
+    internal void ProcessEvent_sends_StateUpdate_with_Player_to_observers(
         GameStateData data,
-        IObserver<PlayerEvent> observer,
+        IObserver<StateUpdate<Player>> observer,
         GameState sut)
     {
         // Arrange
@@ -30,18 +29,18 @@ public class GameStateTest
         sut.ProcessEvent(data);
 
         // Assert
-        observer.Received(1).OnNext(Arg.Is<PlayerEvent>(p =>
+        observer.Received(1).OnNext(Arg.Is<StateUpdate<Player>>(p =>
             p.SteamId == sut.SteamId &&
-            p.Player!.SteamId64 == data.Player!.SteamId64 &&
-            p.Player.Name == data.Player.Name &&
-            p.Player.Team == data.Player.Team &&
-            p.Player.Activity == data.Player.Activity));
+            p.State!.SteamId64 == data.Player!.SteamId64 &&
+            p.State.Name == data.Player.Name &&
+            p.State.Team == data.Player.Team &&
+            p.State.Activity == data.Player.Activity));
     }
 
     [Theory, AutoNSubstituteData]
-    internal void ProcessEvent_sends_PlayerEvent_with_null_Player_to_observers(
+    internal void ProcessEvent_sends_StateUpdate_with_null_Player_to_observers(
         GameStateData data,
-        IObserver<PlayerEvent> observer,
+        IObserver<StateUpdate<Player>> observer,
         GameState sut)
     {
         // Arrange
@@ -53,15 +52,15 @@ public class GameStateTest
         sut.ProcessEvent(data);
 
         // Assert
-        observer.Received(1).OnNext(Arg.Is<PlayerEvent>(p =>
+        observer.Received(1).OnNext(Arg.Is<StateUpdate<Player>>(p =>
             p.SteamId == sut.SteamId &&
-            p.Player == null));
+            p.State == null));
     }
 
     [Theory, AutoNSubstituteData]
-    internal void ProcessEvent_sends_PlayerStateEvent_to_observers(
+    internal void ProcessEvent_sends_StateUpdate_with_PlayerState_to_observers(
         GameStateData data,
-        IObserver<PlayerStateEvent> observer,
+        IObserver<StateUpdate<PlayerState>> observer,
         GameState sut)
     {
         // Arrange
@@ -71,24 +70,24 @@ public class GameStateTest
         sut.ProcessEvent(data);
 
         // Assert
-        observer.Received(1).OnNext(Arg.Is<PlayerStateEvent>(p =>
+        observer.Received(1).OnNext(Arg.Is<StateUpdate<PlayerState>>(p =>
             p.SteamId == sut.SteamId &&
-            p.PlayerState!.Health == data.Player!.State!.Health &&
-            p.PlayerState.Armor == data.Player.State.Armor &&
-            p.PlayerState.Helmet == data.Player.State.Helmet &&
-            p.PlayerState.Flashed == data.Player.State.Flashed &&
-            p.PlayerState.Smoked == data.Player.State.Smoked &&
-            p.PlayerState.Burning == data.Player.State.Burning &&
-            p.PlayerState.Money == data.Player.State.Money &&
-            p.PlayerState.RoundKills == data.Player.State.RoundKills &&
-            p.PlayerState.RoundKillHeadshots == data.Player.State.RoundKillHeadshots &&
-            p.PlayerState.EquipmentValue == data.Player.State.EquipmentValue));
+            p.State!.Health == data.Player!.State!.Health &&
+            p.State.Armor == data.Player.State.Armor &&
+            p.State.Helmet == data.Player.State.Helmet &&
+            p.State.Flashed == data.Player.State.Flashed &&
+            p.State.Smoked == data.Player.State.Smoked &&
+            p.State.Burning == data.Player.State.Burning &&
+            p.State.Money == data.Player.State.Money &&
+            p.State.RoundKills == data.Player.State.RoundKills &&
+            p.State.RoundKillHeadshots == data.Player.State.RoundKillHeadshots &&
+            p.State.EquipmentValue == data.Player.State.EquipmentValue));
     }
 
     [Theory, AutoNSubstituteData]
-    internal void ProcessEvent_sends_PlayerStateEvent_with_null_PlayerState_to_observers(
+    internal void ProcessEvent_sends_StateUpdate_with_null_PlayerState_to_observers(
         GameStateData data,
-        IObserver<PlayerStateEvent> observer,
+        IObserver<StateUpdate<PlayerState>> observer,
         GameState sut)
     {
         // Arrange
@@ -100,15 +99,15 @@ public class GameStateTest
         sut.ProcessEvent(data);
 
         // Assert
-        observer.Received(1).OnNext(Arg.Is<PlayerStateEvent>(ps =>
+        observer.Received(1).OnNext(Arg.Is<StateUpdate<PlayerState>>(ps =>
             ps.SteamId == sut.SteamId &&
-            ps.PlayerState == null));
+            ps.State == null));
     }
 
     [Theory, AutoNSubstituteData]
-    internal void ProcessEvent_sends_MapEvent_to_observers(
+    internal void ProcessEvent_sends_StateUpdate_with_Map_to_observers(
         GameStateData data,
-        IObserver<MapEvent> observer,
+        IObserver<StateUpdate<Map>> observer,
         GameState sut)
     {
         // Arrange
@@ -118,20 +117,20 @@ public class GameStateTest
         sut.ProcessEvent(data);
 
         // Assert
-        observer.Received(1).OnNext(Arg.Is<MapEvent>(m =>
+        observer.Received(1).OnNext(Arg.Is<StateUpdate<Map>>(m =>
             m.SteamId == sut.SteamId &&
-            m.Map!.Mode == data.Map!.Mode &&
-            m.Map.Name == data.Map.Name &&
-            m.Map.Phase == data.Map.Phase &&
-            m.Map.Round == data.Map.Round &&
-            m.Map.T == data.Map.T &&
-            m.Map.CT == data.Map.CT));
+            m.State!.Mode == data.Map!.Mode &&
+            m.State.Name == data.Map.Name &&
+            m.State.Phase == data.Map.Phase &&
+            m.State.Round == data.Map.Round &&
+            m.State.T == data.Map.T &&
+            m.State.CT == data.Map.CT));
     }
 
     [Theory, AutoNSubstituteData]
-    internal void ProcessEvent_sends_MapEvent_with_null_Map_to_observers(
+    internal void ProcessEvent_sends_StateUpdate_with_null_Map_to_observers(
         GameStateData data,
-        IObserver<MapEvent> observer,
+        IObserver<StateUpdate<Map>> observer,
         GameState sut)
     {
         // Arrange
@@ -143,15 +142,15 @@ public class GameStateTest
         sut.ProcessEvent(data);
 
         // Assert
-        observer.Received(1).OnNext(Arg.Is<MapEvent>(m =>
+        observer.Received(1).OnNext(Arg.Is<StateUpdate<Map>>(m =>
             m.SteamId == sut.SteamId &&
-            m.Map == null));
+            m.State == null));
     }
 
     [Theory, AutoNSubstituteData]
-    internal void ProcessEvent_sends_RoundEvent_to_observers(
+    internal void ProcessEvent_sends_StateUpdate_with_Round_to_observers(
         GameStateData data,
-        IObserver<RoundEvent> observer,
+        IObserver<StateUpdate<Round>> observer,
         GameState sut)
     {
         // Arrange
@@ -161,17 +160,17 @@ public class GameStateTest
         sut.ProcessEvent(data);
 
         // Assert
-        observer.Received(1).OnNext(Arg.Is<RoundEvent>(r =>
+        observer.Received(1).OnNext(Arg.Is<StateUpdate<Round>>(r =>
             r.SteamId == sut.SteamId &&
-            r.Round!.Phase == data.Round!.Phase &&
-            r.Round.WinTeam == data.Round.WinTeam &&
-            r.Round.Bomb == data.Round.Bomb));
+            r.State!.Phase == data.Round!.Phase &&
+            r.State.WinTeam == data.Round.WinTeam &&
+            r.State.Bomb == data.Round.Bomb));
     }
 
     [Theory, AutoNSubstituteData]
-    internal void ProcessEvent_sends_RoundEvent_with_null_Round_to_observers(
+    internal void ProcessEvent_sends_StateUpdate_with_null_Round_to_observers(
         GameStateData data,
-        IObserver<RoundEvent> observer,
+        IObserver<StateUpdate<Round>> observer,
         GameState sut)
     {
         // Arrange
@@ -183,18 +182,18 @@ public class GameStateTest
         sut.ProcessEvent(data);
 
         // Assert
-        observer.Received(1).OnNext(Arg.Is<RoundEvent>(r =>
+        observer.Received(1).OnNext(Arg.Is<StateUpdate<Round>>(r =>
             r.SteamId == sut.SteamId &&
-            r.Round == null));
+            r.State == null));
     }
 
     [Theory, AutoNSubstituteData]
-    internal void ProcessEvent_does_not_send_events_on_same_data(
+    internal void ProcessEvent_does_not_send_updates_on_same_data(
         GameStateData data,
-        IObserver<PlayerEvent> playerObserver,
-        IObserver<PlayerStateEvent> playerStateObserver,
-        IObserver<MapEvent> mapObserver,
-        IObserver<RoundEvent> roundObserver,
+        IObserver<StateUpdate<Player>> playerObserver,
+        IObserver<StateUpdate<PlayerState>> playerStateObserver,
+        IObserver<StateUpdate<Map>> mapObserver,
+        IObserver<StateUpdate<Round>> roundObserver,
         GameState sut)
     {
         // Arrange
@@ -208,20 +207,20 @@ public class GameStateTest
         sut.ProcessEvent(data); // Send same data again
 
         // Assert
-        playerObserver.Received(0).OnNext(Arg.Any<PlayerEvent>());
-        playerStateObserver.Received(0).OnNext(Arg.Any<PlayerStateEvent>());
-        mapObserver.Received(0).OnNext(Arg.Any<MapEvent>());
-        roundObserver.Received(0).OnNext(Arg.Any<RoundEvent>());
+        playerObserver.Received(0).OnNext(Arg.Any<StateUpdate<Player>>());
+        playerStateObserver.Received(0).OnNext(Arg.Any<StateUpdate<PlayerState>>());
+        mapObserver.Received(0).OnNext(Arg.Any<StateUpdate<Map>>());
+        roundObserver.Received(0).OnNext(Arg.Any<StateUpdate<Round>>());
     }
 
     [Theory, AutoNSubstituteData]
-    internal void ProcessEvent_does_not_send_events_to_unsubscribed_observers(
+    internal void ProcessEvent_does_not_send_updates_to_unsubscribed_observers(
         GameStateData data1,
         GameStateData data2,
-        IObserver<PlayerEvent> playerObserver,
-        IObserver<PlayerStateEvent> playerStateObserver,
-        IObserver<MapEvent> mapObserver,
-        IObserver<RoundEvent> roundObserver,
+        IObserver<StateUpdate<Player>> playerObserver,
+        IObserver<StateUpdate<PlayerState>> playerStateObserver,
+        IObserver<StateUpdate<Map>> mapObserver,
+        IObserver<StateUpdate<Round>> roundObserver,
         GameState sut)
     {
         // Arrange
@@ -239,23 +238,23 @@ public class GameStateTest
         sut.ProcessEvent(data2);
 
         // Assert
-        playerObserver.Received(1).OnNext(Arg.Any<PlayerEvent>());
-        playerStateObserver.Received(1).OnNext(Arg.Any<PlayerStateEvent>());
-        mapObserver.Received(1).OnNext(Arg.Any<MapEvent>());
-        roundObserver.Received(1).OnNext(Arg.Any<RoundEvent>());
+        playerObserver.Received(1).OnNext(Arg.Any<StateUpdate<Player>>());
+        playerStateObserver.Received(1).OnNext(Arg.Any<StateUpdate<PlayerState>>());
+        mapObserver.Received(1).OnNext(Arg.Any<StateUpdate<Map>>());
+        roundObserver.Received(1).OnNext(Arg.Any<StateUpdate<Round>>());
     }
 
     [Theory, AutoNSubstituteData]
-    internal void ProcessEvent_sends_events_to_multiple_observers(
+    internal void ProcessEvent_sends_updates_to_multiple_observers(
         GameStateData data,
-        IObserver<PlayerEvent> playerObserver1,
-        IObserver<PlayerStateEvent> playerStateObserver1,
-        IObserver<MapEvent> mapObserver1,
-        IObserver<RoundEvent> roundObserver1,
-        IObserver<PlayerEvent> playerObserver2,
-        IObserver<PlayerStateEvent> playerStateObserver2,
-        IObserver<MapEvent> mapObserver2,
-        IObserver<RoundEvent> roundObserver2,
+        IObserver<StateUpdate<Player>> playerObserver1,
+        IObserver<StateUpdate<PlayerState>> playerStateObserver1,
+        IObserver<StateUpdate<Map>> mapObserver1,
+        IObserver<StateUpdate<Round>> roundObserver1,
+        IObserver<StateUpdate<Player>> playerObserver2,
+        IObserver<StateUpdate<PlayerState>> playerStateObserver2,
+        IObserver<StateUpdate<Map>> mapObserver2,
+        IObserver<StateUpdate<Round>> roundObserver2,
         GameState sut)
     {
         // Arrange
@@ -273,14 +272,14 @@ public class GameStateTest
         sut.ProcessEvent(data);
 
         // Assert
-        playerObserver1.Received(1).OnNext(Arg.Any<PlayerEvent>());
-        playerStateObserver1.Received(1).OnNext(Arg.Any<PlayerStateEvent>());
-        mapObserver1.Received(1).OnNext(Arg.Any<MapEvent>());
-        roundObserver1.Received(1).OnNext(Arg.Any<RoundEvent>());
+        playerObserver1.Received(1).OnNext(Arg.Any<StateUpdate<Player>>());
+        playerStateObserver1.Received(1).OnNext(Arg.Any<StateUpdate<PlayerState>>());
+        mapObserver1.Received(1).OnNext(Arg.Any<StateUpdate<Map>>());
+        roundObserver1.Received(1).OnNext(Arg.Any<StateUpdate<Round>>());
 
-        playerObserver2.Received(1).OnNext(Arg.Any<PlayerEvent>());
-        playerStateObserver2.Received(1).OnNext(Arg.Any<PlayerStateEvent>());
-        mapObserver2.Received(1).OnNext(Arg.Any<MapEvent>());
-        roundObserver2.Received(1).OnNext(Arg.Any<RoundEvent>());
+        playerObserver2.Received(1).OnNext(Arg.Any<StateUpdate<Player>>());
+        playerStateObserver2.Received(1).OnNext(Arg.Any<StateUpdate<PlayerState>>());
+        mapObserver2.Received(1).OnNext(Arg.Any<StateUpdate<Map>>());
+        roundObserver2.Received(1).OnNext(Arg.Any<StateUpdate<Round>>());
     }
 }
