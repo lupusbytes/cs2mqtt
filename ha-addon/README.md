@@ -4,7 +4,7 @@ Configure the addon as follows:
 
 -   `MQTT Host`: MQTT Server - If you're running an MQTT broker outside of your HA instance, replace homeassistant.local with the broker's host/IP.
 -   `MQTT Port`: MQTT broker port
--   `Use TLS`: Set to true if your broker uses TLS (optional, default: false)
+-   `Use TLS`: Set to true if your broker uses TLS
 -   `MQTT Username`: MQTT client username (optional)
 -   `MQTT Password`: MQTT client password (optional)
 -   `MQTT Client ID`: MQTT client ID (optional)
@@ -41,10 +41,11 @@ Once you have located the correct path, create a new file there called **gamesta
 }
 ```
 
-> 💡 Tip
->
-> In Windows File Explorer, it can be tricky to create a new file with a specific file extension (like `.cfg`).  
-> A simple workaround is to copy one of the many pre-existing `.cfg` files in the folder, rename it, and then replace its contents using Notepad.
+💡 Tip
+
+In Windows File Explorer, it can be tricky to create a new file with a specific file extension (like `.cfg`).  
+A simple workaround is to copy one of the many pre-existing `.cfg` files in the folder, rename it, and then replace its contents using Notepad.
+
 
 The next time you launch **Counter-Strike 2**, **cs2mqtt** will use the [MQTT discovery protocol](https://www.home-assistant.io/integrations/mqtt/#mqtt-discovery) to make [Home Assistant](https://www.home-assistant.io/) create an MQTT device named `CS2 STEAM_{X}:{Y}:{Z}`, matching your SteamID. On the very first game launch, the device will not have many sensors, but after joining or creating a game server, all sensors will automatically be discovered.
 
