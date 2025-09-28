@@ -41,8 +41,7 @@ Once you have located the correct path, create a new file there called **gamesta
 }
 ```
 
-💡 Tip
-
+💡 Tip  
 In Windows File Explorer, it can be tricky to create a new file with a specific file extension (like `.cfg`).  
 A simple workaround is to copy one of the many pre-existing `.cfg` files in the folder, rename it, and then replace its contents using Notepad.
 
