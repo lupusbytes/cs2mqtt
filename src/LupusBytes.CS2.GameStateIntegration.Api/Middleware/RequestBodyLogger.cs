@@ -11,9 +11,9 @@ public partial class RequestBodyLogger(RequestDelegate next, ILogger<RequestBody
         if (httpContext.Request.Method == HttpMethods.Post && httpContext.Request.ContentLength > 0)
         {
             httpContext.Request.EnableBuffering();
+            await LogRequestBody(httpContext.Request, httpContext.RequestAborted);
         }
 
-        await LogRequestBody(httpContext.Request, httpContext.RequestAborted);
         await next(httpContext);
     }
 
