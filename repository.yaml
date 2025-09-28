@@ -1,6 +1,6 @@
-name: "cs2mqtt Repository"
-url: "https://github.com/lupusbytes/cs2mqtt"
-maintainer: "lupusbytes"
+name: cs2mqtt add-on
+url: https://github.com/lupusbytes/cs2mqtt
+maintainer: lupusbytes
 addons:
   cs2mqtt:
     repository: ha-addon

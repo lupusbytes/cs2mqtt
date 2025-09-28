@@ -1,24 +1,41 @@
 configuration:
-  MQTT__Host: 
+  GameState__IgnoreSpectatedPlayers:
+    name: Zugeschaute Spieler ignorieren
+    description: Wenn aktiviert, werden nur die eigenen Gamestate-Updates versendet. Daten von beobachteten Spielern werden ignoriert.
+  GameState__TimeoutInSeconds:
+    name: Geräte-Timeout
+    description: |
+      Anzahl der Sekunden ohne Updates oder Heartbeats, bevor das gesamte Counter-Strike-Gerät als getrennt gilt.
+      Sollte etwas länger als der Heartbeat-Wert in gamestate_integration_cs2mqtt.cfg sein.
+      Standardmäßig 60,5 Sekunden (für Kompatibilität mit älteren Versionen).
+  GameState__TimeoutCleanupIntervalInSeconds:
+    name: Intervall für Geräte-Timeout-Bereinigung
+    description: |
+      Anzahl der Sekunden zwischen jeder Ausführung von Hintergrundaufgaben, die nach getrennten Counter-Strike-Geräten sucht.
+      Standardmäßig 15 Sekunden.
+  MQTT__Host:
     name: MQTT Host
-    description: MQTT Server Host/IP - Falls ein Broker außerhalb von Home Assistant läuft, hier homeassistant.local durch Host/IP ersetzen
+    description: MQTT Server Host/IP - Falls ein Broker außerhalb von Home Assistant läuft, hier homeassistant.local durch Host/IP ersetzen.
   MQTT__Port:
     name: MQTT Port
-    description: MQTT Broker Port
+    description: MQTT Broker Port.
   MQTT__UseTLS:
     name: Use TLS
-    description: Aktivieren, wenn der Broker SSL verwendet (optional, standardmäßig deaktiviert)
+    description: Aktivieren, wenn der Broker SSL verwendet.
   MQTT__Username:
     name: MQTT Username
     description: MQTT Client Nutzername, leer lassen falls Authentifizierung deaktiviert ist.
-  MQTT__Password: 
+  MQTT__Password:
     name: MQTT Passwort
     description: MQTT Client Passwort, leer lassen falls Authentifizierung deaktiviert ist.
-  MQTT__ClientId: 
+  MQTT__ClientId:
     name: MQTT Client ID
-    description: Optional
+    description: MQTT Client-ID, Standard ist "cs2mqtt" falls leer.
   MQTT__ProtocolVersion:
     name: MQTT Protokollversion
-    description: Optional, Standard ist 5.0.0
+    description: MQTT-Protokollversion, die beim Verbinden mit dem Broker verwendet wird.
+  Logging__LogLevel__Default:
+    name: Log-Level
+    description: Standard ist "Information" wenn nicht gesetzt. "Debug" zeigt alle API-Anfragen aus Counter-Strike (viele Logs).
 network:
   8080/tcp: Game State API Port (muss in der CS2 cfg übereinstimmen)
