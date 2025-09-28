@@ -45,5 +45,6 @@
     "GameState__TimeoutCleanupIntervalInSeconds": "float?",
     "Logging__LogLevel__Default": "list(Debug|Information|Warning)?"
   },
+  "watchdog": "http://[HOST]:[PORT:8080]/alive",
   "image": "ghcr.io/lupusbytes/cs2mqtt"
 }
