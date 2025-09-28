@@ -150,7 +150,7 @@ It is possible to require authentication between **Counter-Strike 2** and **cs2m
 To do this, pick a password and add it as an environment variable in the **cs2mqtt** docker-compose.yml like:
 
 ```yaml
-GameStateOptions__Token: password
+GameState__Token: password
 ```
 
 Then also add the same password to **gamestate_integration_cs2mqtt.cfg** in the root object:
