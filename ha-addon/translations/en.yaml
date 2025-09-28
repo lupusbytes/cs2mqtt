@@ -1,24 +1,41 @@
 configuration:
+  GameState__IgnoreSpectatedPlayers:
+    name: Ignore spectated players
+    description: If enabled, only the player's own game state updates are sent. Data from spectated players are ignored.
+  GameState__TimeoutInSeconds:
+    name: Device timeout
+    description: |
+      Number of seconds without updates or heartbeats before the whole Counter-Strike device is considered disconnected.
+      Should be a tiny bit longer than than the heartbeat configured in the gamestate_integration_cs2mqtt.cfg.
+      Defaults to 60.5 seconds for legacy reasons
+  GameState__TimeoutCleanupIntervalInSeconds:
+    name: Device timeout cleanup interval
+    description: |
+      Number of seconds to wait between each execution of the background task that attempts to find disconnected Counter-Strike devices.
+      Defaults to 15 seconds.
   MQTT__Host: 
     name: MQTT Host
     description: MQTT Server Host/IP - If you're running an MQTT broker outside of your HA instance, replace homeassistant.local with the broker's host/IP.
   MQTT__Port:
     name: MQTT Port
-    description: MQTT broker port
+    description: MQTT broker port.
   MQTT__UseTLS:
     name: Use TLS
-    description: "Set to true if your broker uses TLS (optional, default: false)"
+    description: Enable if your MQTT broker uses TLS.
   MQTT__Username:
     name: MQTT Username
-    description: MQTT client username, leave blank if auth is disabled
+    description: MQTT client username, leave blank if auth is disabled.
   MQTT__Password: 
     name: MQTT Password
-    description: MQTT client password, leave blank if auth is disabled
+    description: MQTT client password, leave blank if auth is disabled.
   MQTT__ClientId: 
     name: MQTT Client ID
-    description: Optional
+    description: MQTT client ID, defaults to "cs2mqtt" if left blank.
   MQTT__ProtocolVersion:
     name: MQTT Protocol Version
-    description: Optional, default is 5.0.0
+    description: The MQTT protocol version to use when connecting to the broker.
+  Logging__LogLevel__Default:
+    name: Log Level
+    description: Defaults to Information if not set. Choose Debug to log all API requests from Counter-Strike (many).
 network:
   8080/tcp: Game State API port (needs to match the port in your CS2 cfg)
