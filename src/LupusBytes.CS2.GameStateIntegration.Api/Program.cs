@@ -25,7 +25,10 @@ public sealed class Program
         app.MapCS2GetEndpoints();
         app.MapHealthCheckEndpoints();
 
-        app.UseMiddleware<LogRequestBodyOnException>();
+        if (app.Logger.IsEnabled(LogLevel.Debug))
+        {
+            app.UseMiddleware<RequestBodyLogger>();
+        }
 
         app.Run();
     }
