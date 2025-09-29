@@ -66,8 +66,12 @@ public static class ServiceCollectionExtensions
         mqttOptions.Username = string.IsNullOrWhiteSpace(cfg.Username) ? string.Empty : cfg.Username;
         mqttOptions.ProtocolVersion = string.IsNullOrWhiteSpace(cfg.Protocol) ? string.Empty : cfg.Protocol;
 
+        Console.WriteLine($"MQTT options: {mqttOptions} after fetch");
+
         // Still bind remaining settings from the config file to fill missing ones
         configuration.GetSection(MqttOptions.Section).Bind(mqttOptions);
+
+        Console.WriteLine($"MQTT options: {mqttOptions} after bind");
 
         return mqttOptions;
     }
