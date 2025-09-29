@@ -42,4 +42,16 @@ public static partial class Log
         Level = LogLevel.Critical,
         Message = "Failed to connect to MQTT broker {Host}:{Port} after {Attempts} attempts, giving up!")]
     public static partial void ConnectionToMqttBrokerAttemptsExhausted(this ILogger logger, Exception ex, string host, int port, int attempts);
+
+    [LoggerMessage(
+        EventId = 2_00,
+        Level = LogLevel.Information,
+        Message = "Requesting MQTT configuration from Home Assistant Supervisor")]
+    public static partial void RequestingSupervisorMqttConfig(this ILogger logger);
+
+    [LoggerMessage(
+        EventId = 2_01,
+        Level = LogLevel.Information,
+        Message = "Successfully retrieved MQTT configuration from Home Assistant Supervisor for add-on: {Addon}")]
+    public static partial void RetrievedSupervisorMqttConfig(this ILogger logger, string addon);
 }

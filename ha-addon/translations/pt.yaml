@@ -13,6 +13,11 @@ configuration:
     description: |
       Número de segundos entre cada execução da tarefa em segundo plano que tenta localizar dispositivos Counter-Strike desconectados.
       O padrão é 15 segundos.
+  SUPERVISOR_OVERRIDE_MQTT_CONFIG:
+    name: Usar configurações MQTT do Home Assistant
+    description: >
+      Quando ativado, cs2mqtt irá buscar as configurações do broker MQTT automaticamente do Home Assistant Supervisor.
+      Desative esta opção apenas se quiser configurar o MQTT manualmente (ative "Mostrar opções de configuração opcionais não utilizadas" para revelar os campos MQTT abaixo).
   MQTT__Host:
     name: Host MQTT
     description: Servidor/Host ou IP do MQTT – Se o broker estiver fora do Home Assistant, substituir homeassistant.local por Host/IP.

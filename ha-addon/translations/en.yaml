@@ -13,7 +13,12 @@ configuration:
     description: |
       Number of seconds to wait between each execution of the background task that attempts to find disconnected Counter-Strike devices.
       Defaults to 15 seconds.
-  MQTT__Host: 
+  SUPERVISOR_OVERRIDE_MQTT_CONFIG:
+    name: Use MQTT settings from Home Assistant
+    description: >
+      When enabled, cs2mqtt will fetch MQTT broker settings automatically from the Home Assistant Supervisor.
+      Disable this only if you want to configure MQTT manually (then enable “Show unused optional configuration options” to reveal the MQTT fields below).
+  MQTT__Host:
     name: MQTT Host
     description: MQTT Server Host/IP - If you're running an MQTT broker outside of your HA instance, replace homeassistant.local with the broker's host/IP.
   MQTT__Port:
@@ -25,10 +30,10 @@ configuration:
   MQTT__Username:
     name: MQTT Username
     description: MQTT client username, leave blank if auth is disabled.
-  MQTT__Password: 
+  MQTT__Password:
     name: MQTT Password
     description: MQTT client password, leave blank if auth is disabled.
-  MQTT__ClientId: 
+  MQTT__ClientId:
     name: MQTT Client ID
     description: MQTT client ID, defaults to "cs2mqtt" if left blank.
   MQTT__ProtocolVersion:

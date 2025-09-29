@@ -13,6 +13,11 @@ configuration:
     description: |
       Anzahl der Sekunden zwischen jeder Ausführung von Hintergrundaufgaben, die nach getrennten Counter-Strike-Geräten sucht.
       Standardmäßig 15 Sekunden.
+  SUPERVISOR_OVERRIDE_MQTT_CONFIG:
+    name: MQTT-Einstellungen von HomeAssistant verwenden
+    description: >
+      Wenn aktiviert, bezieht cs2mqtt automatisch die Einstellungen des MQTT-Brokers vom HomeAssistant Supervisor.
+      Nur deaktivieren, wenn MQTT manuell konfiguriert werden soll (MQTT-Felder anzeigen durch Aktivieren von "Nicht verwendete optionale Konfigurationsoptionen einblenden").
   MQTT__Host:
     name: MQTT Host
     description: MQTT Server Host/IP - Falls ein Broker außerhalb von Home Assistant läuft, hier homeassistant.local durch Host/IP ersetzen.
