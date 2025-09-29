@@ -1,15 +1,3 @@
-# cs2mqtt
-
-Configure the addon as follows:
-
--   `MQTT Host`: MQTT Server - If you're running an MQTT broker outside of your HA instance, replace homeassistant.local with the broker's host/IP.
--   `MQTT Port`: MQTT broker port
--   `Use TLS`: Set to true if your broker uses TLS
--   `MQTT Username`: MQTT client username (optional)
--   `MQTT Password`: MQTT client password (optional)
--   `MQTT Client ID`: MQTT client ID (optional)
--   `MQTT Protocol Version`: Allowed values are 3.1.0, 3.1.1, or 5.0.0 (optional, default: 5.0.0)
-
 ### Connecting **Counter-Strike 2** to **cs2mqtt**
 
 To make **Counter-Strike 2** send game state data to **cs2mqtt**, you need to create a config file within the game's directory.

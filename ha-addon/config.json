@@ -9,7 +9,8 @@
     "aarch64",
     "amd64"
   ],
-  "timeout": 30,
+  "services": [ "mqtt:want" ],
+  "hassio_api": true,
   "legacy": true,
   "ports": {
     "8080/tcp": 5000
@@ -19,26 +20,21 @@
   },
   "options": {
     "GameState__IgnoreSpectatedPlayers": true,
-    "MQTT__Host": "homeassistant.local",
-    "MQTT__Port": 1883,
-    "MQTT__UseTLS": false,
-    "MQTT__Username": "",
-    "MQTT__Password": "",
-    "MQTT__ClientId": "",
-    "MQTT__ProtocolVersion": "5.0.0"
+    "SUPERVISOR_OVERRIDE_MQTT_CONFIG": true
   },
   "schema": {
     "GameState__IgnoreSpectatedPlayers": "bool",
-    "MQTT__Host": "str",
-    "MQTT__Port": "int",
-    "MQTT__UseTLS": "bool",
+    "SUPERVISOR_OVERRIDE_MQTT_CONFIG": "bool",
+    "GameState__TimeoutInSeconds": "float?",
+    "GameState__TimeoutCleanupIntervalInSeconds": "float?",
+    "Logging__LogLevel__Default": "list(Debug|Information|Warning)?",
+    "MQTT__Host": "str?",
+    "MQTT__Port": "int?",
+    "MQTT__UseTLS": "bool?",
     "MQTT__Username": "str?",
     "MQTT__Password": "password?",
     "MQTT__ClientId": "str?",
-    "MQTT__ProtocolVersion": "list(5.0.0|3.1.1|3.1.0)",
-    "GameState__TimeoutInSeconds": "float?",
-    "GameState__TimeoutCleanupIntervalInSeconds": "float?",
-    "Logging__LogLevel__Default": "list(Debug|Information|Warning)?"
+    "MQTT__ProtocolVersion": "list(5.0.0|3.1.1|3.1.0)?"
   },
   "watchdog": "http://[HOST]:[PORT:8080]/alive",
   "image": "ghcr.io/lupusbytes/cs2mqtt"
