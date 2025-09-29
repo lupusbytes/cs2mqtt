@@ -78,7 +78,7 @@ public static class ServiceCollectionExtensions
         httpClient.BaseAddress = new Uri(SupervisorServicesBaseAddress);
         httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", supervisorToken);
 
-        var response = httpClient.GetAsync(new Uri(SupervisorServicesEndpoint)).Result;
+        var response = httpClient.GetAsync(SupervisorServicesEndpoint).Result;
         Console.WriteLine(response.StatusCode);
         response.EnsureSuccessStatusCode();
 
