@@ -10,29 +10,6 @@ namespace LupusBytes.CS2.GameStateIntegration.Mqtt.Tests;
 
 public class MqttClientTest
 {
-    [Theory]
-    [InlineAutoNSubstituteData("5")]
-    [InlineAutoNSubstituteData("4.0.0")]
-    [InlineAutoNSubstituteData("Foo")]
-    public void Constructor_throws_on_invalid_MQTT_protocol(
-        string protocolVersion,
-        IMqttNetClient mqttNetClient,
-        ILogger<MqttClient> logger)
-    {
-        // Arrange
-        var options = new MqttOptions
-        {
-            ProtocolVersion = protocolVersion,
-        };
-
-        // Act & Assert
-        Assert.Throws<ArgumentException>(() => new MqttClient(
-            mqttNetClient,
-            options,
-            onFatalConnectionError: () => Task.CompletedTask,
-            logger));
-    }
-
     [Theory, AutoNSubstituteData]
     public async Task PublishAsync_invokes_MQTTnet_PublishAsync(
         [Frozen] IMqttNetClient mqttNetClient,
@@ -53,6 +30,28 @@ public class MqttClientTest
                 Encoding.UTF8.GetString(x.Payload) == message.Payload &&
                 x.Retain == message.RetainFlag),
             Arg.Is(cancellationToken));
+    }
+
+    [Theory]
+    [InlineAutoNSubstituteData("5")]
+    [InlineAutoNSubstituteData("4.0.0")]
+    [InlineAutoNSubstituteData("Foo")]
+    public Task StartAsync_throws_on_invalid_MQTT_protocol(
+        string protocolVersion,
+        [Frozen] IMqttOptionsProvider optionsProvider,
+        CancellationToken cancellationToken,
+        MqttClient sut)
+    {
+        // Arrange
+        optionsProvider.GetOptionsAsync(cancellationToken).Returns(new MqttOptions
+        {
+            ProtocolVersion = protocolVersion,
+        });
+
+        // Act & Assert
+        return sut.Invoking(x => x.StartAsync(cancellationToken))
+            .Should()
+            .ThrowAsync<ArgumentException>();
     }
 
     [Theory, AutoNSubstituteData]
@@ -185,22 +184,26 @@ public class MqttClientTest
         MqttClient sut)
     {
         // Arrange
+        ArrangeConnectResultCode(mqttNetClient, MqttClientConnectResultCode.Success);
+        await sut.StartAsync(CancellationToken.None);
+
         mqttNetClient.IsConnected.Returns(false);
         foreach (var message in messages)
         {
             // Publish messages
-            await sut.PublishAsync(message, default);
+            await sut.PublishAsync(message, CancellationToken.None);
         }
 
         foreach (var message in messages.Select(message => message with { Payload = "Hello World" }))
         {
             // Publish messages on the same topics, but with Hello World as payload
-            await sut.PublishAsync(message, default);
+            await sut.PublishAsync(message, CancellationToken.None);
         }
 
         // Act
         mqttNetClient.IsConnected.Returns(true);
-        mqttNetClient.ConnectedAsync += Raise.Event<Func<MqttClientConnectedEventArgs, Task>>(new MqttClientConnectedEventArgs(new MqttClientConnectResult()));
+        mqttNetClient.ConnectedAsync += Raise.Event<Func<MqttClientConnectedEventArgs, Task>>(
+            new MqttClientConnectedEventArgs(new MqttClientConnectResult()));
 
         // Assert
         await mqttNetClient.Received(messages.Count).PublishAsync(
@@ -220,6 +223,10 @@ public class MqttClientTest
         // Arrange
         mqttOptions.ReconnectRetryCount = 6;
         mqttOptions.RetryDelayProvider = _ => TimeSpan.Zero;
+
+        ArrangeConnectResultCode(mqttNetClient, MqttClientConnectResultCode.Success);
+        await sut.StartAsync(CancellationToken.None);
+
         mqttNetClient.IsConnected.Returns(false);
         mqttNetClient
             .ConnectAsync(Arg.Any<MqttClientOptions>(), Arg.Any<CancellationToken>())
@@ -237,7 +244,7 @@ public class MqttClientTest
 
         // Assert
         await mqttNetClient
-            .Received(mqttOptions.ReconnectRetryCount + 1)
+            .Received(mqttOptions.ReconnectRetryCount + 2)
             .ConnectAsync(Arg.Any<MqttClientOptions>(), Arg.Any<CancellationToken>());
 
         await onFatalConnectionError.Received(1)();
@@ -248,9 +255,7 @@ public class MqttClientTest
     [InlineAutoNSubstituteData(0)]
     [InlineAutoNSubstituteData(1)]
     [InlineAutoNSubstituteData(10)]
-    [SuppressMessage("Usage", "xUnit1026:Theory methods should use all of their parameters", Justification = "sut's event handler is doing work behind the scenes")]
-    [SuppressMessage("Style", "IDE0060:Remove unused parameter", Justification = "sut's event handler is doing work behind the scenes")]
-    public Task Attempts_to_reconnect_after_disconnect_and_succeeds(
+    public async Task Attempts_to_reconnect_after_disconnect_and_succeeds(
         int reconnectRetryCount,
         [Frozen] IMqttNetClient mqttNetClient,
         [Frozen] MqttOptions mqttOptions,
@@ -258,16 +263,19 @@ public class MqttClientTest
     {
         // Arrange
         var resultCodes = Enumerable
-            .Range(0, Math.Max(0, reconnectRetryCount))
-            .Select(_ => MqttClientConnectResultCode.UnspecifiedError)
-            .Concat([MqttClientConnectResultCode.Success])
+            .Repeat(
+                MqttClientConnectResultCode.UnspecifiedError,
+                Math.Max(0, reconnectRetryCount))
+            .Prepend(MqttClientConnectResultCode.Success)
+            .Append(MqttClientConnectResultCode.Success)
             .ToArray();
-
-        ArrangeConnectResultCode(mqttNetClient, resultCodes);
 
         mqttOptions.ReconnectRetryCount = reconnectRetryCount;
         mqttOptions.RetryDelayProvider = _ => TimeSpan.Zero;
         mqttNetClient.IsConnected.Returns(false);
+
+        ArrangeConnectResultCode(mqttNetClient, resultCodes);
+        await sut.StartAsync(CancellationToken.None);
 
         // Act
         mqttNetClient.DisconnectedAsync += Raise.Event<Func<MqttClientDisconnectedEventArgs, Task>>(
@@ -280,7 +288,7 @@ public class MqttClientTest
                 new SocketException()));
 
         // Assert
-        return mqttNetClient
+        await mqttNetClient
             .Received(resultCodes.Length)
             .ConnectAsync(Arg.Any<MqttClientOptions>(), Arg.Any<CancellationToken>());
     }
@@ -288,16 +296,18 @@ public class MqttClientTest
     [Theory, AutoNSubstituteData]
     [SuppressMessage("Usage", "xUnit1026:Theory methods should use all of their parameters", Justification = "sut's event handler is doing work behind the scenes")]
     [SuppressMessage("Style", "IDE0060:Remove unused parameter", Justification = "sut's event handler is doing work behind the scenes")]
-    public Task Does_not_attempt_to_reconnect_more_than_once_if_ReconnectRetryCount_options_is_0(
+    public async Task Does_not_attempt_to_reconnect_more_than_once_if_ReconnectRetryCount_options_is_0(
         [Frozen] IMqttNetClient mqttNetClient,
         [Frozen] MqttOptions mqttOptions,
         MqttClient sut)
     {
         // Arrange
-        ArrangeConnectResultCode(mqttNetClient, MqttClientConnectResultCode.UnspecifiedError);
+        ArrangeConnectResultCode(mqttNetClient, MqttClientConnectResultCode.Success);
+        await sut.StartAsync(CancellationToken.None);
 
         mqttOptions.ReconnectRetryCount = 0;
         mqttOptions.RetryDelayProvider = _ => TimeSpan.Zero;
+        ArrangeConnectResultCode(mqttNetClient, MqttClientConnectResultCode.UnspecifiedError);
         mqttNetClient.IsConnected.Returns(false);
 
         // Act
@@ -311,7 +321,7 @@ public class MqttClientTest
                 new SocketException()));
 
         // Assert
-        return mqttNetClient.Received(1).ConnectAsync(Arg.Any<MqttClientOptions>(), Arg.Any<CancellationToken>());
+        await mqttNetClient.Received(2).ConnectAsync(Arg.Any<MqttClientOptions>(), Arg.Any<CancellationToken>());
     }
 
     [Theory, AutoNSubstituteData]

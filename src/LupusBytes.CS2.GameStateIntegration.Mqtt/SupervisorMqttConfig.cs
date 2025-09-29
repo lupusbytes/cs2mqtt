@@ -1,0 +1,22 @@
+﻿using System.Text.Json.Serialization;
+
+namespace LupusBytes.CS2.GameStateIntegration.Mqtt;
+
+/// <summary>
+/// HA Supervisor MQTT config.
+/// </summary>
+/// <param name="Addon">The addon providing MQTT functionality.</param>
+/// <param name="Host">The IP of the addon running the service.</param>
+/// <param name="Port">The port the service is running on.</param>
+/// <param name="Ssl">True if SSL is in use.</param>
+/// <param name="Username">The username for the service.</param>
+/// <param name="Password">The password for the service.</param>
+/// <param name="Protocol">The MQTT protocol version.</param>
+public record SupervisorMqttConfig(
+    [property: JsonPropertyName("addon")] string Addon,
+    [property: JsonPropertyName("host")] string Host,
+    [property: JsonPropertyName("port")] int Port,
+    [property: JsonPropertyName("ssl")] bool Ssl,
+    [property: JsonPropertyName("username")] string? Username,
+    [property: JsonPropertyName("password")] string? Password,
+    [property: JsonPropertyName("protocol")] string? Protocol);

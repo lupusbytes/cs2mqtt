@@ -17,14 +17,26 @@ public static class ServiceCollectionExtensions
         // Creating it here, instead of instantiating it inside the class, will enable us to mock/substitute it for unit tests.
         services.AddSingleton(new MqttClientFactory().CreateMqttClient());
 
-        // Get options
-        var mqttOptions = new MqttOptions();
-        configuration.GetSection(MqttOptions.Section).Bind(mqttOptions);
+        // TODO: add comment explaining the Home Assistant token
+        var haSupervisorToken = configuration["SUPERVISOR_TOKEN"];
+
+        if (string.IsNullOrEmpty(haSupervisorToken))
+        {
+            services.AddSingleton<IMqttOptionsProvider, ConfigOptionsProvider>(
+                _ => new ConfigOptionsProvider(configuration));
+        }
+        else
+        {
+            services.AddSingleton<IMqttOptionsProvider, SupervisorOptionsProvider>(
+                sp => new SupervisorOptionsProvider(
+                    haSupervisorToken,
+                    sp.GetRequiredService<ILogger<SupervisorOptionsProvider>>()));
+        }
 
         // Register concrete MqttClient class
         services.AddSingleton(sp => new MqttClient(
             sp.GetRequiredService<IMqttNetClient>(),
-            mqttOptions,
+            sp.GetRequiredService<IMqttOptionsProvider>(),
             () => onFatalConnectionError(sp),
             sp.GetRequiredService<ILogger<MqttClient>>()));
 

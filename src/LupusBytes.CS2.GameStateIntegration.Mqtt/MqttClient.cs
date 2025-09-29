@@ -12,18 +12,20 @@ namespace LupusBytes.CS2.GameStateIntegration.Mqtt;
 
 public sealed class MqttClient : IHostedService, IMqttClient, IDisposable
 {
-    private readonly MqttOptions options;
+    private readonly IMqttOptionsProvider optionsProvider;
     private readonly Func<Task> onFatalConnectionError;
-    private readonly MqttClientOptions clientOptions;
     private readonly ILogger<MqttClient> logger;
     private readonly IMqttNetClient mqttNetClient;
 
     private ConcurrentDictionary<string, MqttMessage> backlog = new(StringComparer.Ordinal);
     private bool shutdownRequested;
 
+    private MqttOptions options = null!;
+    private MqttClientOptions clientOptions = null!;
+
     public MqttClient(
         IMqttNetClient mqttNetClient,
-        MqttOptions options,
+        IMqttOptionsProvider optionsProvider,
         Func<Task> onFatalConnectionError,
         ILogger<MqttClient> logger)
     {
@@ -31,32 +33,17 @@ public sealed class MqttClient : IHostedService, IMqttClient, IDisposable
         this.mqttNetClient.ConnectedAsync += OnConnected;
         this.mqttNetClient.DisconnectedAsync += OnDisconnected;
         this.onFatalConnectionError = onFatalConnectionError;
-        this.options = options;
+        this.optionsProvider = optionsProvider;
         this.logger = logger;
-
-        var clientOptionsBuilder = new MqttClientOptionsBuilder()
-            .WithTcpServer(options.Host, options.Port)
-            .WithClientId(options.ClientId)
-            .WithProtocolVersion(ConvertProtocolVersion(options.ProtocolVersion))
-            .WithTlsOptions(b => b.UseTls(options.UseTls))
-            .WithWillTopic(MqttConstants.SystemAvailabilityTopic)
-            .WithWillPayload("offline")
-            .WithWillRetain();
-
-        if (!string.IsNullOrWhiteSpace(options.Username))
-        {
-            clientOptionsBuilder.WithCredentials(options.Username, options.Password);
-        }
-
-        clientOptions = clientOptionsBuilder.Build();
     }
 
     public bool IsConnected => mqttNetClient.IsConnected;
 
-    public Task StartAsync(CancellationToken cancellationToken)
+    public async Task StartAsync(CancellationToken cancellationToken)
     {
         shutdownRequested = false;
-        return ConnectAsync(options.ConnectRetryCount, cancellationToken);
+        await ConfigureOptionsAsync(cancellationToken);
+        await ConnectAsync(options.ConnectRetryCount, cancellationToken);
     }
 
     public Task StopAsync(CancellationToken cancellationToken)
@@ -160,6 +147,27 @@ public sealed class MqttClient : IHostedService, IMqttClient, IDisposable
         return !shutdownRequested
             ? ConnectAsync(options.ReconnectRetryCount)
             : Task.CompletedTask;
+    }
+
+    private async Task ConfigureOptionsAsync(CancellationToken cancellationToken)
+    {
+        options = await optionsProvider.GetOptionsAsync(cancellationToken);
+
+        var clientOptionsBuilder = new MqttClientOptionsBuilder()
+            .WithTcpServer(options.Host, options.Port)
+            .WithClientId(options.ClientId)
+            .WithProtocolVersion(ConvertProtocolVersion(options.ProtocolVersion))
+            .WithTlsOptions(b => b.UseTls(options.UseTls))
+            .WithWillTopic(MqttConstants.SystemAvailabilityTopic)
+            .WithWillPayload("offline")
+            .WithWillRetain();
+
+        if (!string.IsNullOrWhiteSpace(options.Username))
+        {
+            clientOptionsBuilder.WithCredentials(options.Username, options.Password);
+        }
+
+        clientOptions = clientOptionsBuilder.Build();
     }
 
     private static MqttProtocolVersion ConvertProtocolVersion(string mqttProtocolVersion)

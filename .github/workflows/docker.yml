@@ -5,6 +5,7 @@ on:
   push:
     branches:
       - 'main'
+      - 'feature/haddon-mqtt-zeroconf'
     tags:
       - 'v*.*.*'
   pull_request:
