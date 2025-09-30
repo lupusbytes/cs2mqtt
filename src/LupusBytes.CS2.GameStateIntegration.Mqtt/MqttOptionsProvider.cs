@@ -83,6 +83,10 @@ public class MqttOptionsProvider : IMqttOptionsProvider
             cancellationToken: cancellationToken
         );
 
+        var contentString = await httpResponse.Content.ReadAsStringAsync(cancellationToken);
+        logger.LogInformation("Supervisor response: {Response}", contentString);
+
+
         if (response?.Data is null)
         {
             throw new InvalidOperationException("Invalid supervisor response");
