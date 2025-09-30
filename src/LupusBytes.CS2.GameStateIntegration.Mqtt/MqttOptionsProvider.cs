@@ -57,6 +57,9 @@ public class MqttOptionsProvider : IMqttOptionsProvider
             mqttOptions.Password = string.IsNullOrWhiteSpace(cfg.Password) ? string.Empty : cfg.Password;
             mqttOptions.ProtocolVersion = string.IsNullOrWhiteSpace(cfg.Protocol) ? string.Empty : cfg.Protocol;
 
+            logger.LogInformation("Supervisor MQTT config: {Cfg}", JsonSerializer.Serialize(cfg, new JsonSerializerOptions { WriteIndented = true }));
+            logger.LogInformation("Mapped MQTT options: {MqttOptions}", JsonSerializer.Serialize(mqttOptions, new JsonSerializerOptions { WriteIndented = true }));
+
             fetched = true;
         }
         catch (Exception ex)
