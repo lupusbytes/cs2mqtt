@@ -8,7 +8,7 @@ namespace LupusBytes.CS2.GameStateIntegration.Mqtt;
 
 public class MqttOptionsProvider : IMqttOptionsProvider
 {
-    private const string SupervisorServicesEndpoint = "http://supervisor/services/mqtt";
+    private const string SupervisorServicesEndpoint = "http://localhost:3000/services";
 
     private readonly HttpClient httpClient;
     private readonly ILogger<MqttOptionsProvider> logger;
@@ -44,18 +44,27 @@ public class MqttOptionsProvider : IMqttOptionsProvider
         }
 
         logger.RetrievedSupervisorToken();
-        var cfg = await GetSupervisorMqttConfig(supervisorToken, cancellationToken);
+        try
+        {
+            var cfg = await GetSupervisorMqttConfig(supervisorToken, cancellationToken);
 
-        logger.FetchedMqttInfoFromSupervisor(cfg.Host, cfg.Port);
+            logger.FetchedMqttInfoFromSupervisor(cfg.Host, cfg.Port);
 
-        mqttOptions.Host = cfg.Host;
-        mqttOptions.Port = cfg.Port;
-        mqttOptions.UseTls = cfg.SSL;
-        mqttOptions.Username = string.IsNullOrWhiteSpace(cfg.Username) ? string.Empty : cfg.Username;
-        mqttOptions.Password = string.IsNullOrWhiteSpace(cfg.Password) ? string.Empty : cfg.Password;
-        mqttOptions.ProtocolVersion = string.IsNullOrWhiteSpace(cfg.Protocol) ? string.Empty : cfg.Protocol;
+            mqttOptions.Host = cfg.Host;
+            mqttOptions.Port = cfg.Port;
+            mqttOptions.UseTls = cfg.SSL;
+            mqttOptions.Username = string.IsNullOrWhiteSpace(cfg.Username) ? string.Empty : cfg.Username;
+            mqttOptions.Password = string.IsNullOrWhiteSpace(cfg.Password) ? string.Empty : cfg.Password;
+            mqttOptions.ProtocolVersion = string.IsNullOrWhiteSpace(cfg.Protocol) ? string.Empty : cfg.Protocol;
 
-        fetched = true;
+            fetched = true;
+        }
+        catch (Exception ex)
+        {
+            logger.SupervisorApiRequestFailed(SupervisorServicesEndpoint, ex.Message);
+            return mqttOptions;
+        }
+
         return mqttOptions;
     }
 
@@ -64,17 +73,21 @@ public class MqttOptionsProvider : IMqttOptionsProvider
     {
         httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", supervisorToken);
 
-        var response = await httpClient.GetAsync(new Uri(SupervisorServicesEndpoint), cancellationToken);
-        response.EnsureSuccessStatusCode();
+        var httpResponse = await httpClient.GetAsync(new Uri(SupervisorServicesEndpoint), cancellationToken);
+        httpResponse.EnsureSuccessStatusCode();
 
-        await using var stream = await response.Content.ReadAsStreamAsync(cancellationToken);
+        await using var stream = await httpResponse.Content.ReadAsStreamAsync(cancellationToken);
 
-        var config = await JsonSerializer.DeserializeAsync<SupervisorMqttConfig>(
+        var response = await JsonSerializer.DeserializeAsync<SupervisorMqttConfigResponse>(
             stream,
-            new JsonSerializerOptions { PropertyNameCaseInsensitive = true },
-            cancellationToken
+            cancellationToken: cancellationToken
         );
 
-        return config;
+        if (response?.Data is null)
+        {
+            throw new InvalidOperationException("Invalid supervisor response");
+        }
+
+        return response.Data;
     }
 }

@@ -3,8 +3,7 @@
 namespace LupusBytes.CS2.GameStateIntegration.Mqtt;
 
 /// <summary>
-/// Supervisor GET response for <code>/services/mqtt</code> endpoint.
-/// Contains MQTT connection info and credentials.
+/// HA Supervisor MQTT config.
 /// </summary>
 /// <param name="Addon">The addon providing MQTT functionality.</param>
 /// <param name="Host">The IP of the addon running the service.</param>
