@@ -14,11 +14,13 @@ public sealed class MqttClient : IHostedService, IMqttClient, IDisposable
 {
     private readonly IMqttOptionsProvider optionsProvider;
     private readonly Func<Task> onFatalConnectionError;
-    private readonly MqttClientOptions clientOptions;
+
     private readonly ILogger<MqttClient> logger;
     private readonly IMqttNetClient mqttNetClient;
 
     private ConcurrentDictionary<string, MqttMessage> backlog = new(StringComparer.Ordinal);
+    private MqttOptions mqttOptions = null!;
+    private MqttClientOptions clientOptions = null!;
     private bool shutdownRequested;
 
     public MqttClient(
@@ -33,35 +35,33 @@ public sealed class MqttClient : IHostedService, IMqttClient, IDisposable
         this.onFatalConnectionError = onFatalConnectionError;
         this.optionsProvider = optionsProvider;
         this.logger = logger;
-
-        // TODO: async
-        var options = optionsProvider.GetOptionsAsync().GetAwaiter().GetResult();
-
-        var clientOptionsBuilder = new MqttClientOptionsBuilder()
-            .WithTcpServer(options.Host, options.Port)
-            .WithClientId(options.ClientId)
-            .WithProtocolVersion(ConvertProtocolVersion(options.ProtocolVersion))
-            .WithTlsOptions(b => b.UseTls(options.UseTls))
-            .WithWillTopic(MqttConstants.SystemAvailabilityTopic)
-            .WithWillPayload("offline")
-            .WithWillRetain();
-
-        if (!string.IsNullOrWhiteSpace(options.Username))
-        {
-            clientOptionsBuilder.WithCredentials(options.Username, options.Password);
-        }
-
-        clientOptions = clientOptionsBuilder.Build();
     }
 
     public bool IsConnected => mqttNetClient.IsConnected;
 
-    public Task StartAsync(CancellationToken cancellationToken)
+    public async Task StartAsync(CancellationToken cancellationToken)
     {
+        mqttOptions = await optionsProvider.GetOptionsAsync(cancellationToken);
+
+        var clientOptionsBuilder = new MqttClientOptionsBuilder()
+            .WithTcpServer(mqttOptions.Host, mqttOptions.Port)
+            .WithClientId(mqttOptions.ClientId)
+            .WithProtocolVersion(ConvertProtocolVersion(mqttOptions.ProtocolVersion))
+            .WithTlsOptions(b => b.UseTls(mqttOptions.UseTls))
+            .WithWillTopic(MqttConstants.SystemAvailabilityTopic)
+            .WithWillPayload("offline")
+            .WithWillRetain();
+
+        if (!string.IsNullOrWhiteSpace(mqttOptions.Username))
+        {
+            clientOptionsBuilder.WithCredentials(mqttOptions.Username, mqttOptions.Password);
+        }
+
+        clientOptions = clientOptionsBuilder.Build();
+
         shutdownRequested = false;
 
-        var options = optionsProvider.GetOptionsAsync().GetAwaiter().GetResult();
-        return ConnectAsync(options.ConnectRetryCount, cancellationToken);
+        await ConnectAsync(mqttOptions.ConnectRetryCount, cancellationToken);
     }
 
     public Task StopAsync(CancellationToken cancellationToken)
@@ -93,9 +93,6 @@ public sealed class MqttClient : IHostedService, IMqttClient, IDisposable
     [SuppressMessage("Design", "CA1031:Do not catch general exception types", Justification = "By design.")]
     private async Task ConnectAsync(int retryCount, CancellationToken cancellationToken = default)
     {
-        // TODO: avoid repeated calls
-        var options = optionsProvider.GetOptionsAsync().GetAwaiter().GetResult();
-
         // Ensure we always attempt to execute the loop at least once, even if the retryCount is negative
         var allowedAttempts = Math.Max(1, retryCount + 1);
 
@@ -103,7 +100,7 @@ public sealed class MqttClient : IHostedService, IMqttClient, IDisposable
         {
             try
             {
-                logger.ConnectingToMqttBroker(options.Host, options.Port);
+                logger.ConnectingToMqttBroker(mqttOptions.Host, mqttOptions.Port);
 
                 var result = await mqttNetClient.ConnectAsync(clientOptions, cancellationToken);
 
@@ -113,16 +110,16 @@ public sealed class MqttClient : IHostedService, IMqttClient, IDisposable
                 }
 
                 throw new MqttConnectingFailedException(
-                    $"Failed to connect to MQTT broker {options.Host}:{options.Port.ToString(CultureInfo.InvariantCulture)}. " +
+                    $"Failed to connect to MQTT broker {mqttOptions.Host}:{mqttOptions.Port.ToString(CultureInfo.InvariantCulture)}. " +
                     $"Result code: {result.ResultCode}",
                     innerException: null);
             }
             catch (Exception) when (attempt < allowedAttempts)
             {
-                var delay = options.RetryDelayProvider(attempt);
+                var delay = mqttOptions.RetryDelayProvider(attempt);
                 logger.ConnectionToMqttBrokerFailed(
-                    options.Host,
-                    options.Port,
+                    mqttOptions.Host,
+                    mqttOptions.Port,
                     attempt,
                     allowedAttempts,
                     Convert.ToInt32(delay.TotalSeconds));
@@ -133,8 +130,8 @@ public sealed class MqttClient : IHostedService, IMqttClient, IDisposable
             {
                 logger.ConnectionToMqttBrokerAttemptsExhausted(
                     ex,
-                    options.Host,
-                    options.Port,
+                    mqttOptions.Host,
+                    mqttOptions.Port,
                     attempt);
 
                 await onFatalConnectionError();

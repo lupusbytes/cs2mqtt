@@ -1,5 +1,3 @@
-using System.Net.Http.Headers;
-using System.Text.Json;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
@@ -12,11 +10,26 @@ public static class ServiceCollectionExtensions
 {
     public static IServiceCollection AddMqttClient(
         this IServiceCollection services,
+        IConfiguration configuration,
         Func<IServiceProvider, Task> onFatalConnectionError)
     {
         // Register MQTTnet.IMqttClient. This instance will be injected into our own MqttClient.
         // Creating it here, instead of instantiating it inside the class, will enable us to mock/substitute it for unit tests.
         services.AddSingleton(new MqttClientFactory().CreateMqttClient());
+
+        var token = configuration["SUPERVISOR_TOKEN"];
+        if (!string.IsNullOrEmpty(token))
+        {
+            services.AddSingleton<IMqttOptionsProvider, SupervisorOptionsProvider>(sp =>
+                new SupervisorOptionsProvider(
+                    sp.GetRequiredService<ILogger<SupervisorOptionsProvider>>(),
+                    token));
+        }
+        else
+        {
+            services.AddSingleton<IMqttOptionsProvider, ConfigOptionsProvider>(sp =>
+                new ConfigOptionsProvider(configuration));
+        }
 
         // Register concrete MqttClient class
         services.AddSingleton(sp => new MqttClient(
@@ -33,5 +46,4 @@ public static class ServiceCollectionExtensions
 
         return services;
     }
-
 }
