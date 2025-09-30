@@ -31,17 +31,17 @@ public class MqttClientTest
             MqttConstants.SystemAvailabilityTopic,
             message => tcs.TrySetResult(message));
 
-        var options = new MqttOptions
+        var options = new MqttOptions()
         {
-            Host = ListenAddress,
-            Port = ListenPort,
-            UseTls = false,
-            ClientId = "cs2mqtt",
+            Host = ListenAddress, Port = ListenPort, UseTls = false, ClientId = "cs2mqtt",
         };
+
+        var configOptionsProvider = Substitute.For<IMqttOptionsProvider>();
+        configOptionsProvider.GetOptionsAsync().Returns(Task.FromResult(options));
 
         using var sut = new MqttClient(
             clientFactory.CreateMqttClient(),
-            options,
+            configOptionsProvider,
             onFatalConnectionError: () => Task.CompletedTask,
             NullLogger<MqttClient>.Instance);
 
@@ -73,17 +73,18 @@ public class MqttClientTest
             topic,
             message => tcs.TrySetResult(message));
 
-        var options = new MqttOptions
+        var configOptionsProvider = Substitute.For<IMqttOptionsProvider>();
+        configOptionsProvider.GetOptionsAsync().Returns(Task.FromResult(new MqttOptions
         {
             Host = ListenAddress,
             Port = ListenPort,
             UseTls = false,
             ClientId = "cs2mqtt",
-        };
+        }));
 
         using var sut = new MqttClient(
             clientFactory.CreateMqttClient(),
-            options,
+            configOptionsProvider,
             onFatalConnectionError: () => Task.CompletedTask,
             NullLogger<MqttClient>.Instance);
 
@@ -105,16 +106,19 @@ public class MqttClientTest
             username,
             password);
 
+        var configOptionsProvider = Substitute.For<IMqttOptionsProvider>();
+        configOptionsProvider.GetOptionsAsync().Returns(Task.FromResult(new MqttOptions
+        {
+            Host = ListenAddress,
+            Port = ListenPort,
+            Username = username,
+            Password = password,
+            UseTls = false,
+        }));
+
         using var sut = new MqttClient(
             new MqttClientFactory().CreateMqttClient(),
-            new MqttOptions
-            {
-                Host = ListenAddress,
-                Port = ListenPort,
-                Username = username,
-                Password = password,
-                UseTls = false,
-            },
+            configOptionsProvider,
             onFatalConnectionError: () => Task.CompletedTask,
             NullLogger<MqttClient>.Instance);
 
