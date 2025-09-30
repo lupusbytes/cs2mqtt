@@ -65,11 +65,15 @@ public class MqttOptionsProvider : IMqttOptionsProvider
         httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", supervisorToken);
 
         var response = await httpClient.GetAsync(new Uri(SupervisorServicesEndpoint), cancellationToken);
-        Console.WriteLine(response.StatusCode);
         response.EnsureSuccessStatusCode();
 
         await using var stream = await response.Content.ReadAsStreamAsync(cancellationToken);
-        var config = await JsonSerializer.DeserializeAsync<SupervisorMqttConfig>(stream, cancellationToken: cancellationToken);
+
+        var config = await JsonSerializer.DeserializeAsync<SupervisorMqttConfig>(
+            stream,
+            new JsonSerializerOptions { PropertyNameCaseInsensitive = true },
+            cancellationToken
+        );
 
         return config;
     }
