@@ -41,26 +41,9 @@ public sealed class MqttClient : IHostedService, IMqttClient, IDisposable
 
     public async Task StartAsync(CancellationToken cancellationToken)
     {
-        mqttOptions = await optionsProvider.GetOptionsAsync(cancellationToken);
-
-        var clientOptionsBuilder = new MqttClientOptionsBuilder()
-            .WithTcpServer(mqttOptions.Host, mqttOptions.Port)
-            .WithClientId(mqttOptions.ClientId)
-            .WithProtocolVersion(ConvertProtocolVersion(mqttOptions.ProtocolVersion))
-            .WithTlsOptions(b => b.UseTls(mqttOptions.UseTls))
-            .WithWillTopic(MqttConstants.SystemAvailabilityTopic)
-            .WithWillPayload("offline")
-            .WithWillRetain();
-
-        if (!string.IsNullOrWhiteSpace(mqttOptions.Username))
-        {
-            clientOptionsBuilder.WithCredentials(mqttOptions.Username, mqttOptions.Password);
-        }
-
-        clientOptions = clientOptionsBuilder.Build();
-
         shutdownRequested = false;
 
+        await SetupMqttOptions(cancellationToken);
         await ConnectAsync(mqttOptions.ConnectRetryCount, cancellationToken);
     }
 
@@ -141,10 +124,7 @@ public sealed class MqttClient : IHostedService, IMqttClient, IDisposable
 
     private Task OnConnected(MqttClientConnectedEventArgs arg)
     {
-        // TODO: avoid repeated calls
-        var options = optionsProvider.GetOptionsAsync().GetAwaiter().GetResult();
-
-        logger.ConnectedToMqttBroker(options.Host, options.Port);
+        logger.ConnectedToMqttBroker(mqttOptions.Host, mqttOptions.Port);
         return PublishBacklogAsync();
     }
 
@@ -158,19 +138,37 @@ public sealed class MqttClient : IHostedService, IMqttClient, IDisposable
 
     private Task OnDisconnected(MqttClientDisconnectedEventArgs args)
     {
-        // TODO: avoid repeated calls
-        var options = optionsProvider.GetOptionsAsync().GetAwaiter().GetResult();
-
         if (!args.ClientWasConnected)
         {
             return Task.CompletedTask;
         }
 
-        logger.DisconnectedFromBroker(options.Host, options.Port);
+        logger.DisconnectedFromBroker(mqttOptions.Host, mqttOptions.Port);
 
         return !shutdownRequested
-            ? ConnectAsync(options.ReconnectRetryCount)
+            ? ConnectAsync(mqttOptions.ReconnectRetryCount)
             : Task.CompletedTask;
+    }
+
+    private async Task SetupMqttOptions(CancellationToken cancellationToken)
+    {
+        mqttOptions = await optionsProvider.GetOptionsAsync(cancellationToken);
+
+        var clientOptionsBuilder = new MqttClientOptionsBuilder()
+            .WithTcpServer(mqttOptions.Host, mqttOptions.Port)
+            .WithClientId(mqttOptions.ClientId)
+            .WithProtocolVersion(ConvertProtocolVersion(mqttOptions.ProtocolVersion))
+            .WithTlsOptions(b => b.UseTls(mqttOptions.UseTls))
+            .WithWillTopic(MqttConstants.SystemAvailabilityTopic)
+            .WithWillPayload("offline")
+            .WithWillRetain();
+
+        if (!string.IsNullOrWhiteSpace(mqttOptions.Username))
+        {
+            clientOptionsBuilder.WithCredentials(mqttOptions.Username, mqttOptions.Password);
+        }
+
+        clientOptions = clientOptionsBuilder.Build();
     }
 
     private static MqttProtocolVersion ConvertProtocolVersion(string mqttProtocolVersion)
