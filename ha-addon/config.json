@@ -5,11 +5,6 @@
   "description": "Counter-Strike 2 Game State Integration to MQTT bridge",
   "url": "https://github.com/davidramiro/cs2mqtt",
   "startup": "application",
-  "services": [
-    "mqtt:need"
-  ],
-  "hassio_api": true,
-  "panel_icon": "mdi:pistol",
   "arch": [
     "aarch64",
     "amd64"
@@ -23,15 +18,21 @@
     "8080/tcp": "Game State API port"
   },
   "options": {
+    "GameState__IgnoreSpectatedPlayers": true,
   },
   "schema": {
+    "GameState__IgnoreSpectatedPlayers": "bool",
     "MQTT__Host": "str?",
     "MQTT__Port": "int?",
     "MQTT__UseTLS": "bool?",
     "MQTT__Username": "str?",
     "MQTT__Password": "password?",
     "MQTT__ClientId": "str?",
-    "MQTT__ProtocolVersion": "list(5.0.0|3.1.1|3.1.0)?"
+    "MQTT__ProtocolVersion": "list(5.0.0|3.1.1|3.1.0)?",
+    "GameState__TimeoutInSeconds": "float?",
+    "GameState__TimeoutCleanupIntervalInSeconds": "float?",
+    "Logging__LogLevel__Default": "list(Debug|Information|Warning)?"
   },
+  "watchdog": "http://[HOST]:[PORT:8080]/alive",
   "image": "ghcr.io/davidramiro/cs2mqtt"
 }
