@@ -36,4 +36,22 @@ public static partial class Log
         Level = LogLevel.Error,
         Message = "Disconnected from MQTT broker {Host}:{Port}")]
     public static partial void DisconnectedFromBroker(this ILogger logger, string host, int port);
+
+    [LoggerMessage(
+        EventId = 1_05,
+        Level = LogLevel.Information,
+        Message = "Successfully retrieved HA supervisor token.")]
+    public static partial void RetrievedSupervisorToken(this ILogger logger);
+
+    [LoggerMessage(
+        EventId = 1_06,
+        Level = LogLevel.Information,
+        Message = "No supervisor token found.")]
+    public static partial void NoSupervisorTokenFound(this ILogger logger);
+
+    [LoggerMessage(
+        EventId = 1_07,
+        Level = LogLevel.Information,
+        Message = "Fetched MQTT info from supervisor: {Host}:{Port}.")]
+    public static partial void FetchedMqttInfoFromSupervisor(this ILogger logger, string host, int port);
 }

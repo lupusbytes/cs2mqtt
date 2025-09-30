@@ -1,6 +1,6 @@
 ﻿using System.Text.Json.Serialization;
 
-namespace LupusBytes.CS2.GameStateIntegration.Mqtt.Extensions;
+namespace LupusBytes.CS2.GameStateIntegration.Mqtt;
 
 /// <summary>
 /// Supervisor GET response for <code>/services/mqtt</code> endpoint.

@@ -14,7 +14,9 @@ public sealed class Program
     {
         var builder = WebApplication.CreateBuilder(args);
         builder.Services.AddGameStateService(builder.Configuration);
-        builder.Services.AddMqttClient(builder.Configuration);
+        builder.Services.AddHttpClient<MqttOptionsProvider>();
+        builder.Services.AddSingleton<IMqttOptionsProvider, MqttOptionsProvider>();
+        builder.Services.AddMqttClient();
         builder.Services.AddHostedService<GameStateMqttPublisher>();
         builder.Services.AddHostedService<AvailabilityMqttPublisher>();
         builder.Services.AddHostedService<HomeAssistantDevicePublisher>();

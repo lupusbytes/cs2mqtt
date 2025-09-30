@@ -12,7 +12,7 @@ namespace LupusBytes.CS2.GameStateIntegration.Mqtt;
 
 public sealed class MqttClient : IHostedService, IMqttClient, IDisposable
 {
-    private readonly MqttOptions options;
+    private readonly IMqttOptionsProvider optionsProvider;
     private readonly MqttClientOptions clientOptions;
     private readonly ILogger<MqttClient> logger;
     private readonly IMqttNetClient mqttNetClient;
@@ -20,13 +20,16 @@ public sealed class MqttClient : IHostedService, IMqttClient, IDisposable
     private ConcurrentDictionary<string, MqttMessage> backlog = new(StringComparer.Ordinal);
     private bool shutdownRequested;
 
-    public MqttClient(IMqttNetClient mqttNetClient, MqttOptions options, ILogger<MqttClient> logger)
+    public MqttClient(IMqttNetClient mqttNetClient, IMqttOptionsProvider optionsProvider, ILogger<MqttClient> logger)
     {
         this.mqttNetClient = mqttNetClient;
         this.mqttNetClient.ConnectedAsync += OnConnected;
         this.mqttNetClient.DisconnectedAsync += OnDisconnected;
-        this.options = options;
+        this.optionsProvider = optionsProvider;
         this.logger = logger;
+
+        // TODO: async
+        var options = optionsProvider.GetOptionsAsync().GetAwaiter().GetResult();
 
         var clientOptionsBuilder = new MqttClientOptionsBuilder()
             .WithTcpServer(options.Host, options.Port)
@@ -50,6 +53,8 @@ public sealed class MqttClient : IHostedService, IMqttClient, IDisposable
     public Task StartAsync(CancellationToken cancellationToken)
     {
         shutdownRequested = false;
+
+        var options = optionsProvider.GetOptionsAsync().GetAwaiter().GetResult();
         return ConnectAsync(options.ConnectRetryCount, cancellationToken);
     }
 
@@ -82,6 +87,9 @@ public sealed class MqttClient : IHostedService, IMqttClient, IDisposable
     [SuppressMessage("Design", "CA1031:Do not catch general exception types", Justification = "By design.")]
     private async Task ConnectAsync(int retryCount, CancellationToken cancellationToken = default)
     {
+        // TODO: avoid repeated calls
+        var options = optionsProvider.GetOptionsAsync().GetAwaiter().GetResult();
+
         // Ensure we always attempt to execute the loop at least once, even if the retryCount is negative
         var allowedAttempts = Math.Max(1, retryCount + 1);
 
@@ -120,6 +128,9 @@ public sealed class MqttClient : IHostedService, IMqttClient, IDisposable
 
     private Task OnConnected(MqttClientConnectedEventArgs arg)
     {
+        // TODO: avoid repeated calls
+        var options = optionsProvider.GetOptionsAsync().GetAwaiter().GetResult();
+
         logger.ConnectedToMqttBroker(options.Host, options.Port);
         return PublishBacklogAsync();
     }
@@ -134,6 +145,9 @@ public sealed class MqttClient : IHostedService, IMqttClient, IDisposable
 
     private Task OnDisconnected(MqttClientDisconnectedEventArgs args)
     {
+        // TODO: avoid repeated calls
+        var options = optionsProvider.GetOptionsAsync().GetAwaiter().GetResult();
+
         if (!args.ClientWasConnected)
         {
             return Task.CompletedTask;
