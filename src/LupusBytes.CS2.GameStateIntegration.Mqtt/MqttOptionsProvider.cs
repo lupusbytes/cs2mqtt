@@ -8,7 +8,7 @@ namespace LupusBytes.CS2.GameStateIntegration.Mqtt;
 
 public class MqttOptionsProvider : IMqttOptionsProvider
 {
-    private const string SupervisorServicesEndpoint = "http://localhost:3000/services";
+    private const string SupervisorServicesEndpoint = "http://supervisor/services/mqtt";
 
     private readonly HttpClient httpClient;
     private readonly ILogger<MqttOptionsProvider> logger;
