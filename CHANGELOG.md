@@ -1,5 +1,33 @@
 # Changelog
 
+## [1.8.1](https://github.com/lupusbytes/cs2mqtt/compare/v1.8.0...v1.8.1) (2025-09-26)
+
+
+### Bug fixes
+
+* **mqtt:** fix availability bug preventing sensor from transitioning offline -&gt; online ([e2a50c7](https://github.com/lupusbytes/cs2mqtt/commit/e2a50c7237233c2a7b92ba81407a06091c288cf4))
+
+
+### Performance improvements
+
+* in the documentation for `gamestate_integration_cs2mqtt.cfg`, it originally had `"heartbeat" "60.0"`, but it turns out this value also determines how long cs2 waits before sending player game state data when joining a deathmatch game or when switching from free cam to spectating a player in a casual game and more. the new recommended value is `"heartbeat" "5.0"`. please update your existing configs as you see fit. ([6deb9d7](https://github.com/lupusbytes/cs2mqtt/commit/6deb9d7e56695e81e170855650d2b3ae3765e93d))
+
+## [1.8.0](https://github.com/lupusbytes/cs2mqtt/compare/v1.7.0...v1.8.0) (2025-09-25)
+
+
+### New features
+
+* **homeassistant:** add cs2 game device connectivity sensor ([8c3b03c](https://github.com/lupusbytes/cs2mqtt/commit/8c3b03ce3c6683340838747ec4ea8bfc4c31c13a))
+* **homeassistant:** convert flashed sensor to boolean value ([2ba6cb0](https://github.com/lupusbytes/cs2mqtt/commit/2ba6cb0210fa06c8e90c9936a7427d7b9238fd76))
+* **homeassistant:** convert smoked and burning sensor measurements to percentage ([305a0fd](https://github.com/lupusbytes/cs2mqtt/commit/305a0fd1dfd9523c74f0b4e895521f9c5040c67d))
+* **homeassistant:** use state_class: 'measurement' for numerical sensor values ([c3b1808](https://github.com/lupusbytes/cs2mqtt/commit/c3b18082a5080891236f5e59106310cfe45e050f))
+
+
+### Bug fixes
+
+* **mqtt:** correctly log connection retry delay when wait is over 1 minute ([1f30728](https://github.com/lupusbytes/cs2mqtt/commit/1f307280ad909314af5c7283c4adea6999bcf309))
+* **mqtt:** ensure cs2mqtt shuts down after max reconnect attempts ([2d8c139](https://github.com/lupusbytes/cs2mqtt/commit/2d8c139e86c60c717414eb5be68e2805641726d7))
+
 ## [1.7.0](https://github.com/lupusbytes/cs2mqtt/compare/v1.6.9...v1.7.0) (2025-09-19)
 
 

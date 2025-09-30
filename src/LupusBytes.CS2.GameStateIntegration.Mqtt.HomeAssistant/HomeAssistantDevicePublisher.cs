@@ -2,7 +2,6 @@ using System.Collections.Concurrent;
 using System.Diagnostics.CodeAnalysis;
 using System.Threading.Channels;
 using LupusBytes.CS2.GameStateIntegration.Contracts;
-using LupusBytes.CS2.GameStateIntegration.Events;
 
 namespace LupusBytes.CS2.GameStateIntegration.Mqtt.HomeAssistant;
 
@@ -58,18 +57,18 @@ public sealed class HomeAssistantDevicePublisher(
         "Minor Code Smell",
         "S3267:Loops should be simplified with \"LINQ\" expressions",
         Justification = "To be fixed when upgrading to .NET 10 which contains System.Linq.AsyncEnumerable")]
-    private async Task ProcessChannelAsync<TEvent>(
-        ChannelReader<TEvent> channelReader,
+    private async Task ProcessChannelAsync<TState>(
+        ChannelReader<StateUpdate<TState>> channelReader,
         HashSet<SteamId64> publishedConfigSet,
         Func<Device, MqttDiscoveryMessages> discoveryMessages,
         CancellationToken cancellationToken)
-        where TEvent : BaseEvent
+        where TState : class
     {
-        await foreach (var @event in channelReader.ReadAllAsync(cancellationToken))
+        await foreach (var stateUpdate in channelReader.ReadAllAsync(cancellationToken))
         {
-            var device = devices.GetOrAdd(@event.SteamId, CreateDevice);
+            var device = devices.GetOrAdd(stateUpdate.SteamId, CreateDevice);
 
-            if (!publishedConfigSet.Add(@event.SteamId))
+            if (!publishedConfigSet.Add(stateUpdate.SteamId))
             {
                 continue;
             }

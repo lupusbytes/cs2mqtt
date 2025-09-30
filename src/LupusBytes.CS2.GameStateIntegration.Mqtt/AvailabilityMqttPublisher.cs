@@ -1,7 +1,6 @@
 using System.Threading.Channels;
 using System.Threading.Tasks.Dataflow;
 using LupusBytes.CS2.GameStateIntegration.Contracts;
-using LupusBytes.CS2.GameStateIntegration.Events;
 
 namespace LupusBytes.CS2.GameStateIntegration.Mqtt;
 
@@ -40,11 +39,11 @@ public sealed class AvailabilityMqttPublisher(
 
     protected override Task ExecuteAsync(CancellationToken stoppingToken)
         => Task.WhenAll(
-            ProcessChannelAsync(ProviderChannelReader, onlineProviders, ProviderAvailabilityTopicSuffix, ShouldBeOnline, stoppingToken),
-            ProcessChannelAsync(PlayerChannelReader, onlinePlayers, PlayerAvailabilityTopicSuffix, ShouldBeOnline, stoppingToken),
-            ProcessChannelAsync(PlayerStateChannelReader, onlinePlayerStates, PlayerStateAvailabilityTopicSuffix, ShouldBeOnline, stoppingToken),
-            ProcessChannelAsync(MapChannelReader, onlineMaps, MapAvailabilityTopicSuffix, ShouldBeOnline, stoppingToken),
-            ProcessChannelAsync(RoundChannelReader, onlineRounds, RoundAvailabilityTopicSuffix, ShouldBeOnline, stoppingToken));
+            ProcessChannelAsync(ProviderChannelReader, onlineProviders, ProviderAvailabilityTopicSuffix, stoppingToken),
+            ProcessChannelAsync(PlayerChannelReader, onlinePlayers, PlayerAvailabilityTopicSuffix, stoppingToken),
+            ProcessChannelAsync(PlayerStateChannelReader, onlinePlayerStates, PlayerStateAvailabilityTopicSuffix, stoppingToken),
+            ProcessChannelAsync(MapChannelReader, onlineMaps, MapAvailabilityTopicSuffix, stoppingToken),
+            ProcessChannelAsync(RoundChannelReader, onlineRounds, RoundAvailabilityTopicSuffix, stoppingToken));
 
     private Task SetSystemAvailability(bool online, CancellationToken cancellationToken)
         => mqttClient.PublishAsync(
@@ -70,38 +69,35 @@ public sealed class AvailabilityMqttPublisher(
             },
             cancellationToken);
 
-    private async Task ProcessChannelAsync<TEvent>(
-        ChannelReader<TEvent> channelReader,
+    private async Task ProcessChannelAsync<TState>(
+        ChannelReader<StateUpdate<TState>> channelReader,
         HashSet<SteamId64> onlineSet,
         string topicSuffix,
-        Func<TEvent, bool> shouldBeOnlineFunc,
         CancellationToken cancellationToken)
-        where TEvent : BaseEvent
+        where TState : class
     {
-        await foreach (var @event in channelReader.ReadAllAsync(cancellationToken))
+        await foreach (var stateUpdate in channelReader.ReadAllAsync(cancellationToken))
         {
-            var isOnline = !onlineSet.Add(@event.SteamId);
-            var shouldBeOnline = shouldBeOnlineFunc(@event);
+            var isOnline = onlineSet.Contains(stateUpdate.SteamId);
+            var shouldBeOnline = stateUpdate.HasState;
 
             if (shouldBeOnline == isOnline)
             {
                 continue;
             }
 
-            await SetAvailability(@event.SteamId, topicSuffix, shouldBeOnline, cancellationToken);
+            await SetAvailability(stateUpdate.SteamId, topicSuffix, shouldBeOnline, cancellationToken);
 
-            if (!shouldBeOnline)
+            if (shouldBeOnline)
             {
-                onlineSet.Remove(@event.SteamId);
+                onlineSet.Add(stateUpdate.SteamId);
+            }
+            else
+            {
+                onlineSet.Remove(stateUpdate.SteamId);
             }
         }
     }
-
-    private static bool ShouldBeOnline(ProviderEvent @event) => @event.Provider is not null;
-    private static bool ShouldBeOnline(PlayerEvent @event) => @event.Player is not null;
-    private static bool ShouldBeOnline(PlayerStateEvent @event) => @event.PlayerState is not null;
-    private static bool ShouldBeOnline(MapEvent @event) => @event.Map is not null;
-    private static bool ShouldBeOnline(RoundEvent @event) => @event.Round is not null;
 
     private Task SetAllOffline(CancellationToken cancellationToken)
     {

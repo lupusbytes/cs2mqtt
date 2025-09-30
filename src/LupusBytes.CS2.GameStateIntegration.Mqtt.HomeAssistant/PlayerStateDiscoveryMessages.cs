@@ -36,7 +36,7 @@ public class PlayerStateDiscoveryMessages(Device device) : MqttDiscoveryMessages
         Icon: "mdi:medical-bag",
         device,
         Availability: availability,
-        UnitOfMeasurement: "%"));
+        StateClass: StateClass.Measurement));
 
     private MqttMessage ArmorDiscoveryMessage => CreateMqttMessage(new SensorConfig(
         Name: "Armor",
@@ -46,7 +46,7 @@ public class PlayerStateDiscoveryMessages(Device device) : MqttDiscoveryMessages
         Icon: "mdi:shield",
         device,
         Availability: availability,
-        UnitOfMeasurement: "%"));
+        StateClass: StateClass.Measurement));
 
     private MqttMessage HelmetDiscoveryMessage => CreateMqttMessage(new SensorConfig(
         Name: "Helmet",
@@ -61,7 +61,7 @@ public class PlayerStateDiscoveryMessages(Device device) : MqttDiscoveryMessages
         Name: "Flashed",
         UniqueId: $"{device.Id}_player-state_flashed",
         StateTopic: stateTopic,
-        ValueTemplate: ValueTemplate.JsonPropertyValue("flashed"),
+        ValueTemplate: ValueTemplate.JsonPropertyValueWithByteToBoolConversion("flashed"),
         Icon: "mdi:flash-alert",
         device,
         Availability: availability));
@@ -70,19 +70,23 @@ public class PlayerStateDiscoveryMessages(Device device) : MqttDiscoveryMessages
         Name: "Smoked",
         UniqueId: $"{device.Id}_player-state_smoke",
         StateTopic: stateTopic,
-        ValueTemplate: ValueTemplate.JsonPropertyValue("smoked"),
+        ValueTemplate: ValueTemplate.JsonPropertyValueWithByteToPercentConversion("smoked"),
         Icon: "mdi:weather-fog",
         device,
-        Availability: availability));
+        Availability: availability,
+        UnitOfMeasurement: "%",
+        StateClass: StateClass.Measurement));
 
     private MqttMessage BurningDiscoveryMessage => CreateMqttMessage(new SensorConfig(
         Name: "Burning",
         UniqueId: $"{device.Id}_player-state_burning",
         StateTopic: stateTopic,
-        ValueTemplate: ValueTemplate.JsonPropertyValue("burning"),
+        ValueTemplate: ValueTemplate.JsonPropertyValueWithByteToPercentConversion("burning"),
         Icon: "mdi:fire-alert",
         device,
-        Availability: availability));
+        Availability: availability,
+        UnitOfMeasurement: "%",
+        StateClass: StateClass.Measurement));
 
     private MqttMessage MoneyDiscoveryMessage => CreateMqttMessage(new SensorConfig(
         Name: "Money",
@@ -92,7 +96,8 @@ public class PlayerStateDiscoveryMessages(Device device) : MqttDiscoveryMessages
         Icon: "mdi:currency-usd",
         device,
         Availability: availability,
-        UnitOfMeasurement: "$"));
+        UnitOfMeasurement: "$",
+        StateClass: StateClass.Measurement));
 
     private MqttMessage RoundKillsDiscoveryMessage => CreateMqttMessage(new SensorConfig(
         Name: "Round kills",
@@ -102,7 +107,7 @@ public class PlayerStateDiscoveryMessages(Device device) : MqttDiscoveryMessages
         Icon: "mdi:account-alert",
         device,
         Availability: availability,
-        UnitOfMeasurement: "kills"));
+        StateClass: StateClass.Measurement));
 
     private MqttMessage RoundHeadshotsDiscoveryMessage => CreateMqttMessage(new SensorConfig(
         Name: "Round headshots",
@@ -112,7 +117,7 @@ public class PlayerStateDiscoveryMessages(Device device) : MqttDiscoveryMessages
         Icon: "mdi:head-alert",
         device,
         Availability: availability,
-        UnitOfMeasurement: "kills"));
+        StateClass: StateClass.Measurement));
 
     private MqttMessage EquipmentValueDiscoveryMessage => CreateMqttMessage(new SensorConfig(
         Name: "Equipment value",
@@ -122,5 +127,6 @@ public class PlayerStateDiscoveryMessages(Device device) : MqttDiscoveryMessages
         Icon: "mdi:currency-usd",
         device,
         Availability: availability,
-        UnitOfMeasurement: "$"));
+        UnitOfMeasurement: "$",
+        StateClass: StateClass.Measurement));
 }

@@ -3,7 +3,6 @@ using System.Net.Sockets;
 using System.Text;
 using Microsoft.Extensions.Logging;
 using MQTTnet;
-using MQTTnet.Adapter;
 using NSubstitute.ExceptionExtensions;
 using IMqttNetClient = MQTTnet.IMqttClient;
 
@@ -27,7 +26,11 @@ public class MqttClientTest
         };
 
         // Act & Assert
-        Assert.Throws<ArgumentException>(() => new MqttClient(mqttNetClient, options, logger));
+        Assert.Throws<ArgumentException>(() => new MqttClient(
+            mqttNetClient,
+            options,
+            onFatalConnectionError: () => Task.CompletedTask,
+            logger));
     }
 
     [Theory, AutoNSubstituteData]
@@ -105,6 +108,7 @@ public class MqttClientTest
         MqttClientConnectResultCode resultCode,
         [Frozen] IMqttNetClient mqttNetClient,
         [Frozen] MqttOptions options,
+        [Frozen] Func<Task> onFatalConnectionError,
         MqttClient sut)
     {
         // Arrange
@@ -112,13 +116,15 @@ public class MqttClientTest
         options.RetryDelayProvider = _ => TimeSpan.Zero;
         options.ConnectRetryCount = 3;
 
-        // Act & Assert
-        await Assert.ThrowsAsync<MqttConnectingFailedException>(
-            () => sut.StartAsync(CancellationToken.None));
+        // Act
+        await sut.StartAsync(CancellationToken.None);
 
+        // Assert
         await mqttNetClient.Received(options.ConnectRetryCount + 1).ConnectAsync(
             Arg.Any<MqttClientOptions>(),
             Arg.Any<CancellationToken>());
+
+        await onFatalConnectionError.Received(1)();
     }
 
     [Theory, AutoNSubstituteData]
@@ -205,13 +211,14 @@ public class MqttClientTest
     [Theory, AutoNSubstituteData]
     [SuppressMessage("Usage", "xUnit1026:Theory methods should use all of their parameters", Justification = "sut's event handler is doing work behind the scenes")]
     [SuppressMessage("Style", "IDE0060:Remove unused parameter", Justification = "sut's event handler is doing work behind the scenes")]
-    public Task Attempts_to_reconnect_after_disconnect_and_throws_after_exhausting_retries(
+    public async Task Attempts_to_reconnect_after_disconnect_and_throws_after_exhausting_retries(
         [Frozen] IMqttNetClient mqttNetClient,
         [Frozen] MqttOptions mqttOptions,
+        [Frozen] Func<Task> onFatalConnectionError,
         MqttClient sut)
     {
         // Arrange
-        mqttOptions.ReconnectRetryCount = 1;
+        mqttOptions.ReconnectRetryCount = 6;
         mqttOptions.RetryDelayProvider = _ => TimeSpan.Zero;
         mqttNetClient.IsConnected.Returns(false);
         mqttNetClient
@@ -229,9 +236,11 @@ public class MqttClientTest
                 new SocketException()));
 
         // Assert
-        return mqttNetClient
+        await mqttNetClient
             .Received(mqttOptions.ReconnectRetryCount + 1)
             .ConnectAsync(Arg.Any<MqttClientOptions>(), Arg.Any<CancellationToken>());
+
+        await onFatalConnectionError.Received(1)();
     }
 
     [Theory]

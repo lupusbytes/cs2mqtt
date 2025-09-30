@@ -123,7 +123,7 @@ Once you have located the correct path, create a new file there called **gamesta
  "timeout" "5.0"
  "buffer"  "0.1"
  "throttle" "0.1"
- "heartbeat" "60.0"
+ "heartbeat" "5.0"
  "data"
  {
    "provider"            "1" 
@@ -150,7 +150,7 @@ It is possible to require authentication between **Counter-Strike 2** and **cs2m
 To do this, pick a password and add it as an environment variable in the **cs2mqtt** docker-compose.yml like:
 
 ```yaml
-GameStateOptions__Token: password
+GameState__Token: password
 ```
 
 Then also add the same password to **gamestate_integration_cs2mqtt.cfg** in the root object:

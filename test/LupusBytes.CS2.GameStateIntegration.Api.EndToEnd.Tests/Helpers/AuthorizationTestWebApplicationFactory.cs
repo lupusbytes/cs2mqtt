@@ -14,7 +14,7 @@ public sealed class AuthorizationTestWebApplicationFactory
         builder
             .ConfigureAppConfiguration(config => config.AddInMemoryCollection(
             [
-                new KeyValuePair<string, string?>("GameStateOptions:Token", ExpectedToken),
+                new KeyValuePair<string, string?>("GameState:Token", ExpectedToken),
             ]))
             .ConfigureServices((context, services) => services.AddGameStateService(context.Configuration));
 

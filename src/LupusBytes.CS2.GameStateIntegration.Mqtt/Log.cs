@@ -60,4 +60,10 @@ public static partial class Log
         Level = LogLevel.Error,
         Message = "Failed executing HA supervisor API call to fetch MQTT on {Address}. Error: {Error}.")]
     public static partial void SupervisorApiRequestFailed(this ILogger logger, string address, string error);
+
+    [LoggerMessage(
+        EventId = 1_09,
+        Level = LogLevel.Critical,
+        Message = "Failed to connect to MQTT broker {Host}:{Port} after {Attempts} attempts, giving up!")]
+    public static partial void ConnectionToMqttBrokerAttemptsExhausted(this ILogger logger, Exception ex, string host, int port, int attempts);
 }

@@ -16,7 +16,7 @@ public sealed class Program
         builder.Services.AddGameStateService(builder.Configuration);
         builder.Services.AddHttpClient<MqttOptionsProvider>();
         builder.Services.AddSingleton<IMqttOptionsProvider, MqttOptionsProvider>();
-        builder.Services.AddMqttClient();
+        builder.Services.AddMqttClient(onFatalConnectionError: sp => sp.GetStopApplicationTask());
         builder.Services.AddHostedService<GameStateMqttPublisher>();
         builder.Services.AddHostedService<AvailabilityMqttPublisher>();
         builder.Services.AddHostedService<HomeAssistantDevicePublisher>();
@@ -27,7 +27,10 @@ public sealed class Program
         app.MapCS2GetEndpoints();
         app.MapHealthCheckEndpoints();
 
-        app.UseMiddleware<LogRequestBodyOnException>();
+        if (app.Logger.IsEnabled(LogLevel.Debug))
+        {
+            app.UseMiddleware<RequestBodyLogger>();
+        }
 
         app.Run();
     }

@@ -1,8 +1,15 @@
+using LupusBytes.CS2.GameStateIntegration.Contracts;
+
 namespace LupusBytes.CS2.GameStateIntegration;
 
 public class GameStateOptions
 {
-    public const string Section = nameof(GameStateOptions);
+    public const string Section = "GameState";
+
+    /// <summary>
+    /// If set to <see langword="true" />, data from players with a different <see cref="SteamId64" /> than the <see cref="Provider.SteamId64"/> will be ignored.
+    /// </summary>
+    public bool IgnoreSpectatedPlayers { get; set; } = true;
 
     /// <summary>
     /// Counter-Strike 2 client authentication token.
