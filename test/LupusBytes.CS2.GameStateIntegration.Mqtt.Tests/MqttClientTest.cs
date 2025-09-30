@@ -14,23 +14,27 @@ public class MqttClientTest
     [InlineAutoNSubstituteData("5")]
     [InlineAutoNSubstituteData("4.0.0")]
     [InlineAutoNSubstituteData("Foo")]
-    public void Constructor_throws_on_invalid_MQTT_protocol(
+    public async Task Throws_on_invalid_MQTT_protocol_when_starting(
         string protocolVersion,
         IMqttNetClient mqttNetClient,
         ILogger<MqttClient> logger)
     {
         // Arrange
-        var options = new MqttOptions
-        {
-            ProtocolVersion = protocolVersion,
-        };
+        var configOptionsProvider = Substitute.For<IMqttOptionsProvider>();
+        configOptionsProvider.GetOptionsAsync()
+            .Returns(Task.FromResult(new MqttOptions { ProtocolVersion = protocolVersion }));
+
+        var client = new MqttClient(
+            mqttNetClient,
+            configOptionsProvider,
+            onFatalConnectionError: () => Task.CompletedTask,
+            logger);
 
         // Act & Assert
-        Assert.Throws<ArgumentException>(() => new MqttClient(
-            mqttNetClient,
-            options,
-            onFatalConnectionError: () => Task.CompletedTask,
-            logger));
+        await Assert.ThrowsAsync<ArgumentException>(
+            () => client.StartAsync(CancellationToken.None));
+
+        client.Dispose();
     }
 
     [Theory, AutoNSubstituteData]
