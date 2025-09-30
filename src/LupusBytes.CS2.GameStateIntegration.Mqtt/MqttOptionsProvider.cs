@@ -53,9 +53,9 @@ public class MqttOptionsProvider : IMqttOptionsProvider
             mqttOptions.Host = cfg.Host;
             mqttOptions.Port = cfg.Port;
             mqttOptions.UseTls = cfg.SSL;
-            mqttOptions.Username = string.IsNullOrWhiteSpace(cfg.Username) ? string.Empty : cfg.Username;
-            mqttOptions.Password = string.IsNullOrWhiteSpace(cfg.Password) ? string.Empty : cfg.Password;
-            mqttOptions.ProtocolVersion = string.IsNullOrWhiteSpace(cfg.Protocol) ? string.Empty : cfg.Protocol;
+            mqttOptions.Username = cfg.Username;
+            mqttOptions.Password = cfg.Password;
+            mqttOptions.ProtocolVersion = cfg.Protocol;
 
             logger.LogInformation("Supervisor MQTT config: {Cfg}", JsonSerializer.Serialize(cfg, new JsonSerializerOptions { WriteIndented = true }));
             logger.LogInformation("Mapped MQTT options: {MqttOptions}", JsonSerializer.Serialize(mqttOptions, new JsonSerializerOptions { WriteIndented = true }));

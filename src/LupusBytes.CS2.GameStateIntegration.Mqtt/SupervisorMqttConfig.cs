@@ -17,6 +17,6 @@ public record SupervisorMqttConfig(
     [property: JsonPropertyName("host")] string Host,
     [property: JsonPropertyName("port")] int Port,
     [property: JsonPropertyName("ssl")] bool SSL,
-    [property: JsonPropertyName("Username")] string? Username,
-    [property: JsonPropertyName("Password")] string? Password,
-    [property: JsonPropertyName("Protocol")] string? Protocol);
+    [property: JsonPropertyName("Username")] string Username,
+    [property: JsonPropertyName("Password")] string Password,
+    [property: JsonPropertyName("Protocol")] string Protocol);
