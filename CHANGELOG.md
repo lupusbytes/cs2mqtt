@@ -1,5 +1,17 @@
 # Changelog
 
+## [1.9.0](https://github.com/lupusbytes/cs2mqtt/compare/v1.8.1...v1.9.0) (2025-09-30)
+
+
+### New features
+
+* add option to ignore data from spectated players. it is now enabled by default and must be disabled to revert to previous behavior. ([8573417](https://github.com/lupusbytes/cs2mqtt/commit/8573417e87cb714b7c93e93bbcd0cf40146eca2f))
+* **ha-addon:** add cs2mqtt icon and logo ([e1c1134](https://github.com/lupusbytes/cs2mqtt/commit/e1c11346c35c9a04f409b26c8c7b74bc2b3c62ab))
+* **ha-addon:** expose more cs2mqtt options on configuration page and tidy up ([41ddace](https://github.com/lupusbytes/cs2mqtt/commit/41ddacef43050e27c0b4c8115af791c06067fe64))
+* **ha-addon:** use /alive endpoint for watchdog health checks ([e886dce](https://github.com/lupusbytes/cs2mqtt/commit/e886dce79bac237621016197926a4c0c0835bd19))
+* **logging:** add timestamps to log messages ([59b214a](https://github.com/lupusbytes/cs2mqtt/commit/59b214a552eccd8186b91d25497a19251d925a47))
+* **logging:** log cs2 gsi api requests at debug level ([ad118ee](https://github.com/lupusbytes/cs2mqtt/commit/ad118eedb5dfcc6b2d1c8152c8eb9df428d1afd9))
+
 ## [1.8.1](https://github.com/lupusbytes/cs2mqtt/compare/v1.8.0...v1.8.1) (2025-09-26)
 
 
