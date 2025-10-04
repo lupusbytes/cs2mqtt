@@ -198,3 +198,10 @@ GameState__TimeoutCleanupIntervalInSeconds: 5
 The `TimeoutInSeconds` should be a little longer than the heartbeat defined in the **gamestate_integration_cs2mqtt.cfg**, to get the best results. 
 
 The `TimeoutCleanupIntervalInSeconds` defines how often the background job that checks for timed out devices is executed.
+
+# Resources
+- [Valve Counter-Strike Game State Integration](https://developer.valvesoftware.com/wiki/Counter-Strike:_Global_Offensive_Game_State_Integration)
+- [Reddit thread with in-depth information about Game State Integration](https://www.reddit.com/r/GlobalOffensive/comments/cjhcpy/game_state_integration_a_very_large_and_indepth/)
+- [cs2mqtt reddit announcement thread with crazy automation ideas in the comments](https://www.reddit.com/r/homeassistant/comments/1nkaqfc/counterstrike_as_a_home_assistant_mqtt_device/)
+- [Ulanzi clock automation video](https://streamable.com/xz67rm)  
+[Ulanzi clock automation yaml](https://www.reddit.com/r/homeassistant/comments/1nkaqfc/comment/nfecuul/?utm_source=share&utm_medium=web3x&utm_name=web3xcss&utm_term=1&utm_content=share_button)
