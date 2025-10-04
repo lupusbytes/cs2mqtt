@@ -62,7 +62,7 @@ public class PlayerStateDiscoveryMessages(Device device) : MqttDiscoveryMessages
         UniqueId: $"{device.Id}_player-state_flashed",
         StateTopic: stateTopic,
         ValueTemplate: ValueTemplate.JsonPropertyValueWithByteToBoolConversion("flashed"),
-        Icon: "mdi:flash-alert",
+        Icon: "mdi:eye-off-outline",
         device,
         Availability: availability));
 
