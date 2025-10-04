@@ -6,8 +6,9 @@
     <a href="https://sonarcloud.io/summary/new_code?id=lupusbytes_cs2mqtt"><img src="https://sonarcloud.io/api/project_badges/measure?project=lupusbytes_cs2mqtt&metric=reliability_rating"></a>
     <a href="https://sonarcloud.io/summary/new_code?id=lupusbytes_cs2mqtt"><img src="https://sonarcloud.io/api/project_badges/measure?project=lupusbytes_cs2mqtt&metric=sqale_rating"></a>
 </p>
-
-# cs2mqtt
+<p align="center">
+  <img src="docs/images/banner.png" alt="cs2mqtt banner">
+<p>
 
 ## Introduction
 
