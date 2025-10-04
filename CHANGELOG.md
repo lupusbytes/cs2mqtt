@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.9.1](https://github.com/lupusbytes/cs2mqtt/compare/v1.9.0...v1.9.1) (2025-10-04)
+
+
+### Bug fixes
+
+* **homeassistant:** gracefully handle empty payloads in value_templates ([cd8298d](https://github.com/lupusbytes/cs2mqtt/commit/cd8298d83be97a4dd848595521cc01d2d63e6f23))
+
 ## [1.9.0](https://github.com/lupusbytes/cs2mqtt/compare/v1.8.1...v1.9.0) (2025-09-30)
 
 
