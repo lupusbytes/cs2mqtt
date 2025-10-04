@@ -187,3 +187,14 @@ This behaviour can be changed by setting the environment variables
 ```yaml
 GameState__IgnoreSpectatedPlayers: false
 ```
+
+## Device timeout
+As mentioned in [Device Availability](#device-availability), CS2 can and will **not** notify **cs2mqtt** when the game is closed. To work around this limitation, **cs2mqtt** listens for heartsbeats and sets the device as offline if no data has been received within the expected interval.
+The timeout and cleanup interval can be defined by following environment variables:
+```yaml
+GameState__TimeoutInSeconds: 10.5
+GameState__TimeoutCleanupIntervalInSeconds: 5
+```
+The `TimeoutInSeconds` should be a little longer than the heartbeat defined in the **gamestate_integration_cs2mqtt.cfg**, to get the best results. 
+
+The `TimeoutCleanupIntervalInSeconds` defines how often the background job that checks for timed out devices is executed.
