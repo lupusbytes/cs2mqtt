@@ -180,3 +180,10 @@ It is possible to remove any of the following entries from the data object in **
 - `player_state`
 
 This will stop **Counter-Strike 2** from sending data about the removed topics.
+
+## Data from spectated players
+Since version `1.9.0`, cs2mqtt ignores data from spectated players by default.
+This behaviour can be changed by setting the environment variables 
+```yaml
+GameState__IgnoreSpectatedPlayers: false
+```
