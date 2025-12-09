@@ -32,10 +32,10 @@ jobs:
     - name: 🛒 Checkout repository
       uses: actions/checkout@v6
 
-    - name: ⚙️ Setup .NET 9
+    - name: ⚙️ Setup .NET 10
       uses: actions/setup-dotnet@v5
       with:
-        dotnet-version: '9.0.x'
+        dotnet-version: '10.0.x'
 
     - name: 🧪 Test
       run: dotnet test -c Release -p:CollectCoverage=true -p:CoverletOutput=../ -p:MergeWith=../coverage.json -p:CoverletOutputFormat=\"opencover,json\" -m:1
