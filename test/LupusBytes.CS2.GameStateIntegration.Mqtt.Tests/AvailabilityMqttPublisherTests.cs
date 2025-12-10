@@ -235,20 +235,30 @@ public class AvailabilityMqttPublisherTests
         // Arrange
         await sut.StartAsync(CancellationToken.None);
 
-        var topics = new List<string>();
+        var topics = gameStates
+            .Select(x => x.Provider!.SteamId64)
+            .SelectMany(steamId => new[]
+            {
+                $"{MqttConstants.BaseTopic}/{steamId}/player/status",
+                $"{MqttConstants.BaseTopic}/{steamId}/player-state/status",
+                $"{MqttConstants.BaseTopic}/{steamId}/map/status",
+                $"{MqttConstants.BaseTopic}/{steamId}/round/status",
+            })
+            .ToList();
+
+        var tcs = TaskHelper.CompletionSourceFromTopicPublishment(mqttClient, topics);
+        using var cts = TaskHelper.EnableCompletionSourceTimeout(tcs);
+
         foreach (var gameState in gameStates)
         {
             var steamId = gameState.Provider!.SteamId64;
-            topics.Add($"{MqttConstants.BaseTopic}/{steamId}/player/status");
-            topics.Add($"{MqttConstants.BaseTopic}/{steamId}/player-state/status");
-            topics.Add($"{MqttConstants.BaseTopic}/{steamId}/map/status");
-            topics.Add($"{MqttConstants.BaseTopic}/{steamId}/round/status");
-
             sut.OnNext(new StateUpdate<Player>(steamId, gameState.Player));
             sut.OnNext(new StateUpdate<PlayerState>(steamId, gameState.Player!.State));
             sut.OnNext(new StateUpdate<Map>(steamId, gameState.Map));
             sut.OnNext(new StateUpdate<Round>(steamId, gameState.Round));
         }
+
+        await tcs.Task;
 
         // Act
         await sut.StopAsync(CancellationToken.None);
