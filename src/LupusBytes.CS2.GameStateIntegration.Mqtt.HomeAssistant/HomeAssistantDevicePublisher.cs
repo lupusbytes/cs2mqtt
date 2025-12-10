@@ -56,7 +56,7 @@ public sealed class HomeAssistantDevicePublisher(
     [SuppressMessage(
         "Minor Code Smell",
         "S3267:Loops should be simplified with \"LINQ\" expressions",
-        Justification = "To be fixed when upgrading to .NET 10 which contains System.Linq.AsyncEnumerable")]
+        Justification = "Reads worse and is less performant")]
     private async Task ProcessChannelAsync<TState>(
         ChannelReader<StateUpdate<TState>> channelReader,
         HashSet<SteamId64> publishedConfigSet,
