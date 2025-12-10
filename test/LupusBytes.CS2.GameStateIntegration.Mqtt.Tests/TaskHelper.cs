@@ -4,14 +4,30 @@ internal static class TaskHelper
 {
     public static TaskCompletionSource<bool> CompletionSourceFromTopicPublishment(
         IMqttClient mqttClient,
-        string topic)
+        params IEnumerable<string> topics)
     {
+        var pending = topics.ToHashSet(StringComparer.Ordinal);
+        var lockObj = new Lock();
         var tcs = new TaskCompletionSource<bool>();
-        mqttClient
-            .When(x => x.PublishAsync(
-                Arg.Is<MqttMessage>(m => m.Topic == topic),
-                Arg.Any<CancellationToken>()))
-            .Do(_ => tcs.SetResult(true));
+
+        foreach (var topic in pending)
+        {
+            mqttClient
+                .When(x => x.PublishAsync(
+                    Arg.Is<MqttMessage>(m => m.Topic == topic),
+                    Arg.Any<CancellationToken>()))
+                .Do(_ =>
+                {
+                    lock (lockObj)
+                    {
+                        if (pending.Remove(topic) && pending.Count == 0)
+                        {
+                            tcs.SetResult(true);
+                        }
+                    }
+                });
+        }
+
         return tcs;
     }
 
