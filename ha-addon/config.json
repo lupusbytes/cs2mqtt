@@ -1,6 +1,6 @@
 {
   "name": "cs2mqtt",
-  "version": "1.9.1",
+  "version": "1.9.2",
   "slug": "cs2mqtt",
   "description": "Counter-Strike 2 Game State Integration to MQTT bridge",
   "url": "https://github.com/lupusbytes/cs2mqtt",

@@ -1,5 +1,20 @@
 # Changelog
 
+## [1.9.2](https://github.com/lupusbytes/cs2mqtt/compare/v1.9.1...v1.9.2) (2025-12-11)
+
+
+### Bug fixes
+
+* add compatibility with arms race mode ([90ad315](https://github.com/lupusbytes/cs2mqtt/commit/90ad315d943897efc375005a0c153eadeafc0c4b))
+* add compatibility with retake mode ([90ad315](https://github.com/lupusbytes/cs2mqtt/commit/90ad315d943897efc375005a0c153eadeafc0c4b))
+* add compatibility with training day ([90ad315](https://github.com/lupusbytes/cs2mqtt/commit/90ad315d943897efc375005a0c153eadeafc0c4b))
+* add compatibility with wingman mode ([90ad315](https://github.com/lupusbytes/cs2mqtt/commit/90ad315d943897efc375005a0c153eadeafc0c4b))
+
+
+### Performance improvements
+
+* upgrade project to dotnet 10 ([b126c20](https://github.com/lupusbytes/cs2mqtt/commit/b126c2020e8da91c0076e9210b9b7274ad503f40))
+
 ## [1.9.1](https://github.com/lupusbytes/cs2mqtt/compare/v1.9.0...v1.9.1) (2025-10-04)
 
 
