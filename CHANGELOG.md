@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.9.3](https://github.com/lupusbytes/cs2mqtt/compare/v1.9.2...v1.9.3) (2026-01-18)
+
+
+### Upgrades
+
+* **deps:** update dotnet monorepo to 10.0.2 ([46fb2bb](https://github.com/lupusbytes/cs2mqtt/commit/46fb2bbe1ab75e99fbea12c1fa358fa84b7da413))
+
 ## [1.9.2](https://github.com/lupusbytes/cs2mqtt/compare/v1.9.1...v1.9.2) (2025-12-11)
 
 
