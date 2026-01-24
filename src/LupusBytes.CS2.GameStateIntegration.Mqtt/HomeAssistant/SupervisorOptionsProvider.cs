@@ -54,7 +54,7 @@ public class SupervisorOptionsProvider(
 
         httpResponse.EnsureSuccessStatusCode();
 
-        var response = JsonSerializer.Deserialize<SupervisorResponse>(responseContent);
+        var response = JsonSerializer.Deserialize<SupervisorResponse<SupervisorMqttConfig>>(responseContent);
 
         httpClient.Dispose();
 
