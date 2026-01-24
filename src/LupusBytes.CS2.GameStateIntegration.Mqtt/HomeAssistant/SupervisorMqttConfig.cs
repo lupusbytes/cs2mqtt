@@ -1,6 +1,6 @@
 ﻿using System.Text.Json.Serialization;
 
-namespace LupusBytes.CS2.GameStateIntegration.Mqtt;
+namespace LupusBytes.CS2.GameStateIntegration.Mqtt.HomeAssistant;
 
 /// <summary>
 /// HA Supervisor MQTT config.
@@ -17,6 +17,6 @@ public record SupervisorMqttConfig(
     [property: JsonPropertyName("host")] string Host,
     [property: JsonPropertyName("port")] int Port,
     [property: JsonPropertyName("ssl")] bool Ssl,
-    [property: JsonPropertyName("username")] string? Username,
-    [property: JsonPropertyName("password")] string? Password,
-    [property: JsonPropertyName("protocol")] string? Protocol);
+    [property: JsonPropertyName("username")] string Username,
+    [property: JsonPropertyName("password")] string Password,
+    [property: JsonPropertyName("protocol")] string Protocol);

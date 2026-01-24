@@ -1,8 +1,9 @@
-﻿using System.Net.Http.Headers;
+﻿using System.Diagnostics.CodeAnalysis;
+using System.Net.Http.Headers;
 using System.Text.Json;
 using Microsoft.Extensions.Logging;
 
-namespace LupusBytes.CS2.GameStateIntegration.Mqtt;
+namespace LupusBytes.CS2.GameStateIntegration.Mqtt.HomeAssistant;
 
 public class SupervisorOptionsProvider(
     string supervisorToken,
@@ -15,7 +16,7 @@ public class SupervisorOptionsProvider(
         logger.RetrievedSupervisorToken();
         try
         {
-            var cfg = await GetSupervisorMqttConfig(supervisorToken, cancellationToken);
+            var cfg = await GetSupervisorMqttConfigAsync(cancellationToken);
             logger.FetchedMqttInfoFromSupervisor(cfg.Host, cfg.Port);
 
             return new MqttOptions
@@ -23,9 +24,9 @@ public class SupervisorOptionsProvider(
                 Host = cfg.Host,
                 Port = cfg.Port,
                 UseTls = cfg.Ssl,
-                Username = string.IsNullOrWhiteSpace(cfg.Username) ? string.Empty : cfg.Username,
-                Password = string.IsNullOrWhiteSpace(cfg.Password) ? string.Empty : cfg.Password,
-                ProtocolVersion = cfg.Protocol ?? "5.0.0",
+                Username = cfg.Username,
+                Password = cfg.Password,
+                ProtocolVersion = cfg.Protocol,
             };
         }
         catch (HttpRequestException ex)
@@ -40,19 +41,20 @@ public class SupervisorOptionsProvider(
         }
     }
 
-    private static async Task<SupervisorMqttConfig> GetSupervisorMqttConfig(string supervisorToken, CancellationToken cancellationToken = default)
+    [SuppressMessage("Performance", "CA1848:Use the LoggerMessage delegates", Justification = "Debug")]
+    [SuppressMessage("Usage", "CA2254:Template should be a static expression", Justification = "Debug")]
+    private async Task<SupervisorMqttConfig> GetSupervisorMqttConfigAsync(CancellationToken cancellationToken = default)
     {
         var httpClient = new HttpClient();
         httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", supervisorToken);
 
         var httpResponse = await httpClient.GetAsync(new Uri(SupervisorServicesEndpoint), cancellationToken);
+        var responseContent = await httpResponse.Content.ReadAsStringAsync(cancellationToken);
+        logger.LogInformation("Response {ResponseContent}", responseContent);
+
         httpResponse.EnsureSuccessStatusCode();
 
-        await using var stream = await httpResponse.Content.ReadAsStreamAsync(cancellationToken);
-
-        var response = await JsonSerializer.DeserializeAsync<SupervisorMqttConfigResponse>(
-            stream,
-            cancellationToken: cancellationToken);
+        var response = JsonSerializer.Deserialize<SupervisorResponse>(responseContent);
 
         httpClient.Dispose();
 

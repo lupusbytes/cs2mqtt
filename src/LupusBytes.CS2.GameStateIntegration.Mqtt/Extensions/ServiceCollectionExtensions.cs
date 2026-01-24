@@ -1,3 +1,4 @@
+using LupusBytes.CS2.GameStateIntegration.Mqtt.HomeAssistant;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
