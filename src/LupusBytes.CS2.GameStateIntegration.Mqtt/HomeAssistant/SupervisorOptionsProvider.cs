@@ -1,68 +1,35 @@
-﻿using System.Diagnostics.CodeAnalysis;
-using System.Net.Http.Headers;
-using System.Text.Json;
+﻿using System.Net.Http.Json;
 using Microsoft.Extensions.Logging;
 
 namespace LupusBytes.CS2.GameStateIntegration.Mqtt.HomeAssistant;
 
 public class SupervisorOptionsProvider(
-    string supervisorToken,
+    HttpClient httpClient,
     ILogger<SupervisorOptionsProvider> logger) : IMqttOptionsProvider
 {
-    private const string SupervisorServicesEndpoint = "http://supervisor/services/mqtt";
+    private static readonly Uri MqttEndpoint = new("services/mqtt", UriKind.Relative);
 
     public async Task<MqttOptions> GetOptionsAsync(CancellationToken cancellationToken = default)
     {
         logger.RetrievedSupervisorToken();
-        try
+        var response = await httpClient.GetAsync(MqttEndpoint, HttpCompletionOption.ResponseHeadersRead, cancellationToken);
+        var content = await response.Content.ReadFromJsonAsync<SupervisorResponse<SupervisorMqttConfig>>(cancellationToken);
+        if (!response.IsSuccessStatusCode)
         {
-            var cfg = await GetSupervisorMqttConfigAsync(cancellationToken);
-            logger.FetchedMqttInfoFromSupervisor(cfg.Host, cfg.Port);
-
-            return new MqttOptions
-            {
-                Host = cfg.Host,
-                Port = cfg.Port,
-                UseTls = cfg.Ssl,
-                Username = cfg.Username,
-                Password = cfg.Password,
-                ProtocolVersion = cfg.Protocol,
-            };
-        }
-        catch (HttpRequestException ex)
-        {
-            logger.SupervisorApiRequestFailed(SupervisorServicesEndpoint, ex.Message);
-            throw;
-        }
-        catch (InvalidOperationException ex)
-        {
-            logger.SupervisorApiRequestFailed(SupervisorServicesEndpoint, ex.Message);
-            throw;
-        }
-    }
-
-    [SuppressMessage("Performance", "CA1848:Use the LoggerMessage delegates", Justification = "Debug")]
-    [SuppressMessage("Usage", "CA2254:Template should be a static expression", Justification = "Debug")]
-    private async Task<SupervisorMqttConfig> GetSupervisorMqttConfigAsync(CancellationToken cancellationToken = default)
-    {
-        var httpClient = new HttpClient();
-        httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", supervisorToken);
-
-        var httpResponse = await httpClient.GetAsync(new Uri(SupervisorServicesEndpoint), cancellationToken);
-        var responseContent = await httpResponse.Content.ReadAsStringAsync(cancellationToken);
-        logger.LogInformation("Response {ResponseContent}", responseContent);
-
-        httpResponse.EnsureSuccessStatusCode();
-
-        var response = JsonSerializer.Deserialize<SupervisorResponse<SupervisorMqttConfig>>(responseContent);
-
-        httpClient.Dispose();
-
-        if (response?.Data is null)
-        {
-            throw new InvalidOperationException("Invalid supervisor response");
+            logger.SupervisorApiRequestFailed(response.RequestMessage!.RequestUri!.ToString(), content!.Message);
+            throw new HttpRequestException($"Invalid supervisor response. Message: {content!.Message}");
         }
 
-        return response.Data;
+        var config = content?.Data ?? throw new InvalidOperationException("Invalid supervisor config");
+        logger.FetchedMqttInfoFromSupervisor(config.Host, config.Port);
+        return new MqttOptions
+        {
+            Host = config.Host,
+            Port = config.Port,
+            UseTls = config.Ssl,
+            Username = config.Username,
+            Password = config.Password,
+            ProtocolVersion = config.Protocol,
+        };
     }
 }

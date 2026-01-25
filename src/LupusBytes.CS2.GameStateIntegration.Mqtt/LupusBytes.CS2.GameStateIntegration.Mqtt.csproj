@@ -8,6 +8,7 @@
 
     <ItemGroup>
       <PackageReference Include="Microsoft.Extensions.Hosting.Abstractions" Version="10.0.2" />
+      <PackageReference Include="Microsoft.Extensions.Http" Version="10.0.2" />
       <PackageReference Include="MQTTnet" Version="5.0.1.1416" />
     </ItemGroup>
 
