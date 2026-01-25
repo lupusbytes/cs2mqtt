@@ -12,15 +12,17 @@ public class SupervisorOptionsProvider(
     public async Task<MqttOptions> GetOptionsAsync(CancellationToken cancellationToken = default)
     {
         logger.RetrievedSupervisorToken();
-        var response = await httpClient.GetAsync(MqttEndpoint, HttpCompletionOption.ResponseHeadersRead, cancellationToken);
-        var content = await response.Content.ReadFromJsonAsync<SupervisorResponse<SupervisorMqttConfig>>(cancellationToken);
+        var response = await httpClient.GetAsync(MqttEndpoint, cancellationToken);
         if (!response.IsSuccessStatusCode)
         {
-            logger.SupervisorApiRequestFailed(response.RequestMessage!.RequestUri!.ToString(), content!.Message);
-            throw new HttpRequestException($"Invalid supervisor response. Message: {content!.Message}");
+            throw new HttpRequestException(
+                $"Supervisor returned status code {response.StatusCode} " +
+                $"with message: {response.Content.ReadAsStringAsync(cancellationToken)}");
         }
 
-        var config = content?.Data ?? throw new InvalidOperationException("Invalid supervisor config");
+        var responseContent = await response.Content.ReadFromJsonAsync<SupervisorResponse<SupervisorMqttConfig>>(cancellationToken);
+        var config = responseContent?.Data ?? throw new InvalidOperationException("Supervisor MQTT config is null");
+
         logger.FetchedMqttInfoFromSupervisor(config.Host, config.Port);
         return new MqttOptions
         {

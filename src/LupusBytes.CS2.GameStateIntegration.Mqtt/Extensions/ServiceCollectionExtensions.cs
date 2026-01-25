@@ -38,7 +38,7 @@ public static class ServiceCollectionExtensions
         return services;
     }
 
-    [SuppressMessage("Minor Code Smell", "S1075:URIs should not be hardcoded", Justification = "Pending")]
+    [SuppressMessage("Minor Code Smell", "S1075:URIs should not be hardcoded", Justification = "It's always the same")]
     private static IServiceCollection AddMqttOptionsProvider(
         this IServiceCollection services,
         IConfiguration configuration)
@@ -48,14 +48,13 @@ public static class ServiceCollectionExtensions
         var supervisorToken = configuration["SUPERVISOR_TOKEN"];
 
         if (!string.IsNullOrEmpty(supervisorToken) &&
-            configuration.GetValue("ZEROCONF_MQTT", defaultValue: true))
+            configuration.GetValue("MQTT__ZEROCONF", defaultValue: true))
         {
-            services.AddHttpClient<SupervisorOptionsProvider>(client =>
+            services.AddHttpClient<IMqttOptionsProvider, SupervisorOptionsProvider>(client =>
             {
                 client.BaseAddress = new Uri("http://supervisor/");
                 client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", supervisorToken);
             });
-            services.AddSingleton<IMqttOptionsProvider>(sp => sp.GetRequiredService<SupervisorOptionsProvider>());
         }
         else
         {
