@@ -1,3 +1,4 @@
+using System.Diagnostics.CodeAnalysis;
 using System.Net.Http.Headers;
 using LupusBytes.CS2.GameStateIntegration.Mqtt.HomeAssistant;
 using Microsoft.Extensions.Configuration;
@@ -37,22 +38,21 @@ public static class ServiceCollectionExtensions
         return services;
     }
 
+    [SuppressMessage("Minor Code Smell", "S1075:URIs should not be hardcoded", Justification = "Pending")]
     private static IServiceCollection AddMqttOptionsProvider(
         this IServiceCollection services,
         IConfiguration configuration)
     {
-        // The SUPERVISOR_TOKEN and URL environment variables exists when cs2mqtt is run under the Home Assistant Supervisor.
+        // The SUPERVISOR_TOKEN environment variable exists when cs2mqtt is run under the Home Assistant Supervisor.
         // The token can be used to query an internal API to fetch MQTT info and credentials.
         var supervisorToken = configuration["SUPERVISOR_TOKEN"];
-        var supervisorUrl = configuration["SUPERVISOR_URL"];
 
         if (!string.IsNullOrEmpty(supervisorToken) &&
-            !string.IsNullOrEmpty(supervisorUrl) &&
             configuration.GetValue("ZEROCONF_MQTT", defaultValue: true))
         {
             services.AddHttpClient<SupervisorOptionsProvider>(client =>
             {
-                client.BaseAddress = new Uri(supervisorUrl);
+                client.BaseAddress = new Uri("http://supervisor/");
                 client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", supervisorToken);
             });
             services.AddSingleton<IMqttOptionsProvider>(sp => sp.GetRequiredService<SupervisorOptionsProvider>());
