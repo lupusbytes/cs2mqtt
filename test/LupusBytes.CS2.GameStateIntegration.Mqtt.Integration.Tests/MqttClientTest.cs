@@ -115,17 +115,27 @@ public class MqttClientTest
             Username = username,
             Password = password,
             UseTls = false,
+            RetryDelayProvider = _ => TimeSpan.Zero,
         });
+
+        var fatalErrorCalled = false;
 
         using var sut = new MqttClient(
             new MqttClientFactory().CreateMqttClient(),
             optionsProvider,
-            onFatalConnectionError: () => Task.CompletedTask,
+            onFatalConnectionError: () =>
+            {
+                fatalErrorCalled = true;
+                return Task.CompletedTask;
+            },
             NullLogger<MqttClient>.Instance);
 
-        // Act & Assert
-        var act = () => sut.StartAsync(CancellationToken.None);
-        await act.Should().NotThrowAsync();
+        // Act
+        await sut.StartAsync(CancellationToken.None);
+
+        // Assert
+        sut.IsConnected.Should().BeTrue();
+        fatalErrorCalled.Should().BeFalse();
     }
 
     private static async Task AssertPayload(string expected, TaskCompletionSource<string> tcs)
