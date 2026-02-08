@@ -9,5 +9,7 @@
   <ItemGroup>
     <!-- Makes internal types in libraries visible to their test projects -->
     <InternalsVisibleTo Include="$(AssemblyName).Tests" />
+    <InternalsVisibleTo Include="$(AssemblyName).EndToEnd.Tests" />
+    <InternalsVisibleTo Include="$(AssemblyName).Integration.Tests" />
   </ItemGroup>
 </Project>
