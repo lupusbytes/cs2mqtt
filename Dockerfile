@@ -1,6 +1,6 @@
 FROM --platform=$BUILDPLATFORM mcr.microsoft.com/dotnet/sdk:10.0-noble AS build
 ARG TARGETARCH
-WORKDIR /source
+WORKDIR /cs2mqtt
 
 # Copy .csproj file for LupusBytes.CS2.GameStateIntegration.Api
 COPY src/LupusBytes.CS2.GameStateIntegration.Api/*.csproj ./src/LupusBytes.CS2.GameStateIntegration.Api/
