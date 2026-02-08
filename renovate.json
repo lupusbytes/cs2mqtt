@@ -12,6 +12,10 @@
       "packagePatterns": ["*"],
       "matchFileNames": ["src/**"],
       "semanticCommitType": "fix"
+    },
+    {
+      "matchSourceUrls": ["https://github.com/dotnet/MQTTnet"],
+      "groupName": "mqttnet"
     }
   ]
 }
