@@ -1,5 +1,17 @@
 # Changelog
 
+## [1.10.0](https://github.com/lupusbytes/cs2mqtt/compare/v1.9.2...v1.10.0) (2026-02-08)
+
+
+### New features
+
+* **homeassistant:** cs2mqtt will now automatically fetch mqtt configuration from the home assistant supervisor api when running as an add-on. to revert to manual configuration, disable the "auto-configure mqtt" option in the add-on configuration page. ([ebd82bc](https://github.com/lupusbytes/cs2mqtt/commit/ebd82bcc39b79c19c361366e8f2c0adae744e06e))
+
+
+### Upgrades
+
+* **deps:** update dotnet monorepo to 10.0.2 ([46fb2bb](https://github.com/lupusbytes/cs2mqtt/commit/46fb2bbe1ab75e99fbea12c1fa358fa84b7da413))
+
 ## [1.9.2](https://github.com/lupusbytes/cs2mqtt/compare/v1.9.1...v1.9.2) (2025-12-11)
 
 
