@@ -49,7 +49,7 @@ public sealed class MqttClient : IHostedService, IMqttClient, IDisposable
     public Task StopAsync(CancellationToken cancellationToken)
     {
         shutdownRequested = true;
-        return mqttNetClient.DisconnectAsync(cancellationToken: cancellationToken);
+        return mqttNetClient.DisconnectAsync(new MqttClientDisconnectOptions(), cancellationToken);
     }
 
     public async Task PublishAsync(MqttMessage message, CancellationToken cancellationToken)
