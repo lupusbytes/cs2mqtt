@@ -50,6 +50,28 @@ public class GameStateMqttPublisherTest
     }
 
     [Theory, AutoNSubstituteData]
+    public async Task Publishes_PlayerMatchStats_data(
+        [Frozen] IMqttClient mqttClient,
+        SteamId64 steamId,
+        PlayerMatchStats playerMatchStats,
+        GameStateMqttPublisher sut)
+    {
+        // Arrange
+        var topic = $"{MqttConstants.BaseTopic}/{steamId}/player-match-stats";
+        var tcs = TaskHelper.CompletionSourceFromTopicPublishment(mqttClient, topic);
+        using var cts = TaskHelper.EnableCompletionSourceTimeout(tcs);
+        await sut.StartAsync(CancellationToken.None);
+
+        // Act
+        sut.OnNext(new StateUpdate<PlayerMatchStats>(steamId, playerMatchStats));
+
+        // Assert
+        await tcs.Task;
+        var expectedPayload = JsonSerializer.Serialize(playerMatchStats);
+        await AssertPayloadPublishedOnTopic(mqttClient, topic, expectedPayload);
+    }
+
+    [Theory, AutoNSubstituteData]
     public async Task Publishes_Map_data(
         [Frozen] IMqttClient mqttClient,
         SteamId64 steamId,

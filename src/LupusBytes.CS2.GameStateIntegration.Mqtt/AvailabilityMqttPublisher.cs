@@ -11,12 +11,14 @@ public sealed class AvailabilityMqttPublisher(
     private const string ProviderAvailabilityTopicSuffix = "status";
     private const string PlayerAvailabilityTopicSuffix = "player/status";
     private const string PlayerStateAvailabilityTopicSuffix = "player-state/status";
+    private const string PlayerMatchStatsAvailabilityTopicSuffix = "player-match-stats/status";
     private const string MapAvailabilityTopicSuffix = "map/status";
     private const string RoundAvailabilityTopicSuffix = "round/status";
 
     private readonly HashSet<SteamId64> onlineProviders = [];
     private readonly HashSet<SteamId64> onlinePlayers = [];
     private readonly HashSet<SteamId64> onlinePlayerStates = [];
+    private readonly HashSet<SteamId64> onlinePlayerMatchStats = [];
     private readonly HashSet<SteamId64> onlineMaps = [];
     private readonly HashSet<SteamId64> onlineRounds = [];
 
@@ -42,6 +44,7 @@ public sealed class AvailabilityMqttPublisher(
             ProcessChannelAsync(ProviderChannelReader, onlineProviders, ProviderAvailabilityTopicSuffix, stoppingToken),
             ProcessChannelAsync(PlayerChannelReader, onlinePlayers, PlayerAvailabilityTopicSuffix, stoppingToken),
             ProcessChannelAsync(PlayerStateChannelReader, onlinePlayerStates, PlayerStateAvailabilityTopicSuffix, stoppingToken),
+            ProcessChannelAsync(PlayerMatchStatsChannelReader, onlinePlayerMatchStats, PlayerMatchStatsAvailabilityTopicSuffix, stoppingToken),
             ProcessChannelAsync(MapChannelReader, onlineMaps, MapAvailabilityTopicSuffix, stoppingToken),
             ProcessChannelAsync(RoundChannelReader, onlineRounds, RoundAvailabilityTopicSuffix, stoppingToken));
 
@@ -116,6 +119,7 @@ public sealed class AvailabilityMqttPublisher(
         var entries = onlinePlayers.Select(steamId => (steamId, PlayerAvailabilityTopicSuffix))
             .Concat(onlineProviders.Select(steamId => (steamId, ProviderAvailabilityTopicSuffix)))
             .Concat(onlinePlayerStates.Select(steamId => (steamId, PlayerStateAvailabilityTopicSuffix)))
+            .Concat(onlinePlayerMatchStats.Select(steamId => (steamId, PlayerMatchStatsAvailabilityTopicSuffix)))
             .Concat(onlineMaps.Select(steamId => (steamId, MapAvailabilityTopicSuffix)))
             .Concat(onlineRounds.Select(steamId => (steamId, RoundAvailabilityTopicSuffix)));
 

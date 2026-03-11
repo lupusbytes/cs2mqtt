@@ -106,6 +106,27 @@ public class AvailabilityMqttPublisherTests
     }
 
     [Theory, AutoNSubstituteData]
+    public async Task Publishes_player_match_stats_availability(
+        [Frozen] IMqttClient mqttClient,
+        SteamId64 steamId,
+        PlayerMatchStats playerMatchStats,
+        AvailabilityMqttPublisher sut)
+    {
+        // Arrange
+        var topic = $"{MqttConstants.BaseTopic}/{steamId}/player-match-stats/status";
+        var tcs = TaskHelper.CompletionSourceFromTopicPublishment(mqttClient, topic);
+        using var cts = TaskHelper.EnableCompletionSourceTimeout(tcs);
+        await sut.StartAsync(CancellationToken.None);
+
+        // Act
+        sut.OnNext(new StateUpdate<PlayerMatchStats>(steamId, playerMatchStats));
+
+        // Assert
+        await tcs.Task;
+        await AssertAvailabilityPublishedOnTopic(mqttClient, topic);
+    }
+
+    [Theory, AutoNSubstituteData]
     public async Task Publishes_map_availability(
         [Frozen] IMqttClient mqttClient,
         SteamId64 steamId,
@@ -241,6 +262,7 @@ public class AvailabilityMqttPublisherTests
             {
                 $"{MqttConstants.BaseTopic}/{steamId}/player/status",
                 $"{MqttConstants.BaseTopic}/{steamId}/player-state/status",
+                $"{MqttConstants.BaseTopic}/{steamId}/player-match-stats/status",
                 $"{MqttConstants.BaseTopic}/{steamId}/map/status",
                 $"{MqttConstants.BaseTopic}/{steamId}/round/status",
             })
@@ -254,6 +276,7 @@ public class AvailabilityMqttPublisherTests
             var steamId = gameState.Provider!.SteamId64;
             sut.OnNext(new StateUpdate<Player>(steamId, gameState.Player));
             sut.OnNext(new StateUpdate<PlayerState>(steamId, gameState.Player!.State));
+            sut.OnNext(new StateUpdate<PlayerMatchStats>(steamId, gameState.Player.MatchStats));
             sut.OnNext(new StateUpdate<Map>(steamId, gameState.Map));
             sut.OnNext(new StateUpdate<Round>(steamId, gameState.Round));
         }

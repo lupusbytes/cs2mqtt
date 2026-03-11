@@ -7,7 +7,8 @@ public interface IGameStateService :
     IObservable<StateUpdate<Map>>,
     IObservable<StateUpdate<Round>>,
     IObservable<StateUpdate<Player>>,
-    IObservable<StateUpdate<PlayerState>>
+    IObservable<StateUpdate<PlayerState>>,
+    IObservable<StateUpdate<PlayerMatchStats>>
 {
     public Map? GetMap(SteamId64 steamId);
     public Round? GetRound(SteamId64 steamId);
