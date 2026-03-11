@@ -24,7 +24,7 @@ internal sealed class GameStateService : ObservableGameState, IGameStateService
     public Map? GetMap(SteamId64 steamId)
         => gameStateSubscriptions.GetValueOrDefault(steamId)?.GameState.Map;
 
-    public PlayerWithState? GetPlayer(SteamId64 steamId)
+    public PlayerData? GetPlayer(SteamId64 steamId)
         => gameStateSubscriptions.GetValueOrDefault(steamId)?.GameState.Player;
 
     public Round? GetRound(SteamId64 steamId)

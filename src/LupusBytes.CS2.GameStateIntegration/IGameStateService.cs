@@ -11,6 +11,6 @@ public interface IGameStateService :
 {
     public Map? GetMap(SteamId64 steamId);
     public Round? GetRound(SteamId64 steamId);
-    public PlayerWithState? GetPlayer(SteamId64 steamId);
+    public PlayerData? GetPlayer(SteamId64 steamId);
     void ProcessEvent(GameStateData data);
 }
