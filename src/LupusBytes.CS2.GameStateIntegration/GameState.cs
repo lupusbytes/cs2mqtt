@@ -7,6 +7,7 @@ internal sealed class GameState(SteamId64 steamId, bool ignoreSpectatedPlayers) 
     private Map? map;
     private Player? player;
     private PlayerState? playerState;
+    private PlayerMatchStats? playerMatchStats;
     private Round? round;
 
     public SteamId64 SteamId => steamId;
@@ -33,6 +34,7 @@ internal sealed class GameState(SteamId64 steamId, bool ignoreSpectatedPlayers) 
             : new PlayerData(player.SteamId64, player.Name, player.Team, player.Activity)
             {
                 State = playerState,
+                MatchStats = playerMatchStats,
             };
         private set
         {
@@ -51,13 +53,19 @@ internal sealed class GameState(SteamId64 steamId, bool ignoreSpectatedPlayers) 
                 PushStateUpdate(PlayerObservers, new StateUpdate<Player>(SteamId, valuePlayer));
             }
 
-            if (playerState == value?.State)
+            if (playerState != value?.State)
+            {
+                playerState = value?.State;
+                PushStateUpdate(PlayerStateObservers, new StateUpdate<PlayerState>(SteamId, playerState));
+            }
+
+            if (playerMatchStats == value?.MatchStats)
             {
                 return;
             }
 
-            playerState = value?.State;
-            PushStateUpdate(PlayerStateObservers, new StateUpdate<PlayerState>(SteamId, playerState));
+            playerMatchStats = value?.MatchStats;
+            PushStateUpdate(PlayerMatchStatsObservers, new StateUpdate<PlayerMatchStats>(SteamId, playerMatchStats));
         }
     }
 

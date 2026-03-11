@@ -16,6 +16,7 @@ public sealed class HomeAssistantDevicePublisher(
     private readonly HashSet<SteamId64> publishedProviderConfigs = [];
     private readonly HashSet<SteamId64> publishedPlayerConfigs = [];
     private readonly HashSet<SteamId64> publishedPlayerStateConfigs = [];
+    private readonly HashSet<SteamId64> publishedPlayerMatchStatsConfigs = [];
     private readonly HashSet<SteamId64> publishedMapConfigs = [];
     private readonly HashSet<SteamId64> publishedRoundConfigs = [];
 
@@ -41,6 +42,11 @@ public sealed class HomeAssistantDevicePublisher(
                 PlayerStateChannelReader,
                 publishedPlayerStateConfigs,
                 device => new PlayerStateDiscoveryMessages(device),
+                stoppingToken),
+            ProcessChannelAsync(
+                PlayerMatchStatsChannelReader,
+                publishedPlayerMatchStatsConfigs,
+                device => new PlayerMatchStatsDiscoveryMessages(device),
                 stoppingToken),
             ProcessChannelAsync(
                 MapChannelReader,

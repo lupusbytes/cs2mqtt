@@ -17,7 +17,14 @@ public record PlayerData(string SteamId64, string Name, Team? Team, Activity Act
     /// <summary>
     /// The state of the current player.
     /// </summary>
-    [JsonPropertyOrder(int.MaxValue)]
+    [JsonPropertyOrder(int.MaxValue - 1)]
     [JsonPropertyName("state")]
     public PlayerState? State { get; init; }
+
+    /// <summary>
+    /// The stats of the current player in this match such as kill, assists, score, deaths and MVPs.
+    /// </summary>
+    [JsonPropertyOrder(int.MaxValue)]
+    [JsonPropertyName("match_stats")]
+    public PlayerMatchStats? MatchStats { get; init; }
 }

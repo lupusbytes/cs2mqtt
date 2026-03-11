@@ -1,4 +1,5 @@
 using System.Threading.Channels;
+using LupusBytes.CS2.GameStateIntegration.Contracts;
 using LupusBytes.CS2.GameStateIntegration.Mqtt.Extensions;
 
 namespace LupusBytes.CS2.GameStateIntegration.Mqtt;
@@ -11,6 +12,7 @@ public sealed class GameStateMqttPublisher(
         => Task.WhenAll(
             ProcessChannelAsync(PlayerChannelReader, stoppingToken),
             ProcessChannelAsync(PlayerStateChannelReader, stoppingToken),
+            ProcessChannelAsync(PlayerMatchStatsChannelReader, stoppingToken),
             ProcessChannelAsync(MapChannelReader, stoppingToken),
             ProcessChannelAsync(RoundChannelReader, stoppingToken));
 

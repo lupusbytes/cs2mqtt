@@ -19,12 +19,14 @@ public abstract class GameStateWithoutProviderObserverService :
     BackgroundService,
     IObserver<StateUpdate<Player>>,
     IObserver<StateUpdate<PlayerState>>,
+    IObserver<StateUpdate<PlayerMatchStats>>,
     IObserver<StateUpdate<Map>>,
     IObserver<StateUpdate<Round>>
 {
     private readonly IDisposable[] subscriptions;
     private readonly Channel<StateUpdate<Player>> playerChannel;
     private readonly Channel<StateUpdate<PlayerState>> playerStateChannel;
+    private readonly Channel<StateUpdate<PlayerMatchStats>> playerMatchStatsChannel;
     private readonly Channel<StateUpdate<Map>> mapChannel;
     private readonly Channel<StateUpdate<Round>> roundChannel;
 
@@ -37,6 +39,7 @@ public abstract class GameStateWithoutProviderObserverService :
 
     protected ChannelReader<StateUpdate<Player>> PlayerChannelReader => playerChannel.Reader;
     protected ChannelReader<StateUpdate<PlayerState>> PlayerStateChannelReader => playerStateChannel.Reader;
+    protected ChannelReader<StateUpdate<PlayerMatchStats>> PlayerMatchStatsChannelReader => playerMatchStatsChannel.Reader;
     protected ChannelReader<StateUpdate<Map>> MapChannelReader => mapChannel.Reader;
     protected ChannelReader<StateUpdate<Round>> RoundChannelReader => roundChannel.Reader;
 
@@ -44,6 +47,7 @@ public abstract class GameStateWithoutProviderObserverService :
     {
         playerChannel = Channel.CreateBounded<StateUpdate<Player>>(ChannelOptions);
         playerStateChannel = Channel.CreateBounded<StateUpdate<PlayerState>>(ChannelOptions);
+        playerMatchStatsChannel = Channel.CreateBounded<StateUpdate<PlayerMatchStats>>(ChannelOptions);
         mapChannel = Channel.CreateBounded<StateUpdate<Map>>(ChannelOptions);
         roundChannel = Channel.CreateBounded<StateUpdate<Round>>(ChannelOptions);
 
@@ -51,6 +55,7 @@ public abstract class GameStateWithoutProviderObserverService :
         [
             gameStateService.Subscribe(this as IObserver<StateUpdate<Player>>),
             gameStateService.Subscribe(this as IObserver<StateUpdate<PlayerState>>),
+            gameStateService.Subscribe(this as IObserver<StateUpdate<PlayerMatchStats>>),
             gameStateService.Subscribe(this as IObserver<StateUpdate<Round>>),
             gameStateService.Subscribe(this as IObserver<StateUpdate<Map>>),
         ];
@@ -58,6 +63,7 @@ public abstract class GameStateWithoutProviderObserverService :
 
     public void OnNext(StateUpdate<Player> value) => playerChannel.Writer.TryWrite(value);
     public void OnNext(StateUpdate<PlayerState> value) => playerStateChannel.Writer.TryWrite(value);
+    public void OnNext(StateUpdate<PlayerMatchStats> value) => playerMatchStatsChannel.Writer.TryWrite(value);
     public void OnNext(StateUpdate<Map> value) => mapChannel.Writer.TryWrite(value);
     public void OnNext(StateUpdate<Round> value) => roundChannel.Writer.TryWrite(value);
 
