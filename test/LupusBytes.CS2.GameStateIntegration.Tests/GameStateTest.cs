@@ -236,6 +236,110 @@ public class GameStateTest
     }
 
     [Theory, AutoNSubstituteData]
+    internal void ProcessEvent_sends_StateUpdate_with_PlayerMatchStats_to_observers_while_IgnoreSpectatedPlayers_false(
+        GameStateData data,
+        IObserver<StateUpdate<PlayerMatchStats>> observer)
+    {
+        // Arrange
+        var sut = new GameState(data.Provider!.SteamId64, ignoreSpectatedPlayers: false);
+        sut.Subscribe(observer);
+
+        // Act
+        sut.ProcessEvent(data);
+
+        // Assert
+        observer.Received(1).OnNext(Arg.Is<StateUpdate<PlayerMatchStats>>(p =>
+            p.SteamId == sut.SteamId &&
+            p.State!.Kills == data.Player!.MatchStats!.Kills &&
+            p.State.Assists == data.Player.MatchStats.Assists &&
+            p.State.Deaths == data.Player.MatchStats.Deaths &&
+            p.State.Mvps == data.Player.MatchStats.Mvps &&
+            p.State.Score == data.Player.MatchStats.Score));
+    }
+
+    [Theory, AutoNSubstituteData]
+    internal void ProcessEvent_sends_StateUpdate_with_null_PlayerMatchStats_to_observers_while_IgnoreSpectatedPlayers_false(
+        GameStateData data,
+        IObserver<StateUpdate<PlayerMatchStats>> observer)
+    {
+        // Arrange
+        var sut = new GameState(data.Provider!.SteamId64, ignoreSpectatedPlayers: false);
+        sut.ProcessEvent(data); // Set initial properties
+        data = data with { Player = data.Player! with { MatchStats = null } };
+        sut.Subscribe(observer);
+
+        // Act
+        sut.ProcessEvent(data);
+
+        // Assert
+        observer.Received(1).OnNext(Arg.Is<StateUpdate<PlayerMatchStats>>(ps =>
+            ps.SteamId == sut.SteamId &&
+            ps.State == null));
+    }
+
+    [Theory, AutoNSubstituteData]
+    internal void ProcessEvent_sends_StateUpdate_with_PlayerMatchStats_to_observers_while_IgnoreSpectatedPlayers_true(
+        GameStateData data,
+        IObserver<StateUpdate<PlayerMatchStats>> observer)
+    {
+        // Arrange
+        var sut = new GameState(data.Provider!.SteamId64, ignoreSpectatedPlayers: true);
+        data = data with { Player = data.Player! with { SteamId64 = data.Provider.SteamId64 } };
+        sut.Subscribe(observer);
+
+        // Act
+        sut.ProcessEvent(data);
+
+        // Assert
+        observer.Received(1).OnNext(Arg.Is<StateUpdate<PlayerMatchStats>>(ps =>
+            ps.SteamId == sut.SteamId &&
+            ps.State!.Kills == data.Player!.MatchStats!.Kills &&
+            ps.State.Assists == data.Player.MatchStats.Assists &&
+            ps.State.Deaths == data.Player.MatchStats.Deaths &&
+            ps.State.Mvps == data.Player.MatchStats.Mvps &&
+            ps.State.Score == data.Player.MatchStats.Score));
+    }
+
+    [Theory, AutoNSubstituteData]
+    internal void ProcessEvent_sends_StateUpdate_with_null_PlayerMatchStats_to_observers_while_IgnoreSpectatedPlayers_true(
+        GameStateData data,
+        IObserver<StateUpdate<PlayerMatchStats>> observer)
+    {
+        // Arrange
+        var sut = new GameState(data.Provider!.SteamId64, ignoreSpectatedPlayers: true);
+        data = data with { Player = data.Player! with { SteamId64 = data.Provider.SteamId64 } };
+        sut.ProcessEvent(data); // Set initial properties with matching SteamId
+        data = data with { Player = data.Player! with { MatchStats = null } };
+        sut.Subscribe(observer);
+
+        // Act
+        sut.ProcessEvent(data);
+
+        // Assert
+        observer.Received(1).OnNext(Arg.Is<StateUpdate<PlayerMatchStats>>(ps =>
+            ps.SteamId == sut.SteamId &&
+            ps.State == null));
+    }
+
+    [Theory, AutoNSubstituteData]
+    internal void ProcessEvent_does_not_send_StateUpdate_with_PlayerMatchStats_to_observers_when_IgnoreSpectatedPlayers_true_and_SteamId_doesnt_match(
+        GameStateData data,
+        SteamId64 differentSteamId,
+        IObserver<StateUpdate<PlayerMatchStats>> observer)
+    {
+        // Arrange
+        var sut = new GameState(data.Provider!.SteamId64, ignoreSpectatedPlayers: true);
+        data = data with { Player = data.Player! with { SteamId64 = differentSteamId.ToString() } };
+        sut.Subscribe(observer);
+
+        // Act
+        sut.ProcessEvent(data);
+
+        // Assert
+        observer.Received(0).OnNext(Arg.Any<StateUpdate<PlayerMatchStats>>());
+    }
+
+    [Theory, AutoNSubstituteData]
     internal void ProcessEvent_sends_StateUpdate_with_Map_to_observers(
         GameStateData data,
         IObserver<StateUpdate<Map>> observer,
@@ -323,6 +427,7 @@ public class GameStateTest
         GameStateData data,
         IObserver<StateUpdate<Player>> playerObserver,
         IObserver<StateUpdate<PlayerState>> playerStateObserver,
+        IObserver<StateUpdate<PlayerMatchStats>> playerMatchStatsObserver,
         IObserver<StateUpdate<Map>> mapObserver,
         IObserver<StateUpdate<Round>> roundObserver,
         GameState sut)
@@ -331,6 +436,7 @@ public class GameStateTest
         sut.ProcessEvent(data); // Set initial properties
         sut.Subscribe(playerObserver);
         sut.Subscribe(playerStateObserver);
+        sut.Subscribe(playerMatchStatsObserver);
         sut.Subscribe(mapObserver);
         sut.Subscribe(roundObserver);
 
@@ -340,6 +446,7 @@ public class GameStateTest
         // Assert
         playerObserver.Received(0).OnNext(Arg.Any<StateUpdate<Player>>());
         playerStateObserver.Received(0).OnNext(Arg.Any<StateUpdate<PlayerState>>());
+        playerMatchStatsObserver.Received(0).OnNext(Arg.Any<StateUpdate<PlayerMatchStats>>());
         mapObserver.Received(0).OnNext(Arg.Any<StateUpdate<Map>>());
         roundObserver.Received(0).OnNext(Arg.Any<StateUpdate<Round>>());
     }
@@ -351,6 +458,7 @@ public class GameStateTest
         GameStateData data2,
         IObserver<StateUpdate<Player>> playerObserver,
         IObserver<StateUpdate<PlayerState>> playerStateObserver,
+        IObserver<StateUpdate<PlayerMatchStats>> playerMatchStatsObserver,
         IObserver<StateUpdate<Map>> mapObserver,
         IObserver<StateUpdate<Round>> roundObserver)
     {
@@ -358,6 +466,7 @@ public class GameStateTest
         var sut = new GameState(steamId, ignoreSpectatedPlayers: false);
         var playerSubscription = sut.Subscribe(playerObserver);
         var playerStateSubscription = sut.Subscribe(playerStateObserver);
+        var playerMatchStatsSubscription = sut.Subscribe(playerMatchStatsObserver);
         var mapSubscription = sut.Subscribe(mapObserver);
         var roundSubscription = sut.Subscribe(roundObserver);
 
@@ -365,6 +474,7 @@ public class GameStateTest
         sut.ProcessEvent(data1);
         playerSubscription.Dispose();
         playerStateSubscription.Dispose();
+        playerMatchStatsSubscription.Dispose();
         mapSubscription.Dispose();
         roundSubscription.Dispose();
         sut.ProcessEvent(data2);
@@ -372,6 +482,7 @@ public class GameStateTest
         // Assert
         playerObserver.Received(1).OnNext(Arg.Any<StateUpdate<Player>>());
         playerStateObserver.Received(1).OnNext(Arg.Any<StateUpdate<PlayerState>>());
+        playerMatchStatsObserver.Received(1).OnNext(Arg.Any<StateUpdate<PlayerMatchStats>>());
         mapObserver.Received(1).OnNext(Arg.Any<StateUpdate<Map>>());
         roundObserver.Received(1).OnNext(Arg.Any<StateUpdate<Round>>());
     }
@@ -381,10 +492,12 @@ public class GameStateTest
         GameStateData data,
         IObserver<StateUpdate<Player>> playerObserver1,
         IObserver<StateUpdate<PlayerState>> playerStateObserver1,
+        IObserver<StateUpdate<PlayerMatchStats>> playerMatchStatsObserver1,
         IObserver<StateUpdate<Map>> mapObserver1,
         IObserver<StateUpdate<Round>> roundObserver1,
         IObserver<StateUpdate<Player>> playerObserver2,
         IObserver<StateUpdate<PlayerState>> playerStateObserver2,
+        IObserver<StateUpdate<PlayerMatchStats>> playerMatchStatsObserver2,
         IObserver<StateUpdate<Map>> mapObserver2,
         IObserver<StateUpdate<Round>> roundObserver2)
     {
@@ -392,11 +505,13 @@ public class GameStateTest
         var sut = new GameState(data.Provider!.SteamId64, ignoreSpectatedPlayers: false);
         sut.Subscribe(playerObserver1);
         sut.Subscribe(playerStateObserver1);
+        sut.Subscribe(playerMatchStatsObserver1);
         sut.Subscribe(mapObserver1);
         sut.Subscribe(roundObserver1);
 
         sut.Subscribe(playerObserver2);
         sut.Subscribe(playerStateObserver2);
+        sut.Subscribe(playerMatchStatsObserver2);
         sut.Subscribe(mapObserver2);
         sut.Subscribe(roundObserver2);
 
@@ -406,11 +521,13 @@ public class GameStateTest
         // Assert
         playerObserver1.Received(1).OnNext(Arg.Any<StateUpdate<Player>>());
         playerStateObserver1.Received(1).OnNext(Arg.Any<StateUpdate<PlayerState>>());
+        playerMatchStatsObserver1.Received(1).OnNext(Arg.Any<StateUpdate<PlayerMatchStats>>());
         mapObserver1.Received(1).OnNext(Arg.Any<StateUpdate<Map>>());
         roundObserver1.Received(1).OnNext(Arg.Any<StateUpdate<Round>>());
 
         playerObserver2.Received(1).OnNext(Arg.Any<StateUpdate<Player>>());
         playerStateObserver2.Received(1).OnNext(Arg.Any<StateUpdate<PlayerState>>());
+        playerMatchStatsObserver2.Received(1).OnNext(Arg.Any<StateUpdate<PlayerMatchStats>>());
         mapObserver2.Received(1).OnNext(Arg.Any<StateUpdate<Map>>());
         roundObserver2.Received(1).OnNext(Arg.Any<StateUpdate<Round>>());
     }

@@ -6,10 +6,11 @@ namespace LupusBytes.CS2.GameStateIntegration.Mqtt;
 /// <summary>
 /// This class sets up <see cref="StateUpdate{TState}"/> subscriptions for
 /// <see cref="Provider"/>,
-/// <see cref="Map"/>,
-/// <see cref="Round"/>,
-/// <see cref="Player"/> and
+/// <see cref="Player"/>,
 /// <see cref="PlayerState"/>,
+/// <see cref="PlayerMatchStats"/>,
+/// <see cref="Map"/> and
+/// <see cref="Round"/>
 /// on the given <see cref="IGameStateService"/> and re-transmits all the incoming events on matching <see cref="Channel"/>s.
 /// Use <see cref="GameStateWithoutProviderObserverService"/> if <see cref="Provider"/> is not needed.
 /// </summary>

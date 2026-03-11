@@ -11,6 +11,7 @@ public sealed class GameStateMqttPublisher(
         => Task.WhenAll(
             ProcessChannelAsync(PlayerChannelReader, stoppingToken),
             ProcessChannelAsync(PlayerStateChannelReader, stoppingToken),
+            ProcessChannelAsync(PlayerMatchStatsChannelReader, stoppingToken),
             ProcessChannelAsync(MapChannelReader, stoppingToken),
             ProcessChannelAsync(RoundChannelReader, stoppingToken));
 

@@ -97,6 +97,13 @@ public class EndpointsTest(TestWebApplicationFactory<Program> factory)
                          "round_kills": 0,
                          "round_killhs": 0,
                          "equip_value": 2900
+                       },
+                       "match_stats": {
+                         "kills": 13,
+                         "assists": 3,
+                         "deaths": 7,
+                         "mvps": 2,
+                         "score": 33
                        }
                      }
                    }
@@ -134,6 +141,12 @@ public class EndpointsTest(TestWebApplicationFactory<Program> factory)
                     RoundKills: 0,
                     RoundKillHeadshots: 0,
                     EquipmentValue: 2900),
+                MatchStats = new PlayerMatchStats(
+                    Kills: 13,
+                    Assists: 3,
+                    Deaths: 7,
+                    Mvps: 2,
+                    Score: 33),
             });
     }
 

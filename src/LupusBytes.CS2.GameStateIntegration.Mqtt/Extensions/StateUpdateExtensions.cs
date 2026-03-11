@@ -13,6 +13,7 @@ public static class StateUpdateExtensions
         KeyValuePair.Create(typeof(Round), "round"),
         KeyValuePair.Create(typeof(Player), "player"),
         KeyValuePair.Create(typeof(PlayerState), "player-state"),
+        KeyValuePair.Create(typeof(PlayerMatchStats), "player-match-stats"),
     }.ToFrozenDictionary();
 
     public static MqttMessage ToMqttMessage<TState>(this StateUpdate<TState> stateUpdate)
