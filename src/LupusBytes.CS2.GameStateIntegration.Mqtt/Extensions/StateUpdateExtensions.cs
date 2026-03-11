@@ -1,3 +1,4 @@
+using System.Collections.Frozen;
 using System.Text.Json;
 using LupusBytes.CS2.GameStateIntegration.Contracts;
 
@@ -5,14 +6,14 @@ namespace LupusBytes.CS2.GameStateIntegration.Mqtt.Extensions;
 
 public static class StateUpdateExtensions
 {
-    private static readonly Dictionary<Type, string> TypeLevel = new()
+    private static readonly FrozenDictionary<Type, string> TypeLevel = new[]
     {
-        { typeof(Provider), "provider" },
-        { typeof(Map), "map" },
-        { typeof(Round), "round" },
-        { typeof(Player), "player" },
-        { typeof(PlayerState), "player-state" },
-    };
+        KeyValuePair.Create(typeof(Provider), "provider"),
+        KeyValuePair.Create(typeof(Map), "map"),
+        KeyValuePair.Create(typeof(Round), "round"),
+        KeyValuePair.Create(typeof(Player), "player"),
+        KeyValuePair.Create(typeof(PlayerState), "player-state"),
+    }.ToFrozenDictionary();
 
     public static MqttMessage ToMqttMessage<TState>(this StateUpdate<TState> stateUpdate)
         where TState : class
