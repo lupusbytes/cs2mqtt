@@ -15,6 +15,6 @@ public interface IGameState :
     SteamId64 SteamId { get; }
     Map? Map { get; }
     Round? Round { get; }
-    PlayerWithState? Player { get; }
+    PlayerData? Player { get; }
     void ProcessEvent(GameStateData data);
 }

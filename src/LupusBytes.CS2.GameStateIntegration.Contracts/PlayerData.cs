@@ -11,7 +11,7 @@ namespace LupusBytes.CS2.GameStateIntegration.Contracts;
 /// <param name="Name">The name of the current player.</param>
 /// <param name="Team">The team of the current player.</param>
 /// <param name="Activity">Status of the provider.</param>
-public record PlayerWithState(string SteamId64, string Name, Team? Team, Activity Activity)
+public record PlayerData(string SteamId64, string Name, Team? Team, Activity Activity)
     : Player(SteamId64, Name, Team, Activity)
 {
     /// <summary>

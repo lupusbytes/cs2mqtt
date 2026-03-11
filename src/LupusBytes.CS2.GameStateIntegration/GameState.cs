@@ -26,11 +26,11 @@ internal sealed class GameState(SteamId64 steamId, bool ignoreSpectatedPlayers) 
         }
     }
 
-    public PlayerWithState? Player
+    public PlayerData? Player
     {
         get => player is null
             ? null
-            : new PlayerWithState(player.SteamId64, player.Name, player.Team, player.Activity)
+            : new PlayerData(player.SteamId64, player.Name, player.Team, player.Activity)
             {
                 State = playerState,
             };

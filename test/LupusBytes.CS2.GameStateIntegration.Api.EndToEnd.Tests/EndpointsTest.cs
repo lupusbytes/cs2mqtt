@@ -119,9 +119,9 @@ public class EndpointsTest(TestWebApplicationFactory<Program> factory)
 
         // Assert
         response.Should().HaveStatusCode(HttpStatusCode.OK);
-        var resource = await response.Content.ReadFromJsonAsync<PlayerWithState>();
+        var resource = await response.Content.ReadFromJsonAsync<PlayerData>();
         resource.Should().Be(
-            new PlayerWithState(SteamId64: "247", "Bassey", Team.T, Activity.Playing)
+            new PlayerData(SteamId64: "247", "Bassey", Team.T, Activity.Playing)
             {
                 State = new PlayerState(
                     Health: 100,

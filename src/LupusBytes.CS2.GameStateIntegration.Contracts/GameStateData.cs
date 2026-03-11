@@ -27,4 +27,4 @@ public record GameStateData(
     [property: JsonPropertyName("provider"), Required] Provider? Provider,
     [property: JsonPropertyName("map")] Map? Map,
     [property: JsonPropertyName("round")] Round? Round,
-    [property: JsonPropertyName("player")] PlayerWithState? Player);
+    [property: JsonPropertyName("player")] PlayerData? Player);
