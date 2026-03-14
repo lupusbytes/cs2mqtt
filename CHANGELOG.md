@@ -1,5 +1,17 @@
 # Changelog
 
+## [1.10.2](https://github.com/lupusbytes/cs2mqtt/compare/v1.10.1...v1.10.2) (2026-03-14)
+
+
+### Upgrades
+
+* **deps:** update dotnet monorepo to 10.0.5 ([e9e5f2d](https://github.com/lupusbytes/cs2mqtt/commit/e9e5f2d7fa61dd40354aa9492f4bd2b472bc9a80))
+
+
+### Performance improvements
+
+* **mqtt:** optimize data structure for message routing ([bbd05e9](https://github.com/lupusbytes/cs2mqtt/commit/bbd05e9e65df8266ae4a31b7e61afb732a08f868))
+
 ## [1.10.1](https://github.com/lupusbytes/cs2mqtt/compare/v1.10.0...v1.10.1) (2026-02-12)
 
 
