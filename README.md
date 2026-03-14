@@ -86,11 +86,12 @@ Once you have located the correct path, create a new file there called **gamesta
  "heartbeat" "5.0"
  "data"
  {
-   "provider"            "1" 
-   "map"                 "1"      
+   "provider"            "1"
+   "map"                 "1"
    "round"               "1"
    "player_id"           "1"
    "player_state"        "1"
+   "player_match_stats"  "1"
  }
 }
 ```
@@ -148,7 +149,7 @@ On graceful shutdown, **cs2mqtt** will publish an offline message to this topic 
 
 ## Device availability
 When a Counter-Strike 2 game instance submits data for the first time, **cs2mqtt** will automatically create an MQTT device for it, as described [above](#counter-strike-as-a-home-assistant-mqtt-device), and publish online messages to `cs2mqtt/{steamId64}/+/status` topics.
-If a player disconnects from a game server, the topics related to `player_state`, `map`, and `round` will immediately be set to `offline`.
+If a player disconnects from a game server, the topics related to `player_state`, `player_match_stats`, `map`, and `round` will immediately be set to `offline`.
 When a player closes their Counter-Strike 2 game, there is no data transmitted, and there's nothing to indicate they've quit. As a result, **cs2mqtt** listens for heartbeats and eventually sets the entire device to an offline availability state once the timeout is reached.
 
 
@@ -178,6 +179,7 @@ It is possible to remove any of the following entries from the data object in **
 - `round`
 - `player_id`
 - `player_state`
+- `player_match_stats`
 
 This will stop **Counter-Strike 2** from sending data about the removed topics.
 

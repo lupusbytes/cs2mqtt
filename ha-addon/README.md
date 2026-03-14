@@ -25,6 +25,7 @@ Once you have located the correct path, create a new file there called **gamesta
    "round"               "1"
    "player_id"           "1"
    "player_state"        "1"
+   "player_match_stats"  "1"
  }
 }
 ```
@@ -44,6 +45,7 @@ It is possible to remove any of the following entries from the data object in **
 -   `round`
 -   `player_id`
 -   `player_state`
+-   `player_match_stats`
 
 This will stop **Counter-Strike 2** from sending data about the removed topics.  
 The only required entry is `provider`.
