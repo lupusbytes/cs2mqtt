@@ -42,6 +42,14 @@ public class StateUpdateExtensionsTest
         StateUpdate<PlayerState> playerStateUpdate)
         => Assert(playerStateUpdate.ToMqttMessage(), expectedTopic, expectedPayload);
 
+    [Theory]
+    [MemberData(nameof(PlayerMatchStatsCases))]
+    public void ToMqttMessage_PlayerMatchStats(
+        string expectedTopic,
+        string expectedPayload,
+        StateUpdate<PlayerMatchStats> playerMatchStatsUpdate)
+        => Assert(playerMatchStatsUpdate.ToMqttMessage(), expectedTopic, expectedPayload);
+
     public static TheoryData<string, string, StateUpdate<Player>> PlayerCases => new()
     {
         {
@@ -101,6 +109,25 @@ public class StateUpdateExtensionsTest
                 44,
                 new TeamMapDetails(23, 0, 0, 0),
                 new TeamMapDetails(20, 3, 0, 0)))
+        },
+    };
+
+    public static TheoryData<string, string, StateUpdate<PlayerMatchStats>> PlayerMatchStatsCases => new()
+    {
+        {
+            $"{MqttConstants.BaseTopic}/{SteamId}/player-match-stats",
+            string.Empty,
+            new StateUpdate<PlayerMatchStats>(SteamId, State: null)
+        },
+        {
+            $"{MqttConstants.BaseTopic}/{SteamId}/player-match-stats",
+            """{"kills":15,"assists":3,"deaths":7,"mvps":2,"score":34}""",
+            new StateUpdate<PlayerMatchStats>(SteamId, new PlayerMatchStats(
+                Kills: 15,
+                Assists: 3,
+                Deaths: 7,
+                Mvps: 2,
+                Score: 34))
         },
     };
 
