@@ -24,7 +24,7 @@ internal sealed class GameStateService : ObservableGameState, IGameStateService
     public Map? GetMap(SteamId64 steamId)
         => gameStateSubscriptions.GetValueOrDefault(steamId)?.GameState.Map;
 
-    public PlayerWithState? GetPlayer(SteamId64 steamId)
+    public PlayerData? GetPlayer(SteamId64 steamId)
         => gameStateSubscriptions.GetValueOrDefault(steamId)?.GameState.Player;
 
     public Round? GetRound(SteamId64 steamId)
@@ -70,6 +70,8 @@ internal sealed class GameStateService : ObservableGameState, IGameStateService
 
     private void OnStateUpdate(StateUpdate<PlayerState> value) => PushStateUpdate(PlayerStateObservers, value);
 
+    private void OnStateUpdate(StateUpdate<PlayerMatchStats> value) => PushStateUpdate(PlayerMatchStatsObservers, value);
+
     private void OnStateUpdate(StateUpdate<Round> value) => PushStateUpdate(RoundObservers, value);
 
     private async Task CleanupDeadSubscriptionsAsync(
@@ -105,6 +107,7 @@ internal sealed class GameStateService : ObservableGameState, IGameStateService
         PushState(RoundObservers, new StateUpdate<Round>(steamId, State: null));
         PushState(PlayerObservers, new StateUpdate<Player>(steamId, State: null));
         PushState(PlayerStateObservers, new StateUpdate<PlayerState>(steamId, State: null));
+        PushState(PlayerMatchStatsObservers, new StateUpdate<PlayerMatchStats>(steamId, State: null));
     }
 
     private sealed class Subscription :
@@ -112,7 +115,8 @@ internal sealed class GameStateService : ObservableGameState, IGameStateService
         IObserver<StateUpdate<Map>>,
         IObserver<StateUpdate<Round>>,
         IObserver<StateUpdate<Player>>,
-        IObserver<StateUpdate<PlayerState>>
+        IObserver<StateUpdate<PlayerState>>,
+        IObserver<StateUpdate<PlayerMatchStats>>
     {
         private readonly GameStateService service;
         private readonly IDisposable[] subscriptions;
@@ -129,7 +133,8 @@ internal sealed class GameStateService : ObservableGameState, IGameStateService
             var roundSub = GameState.Subscribe(this as IObserver<StateUpdate<Round>>);
             var playerSub = GameState.Subscribe(this as IObserver<StateUpdate<Player>>);
             var playerStateSub = GameState.Subscribe(this as IObserver<StateUpdate<PlayerState>>);
-            subscriptions = [providerSub, mapSub, roundSub, playerSub, playerStateSub];
+            var playerMatchStatsSub = GameState.Subscribe(this as IObserver<StateUpdate<PlayerMatchStats>>);
+            subscriptions = [providerSub, mapSub, roundSub, playerSub, playerStateSub, playerMatchStatsSub];
         }
 
         public void OnNext(StateUpdate<Provider> value) => service.OnStateUpdate(value);
@@ -141,6 +146,8 @@ internal sealed class GameStateService : ObservableGameState, IGameStateService
         public void OnNext(StateUpdate<Player> value) => service.OnStateUpdate(value);
 
         public void OnNext(StateUpdate<PlayerState> value) => service.OnStateUpdate(value);
+
+        public void OnNext(StateUpdate<PlayerMatchStats> value) => service.OnStateUpdate(value);
 
         public void OnCompleted()
         {

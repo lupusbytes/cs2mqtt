@@ -7,7 +7,8 @@ public interface IGameState :
     IObservable<StateUpdate<Map>>,
     IObservable<StateUpdate<Round>>,
     IObservable<StateUpdate<Player>>,
-    IObservable<StateUpdate<PlayerState>>
+    IObservable<StateUpdate<PlayerState>>,
+    IObservable<StateUpdate<PlayerMatchStats>>
 {
     /// <summary>
     /// The SteamID of the game state provider.
@@ -15,6 +16,6 @@ public interface IGameState :
     SteamId64 SteamId { get; }
     Map? Map { get; }
     Round? Round { get; }
-    PlayerWithState? Player { get; }
+    PlayerData? Player { get; }
     void ProcessEvent(GameStateData data);
 }

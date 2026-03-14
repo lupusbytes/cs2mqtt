@@ -11,13 +11,20 @@ namespace LupusBytes.CS2.GameStateIntegration.Contracts;
 /// <param name="Name">The name of the current player.</param>
 /// <param name="Team">The team of the current player.</param>
 /// <param name="Activity">Status of the provider.</param>
-public record PlayerWithState(string SteamId64, string Name, Team? Team, Activity Activity)
+public record PlayerData(string SteamId64, string Name, Team? Team, Activity Activity)
     : Player(SteamId64, Name, Team, Activity)
 {
     /// <summary>
     /// The state of the current player.
     /// </summary>
-    [JsonPropertyOrder(int.MaxValue)]
+    [JsonPropertyOrder(int.MaxValue - 1)]
     [JsonPropertyName("state")]
     public PlayerState? State { get; init; }
+
+    /// <summary>
+    /// The stats of the current player in this match such as kill, assists, score, deaths and MVPs.
+    /// </summary>
+    [JsonPropertyOrder(int.MaxValue)]
+    [JsonPropertyName("match_stats")]
+    public PlayerMatchStats? MatchStats { get; init; }
 }
