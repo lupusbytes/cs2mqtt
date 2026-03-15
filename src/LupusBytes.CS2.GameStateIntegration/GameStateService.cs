@@ -51,17 +51,6 @@ internal sealed class GameStateService : ObservableGameState, IGameStateService
         gameStateSubscription.LastActivity = DateTimeOffset.UtcNow;
     }
 
-    private static void PushState<TState>(
-        IEnumerable<IObserver<StateUpdate<TState>>> observers,
-        StateUpdate<TState> stateUpdate)
-        where TState : class
-    {
-        foreach (var observer in observers)
-        {
-            observer.OnNext(stateUpdate);
-        }
-    }
-
     private void OnStateUpdate(StateUpdate<Provider> stateUpdate) => PushStateUpdate(ProviderObservers, stateUpdate);
 
     private void OnStateUpdate(StateUpdate<Map> value) => PushStateUpdate(MapObservers, value);
@@ -102,12 +91,12 @@ internal sealed class GameStateService : ObservableGameState, IGameStateService
         gameStateSubscriptions.Remove(steamId, out _);
 
         // Send null states to all observers for this SteamID to overwrite their last buffer.
-        PushState(ProviderObservers, new StateUpdate<Provider>(steamId, State: null));
-        PushState(MapObservers, new StateUpdate<Map>(steamId, State: null));
-        PushState(RoundObservers, new StateUpdate<Round>(steamId, State: null));
-        PushState(PlayerObservers, new StateUpdate<Player>(steamId, State: null));
-        PushState(PlayerStateObservers, new StateUpdate<PlayerState>(steamId, State: null));
-        PushState(PlayerMatchStatsObservers, new StateUpdate<PlayerMatchStats>(steamId, State: null));
+        PushStateUpdate(ProviderObservers, new StateUpdate<Provider>(steamId, State: null));
+        PushStateUpdate(MapObservers, new StateUpdate<Map>(steamId, State: null));
+        PushStateUpdate(RoundObservers, new StateUpdate<Round>(steamId, State: null));
+        PushStateUpdate(PlayerObservers, new StateUpdate<Player>(steamId, State: null));
+        PushStateUpdate(PlayerStateObservers, new StateUpdate<PlayerState>(steamId, State: null));
+        PushStateUpdate(PlayerMatchStatsObservers, new StateUpdate<PlayerMatchStats>(steamId, State: null));
     }
 
     private sealed class Subscription :
