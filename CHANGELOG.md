@@ -1,5 +1,22 @@
 # Changelog
 
+## [1.11.0](https://github.com/lupusbytes/cs2mqtt/compare/v1.10.1...v1.11.0) (2026-03-15)
+
+
+### New features
+
+* add support for player_match_stats from game state integration ([66d5c4a](https://github.com/lupusbytes/cs2mqtt/commit/66d5c4ad51d2f806f3a2887140b3376b109b536a))
+
+
+### Upgrades
+
+* **deps:** update dotnet monorepo to 10.0.5 ([e9e5f2d](https://github.com/lupusbytes/cs2mqtt/commit/e9e5f2d7fa61dd40354aa9492f4bd2b472bc9a80))
+
+
+### Performance improvements
+
+* **mqtt:** optimize data structure for message routing ([bbd05e9](https://github.com/lupusbytes/cs2mqtt/commit/bbd05e9e65df8266ae4a31b7e61afb732a08f868))
+
 ## [1.10.1](https://github.com/lupusbytes/cs2mqtt/compare/v1.10.0...v1.10.1) (2026-02-12)
 
 
