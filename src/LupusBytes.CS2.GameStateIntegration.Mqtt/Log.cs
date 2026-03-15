@@ -28,7 +28,7 @@ public static partial class Log
     [LoggerMessage(
         EventId = 1_03,
         Level = LogLevel.Error,
-        Message = "Error connecting to MQTT broker {Host}:{Port}. This was attempt {RetryCount} of {TotalRetryCount}. Waiting {waitTime} seconds before retrying")]
+        Message = "Error connecting to MQTT broker {Host}:{Port}. This was attempt {RetryCount} of {TotalRetryCount}. Waiting {WaitTime} seconds before retrying")]
     public static partial void ConnectionToMqttBrokerFailed(this ILogger logger, string host, int port, int retryCount, int totalRetryCount, int waitTime);
 
     [LoggerMessage(
