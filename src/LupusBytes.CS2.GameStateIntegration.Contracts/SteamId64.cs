@@ -47,7 +47,7 @@ public readonly record struct SteamId64
         var y = steamId64 & 1;
 
         // Z is the "account number"
-        var z = (steamId64 >> 1) & 0x7FFFFFF;
+        var z = (steamId64 >> 1) & 0x7FFFFFFF;
 
         return $"STEAM_{x}:{y}:{z}";
     }
