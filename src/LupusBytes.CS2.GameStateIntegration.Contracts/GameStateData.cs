@@ -17,7 +17,7 @@ namespace LupusBytes.CS2.GameStateIntegration.Contracts;
 /// </param>
 /// <param name="Player">
 /// Information about the current or observed player.<br/>
-/// Enabled by including <code>"player_id": "1"</code> and <code>"player_state": "1"</code> in the game state cfg file.
+/// Enabled by including <code>"player_id": "1"</code>, <code>"player_state": "1"</code> and <code>"player_match_stats": "1"</code> in the game state cfg file.
 /// </param>
 /// <param name="Provider">
 /// Required information about the game and steam account that is providing data.<br />
