@@ -5,7 +5,7 @@ namespace LupusBytes.CS2.GameStateIntegration.Contracts;
 
 /// <summary>
 /// Raw data from CS2.
-/// Contains game state seperated into independent blocks.
+/// Contains game state separated into independent blocks.
 /// </summary>
 /// <param name="Map">
 /// Information about the current map.<br/>
