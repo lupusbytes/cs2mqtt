@@ -58,7 +58,7 @@ public enum Mode
     /// </summary>
     Training,
 
-    /// <summary> .
+    /// <summary>
     /// This is an "empty" game mode allowing mapmakers to implement any map-specific custom game mode.
     /// </summary>
     Custom,
