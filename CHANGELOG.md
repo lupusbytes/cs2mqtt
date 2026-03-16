@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.11.1](https://github.com/lupusbytes/cs2mqtt/compare/v1.11.0...v1.11.1) (2026-03-16)
+
+
+### Bug fixes
+
+* **homeassistant:** correct issue causing truncation of device and sensor names for accounts with steamid64 &gt;= 76561198228701184. affected users may need to update their automations. ([0319397](https://github.com/lupusbytes/cs2mqtt/commit/0319397dfe9b8e66f33ba5b8858f078802dcb95e))
+
 ## [1.11.0](https://github.com/lupusbytes/cs2mqtt/compare/v1.10.1...v1.11.0) (2026-03-15)
 
 
