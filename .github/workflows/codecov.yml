@@ -41,7 +41,7 @@ jobs:
       run: dotnet test -c Release -p:CollectCoverage=true -p:CoverletOutput=../ -p:MergeWith=../coverage.json -p:CoverletOutputFormat=\"opencover,json\" -m:1
 
     - name: 📊 Upload coverage reports to Codecov
-      uses: codecov/codecov-action@v5
+      uses: codecov/codecov-action@v6
       with:
         disable_search: true
         files: test/coverage.opencover.xml
