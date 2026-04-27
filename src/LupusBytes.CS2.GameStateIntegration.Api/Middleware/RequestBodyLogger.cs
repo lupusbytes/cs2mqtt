@@ -1,4 +1,3 @@
-using System.Diagnostics.CodeAnalysis;
 using System.Net.Mime;
 using System.Text.Json;
 
@@ -17,11 +16,8 @@ public partial class RequestBodyLogger(RequestDelegate next, ILogger<RequestBody
         await next(httpContext);
     }
 
-    [SuppressMessage("Reliability", "CA2000:Dispose objects before losing scope", Justification = "We don't own httpRequest.Body, so we should not dispose it")]
     private async Task LogRequestBody(HttpRequest httpRequest, CancellationToken cancellationToken)
     {
-        var reader = new StreamReader(httpRequest.Body);
-
         string requestBody;
         if (httpRequest.ContentType?.StartsWith(MediaTypeNames.Application.Json, StringComparison.OrdinalIgnoreCase) == true)
         {
@@ -31,6 +27,7 @@ public partial class RequestBodyLogger(RequestDelegate next, ILogger<RequestBody
         }
         else
         {
+            using var reader = new StreamReader(httpRequest.Body, leaveOpen: true);
             requestBody = await reader.ReadToEndAsync(cancellationToken);
         }
 
