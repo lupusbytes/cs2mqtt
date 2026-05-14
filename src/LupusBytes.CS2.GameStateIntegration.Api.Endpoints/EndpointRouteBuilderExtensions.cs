@@ -70,19 +70,4 @@ public static class EndpointRouteBuilderExtensions
 
             b.RequestDelegate = tokenHandler.InvokeAsync;
         });
-
-    public static void MapIngestionDebugEndpoint(this IEndpointRouteBuilder app)
-        => app.MapPost("/debug", async (HttpRequest request) =>
-        {
-            string body;
-            using (var stream = new StreamReader(request.Body))
-            {
-                body = await stream.ReadToEndAsync();
-            }
-
-            Console.WriteLine("*** EVENT RECEIVED ***");
-            Console.WriteLine(body);
-
-            return TypedResults.NoContent();
-        });
 }
