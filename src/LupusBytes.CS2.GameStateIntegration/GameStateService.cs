@@ -117,13 +117,15 @@ internal sealed class GameStateService : ObservableGameState, IGameStateService
         {
             this.service = service;
             GameState = gameState;
-            var providerSub = GameState.Subscribe(this as IObserver<StateUpdate<Provider>>);
-            var mapSub = GameState.Subscribe(this as IObserver<StateUpdate<Map>>);
-            var roundSub = GameState.Subscribe(this as IObserver<StateUpdate<Round>>);
-            var playerSub = GameState.Subscribe(this as IObserver<StateUpdate<Player>>);
-            var playerStateSub = GameState.Subscribe(this as IObserver<StateUpdate<PlayerState>>);
-            var playerMatchStatsSub = GameState.Subscribe(this as IObserver<StateUpdate<PlayerMatchStats>>);
-            subscriptions = [providerSub, mapSub, roundSub, playerSub, playerStateSub, playerMatchStatsSub];
+            subscriptions =
+            [
+                GameState.Subscribe(this as IObserver<StateUpdate<Provider>>),
+                GameState.Subscribe(this as IObserver<StateUpdate<Map>>),
+                GameState.Subscribe(this as IObserver<StateUpdate<Round>>),
+                GameState.Subscribe(this as IObserver<StateUpdate<Player>>),
+                GameState.Subscribe(this as IObserver<StateUpdate<PlayerState>>),
+                GameState.Subscribe(this as IObserver<StateUpdate<PlayerMatchStats>>),
+            ];
         }
 
         public void OnNext(StateUpdate<Provider> value) => service.OnStateUpdate(value);
