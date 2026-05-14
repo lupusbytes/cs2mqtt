@@ -68,7 +68,7 @@ public static class EndpointRouteBuilderExtensions
                 token,
                 b.ApplicationServices.GetRequiredService<ILogger<TokenAuthorizationMiddleware>>());
 
-            b.RequestDelegate = context => tokenHandler.InvokeAsync(context);
+            b.RequestDelegate = tokenHandler.InvokeAsync;
         });
 
     public static void MapIngestionDebugEndpoint(this IEndpointRouteBuilder app)
