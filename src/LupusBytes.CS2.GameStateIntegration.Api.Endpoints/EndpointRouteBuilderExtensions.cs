@@ -50,6 +50,9 @@ public static class EndpointRouteBuilderExtensions
             return Results.NoContent();
         });
 
+        // Limit request body size to possible CSGSI payloads
+        ingestionEndpoint.WithMetadata(new RequestSizeLimitAttribute(Constants.MaxIngestionRequestBodySizeBytes));
+
         // Check if we should enable token authorization
         var token = app.ServiceProvider.GetService<GameStateOptions>()?.Token;
         if (!string.IsNullOrWhiteSpace(token))

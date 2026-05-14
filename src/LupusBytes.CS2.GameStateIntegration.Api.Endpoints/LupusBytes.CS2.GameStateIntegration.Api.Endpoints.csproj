@@ -11,4 +11,8 @@
       <ProjectReference Include="..\LupusBytes.CS2.GameStateIntegration\LupusBytes.CS2.GameStateIntegration.csproj" />
     </ItemGroup>
 
+    <ItemGroup>
+      <InternalsVisibleTo Include="LupusBytes.CS2.GameStateIntegration.Api.EndToEnd.Tests" />
+    </ItemGroup>
+
 </Project>
