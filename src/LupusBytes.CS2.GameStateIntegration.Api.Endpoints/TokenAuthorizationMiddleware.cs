@@ -1,4 +1,4 @@
-using System.Diagnostics.CodeAnalysis;
+using System.Net;
 using System.Text.Json;
 
 namespace LupusBytes.CS2.GameStateIntegration.Api.Endpoints;
@@ -7,8 +7,7 @@ namespace LupusBytes.CS2.GameStateIntegration.Api.Endpoints;
 /// Validates the <c>auth.token</c> field of incoming Game State Integration payloads
 /// and short-circuits the request with <c>401 Unauthorized</c> when it does not match the expected token.
 /// </summary>
-[SuppressMessage("Performance", "CA1848:Use the LoggerMessage delegates", Justification = "TODO")]
-internal class TokenAuthorizationMiddleware(
+internal partial class TokenAuthorizationMiddleware(
     RequestDelegate next,
     string expectedToken,
     ILogger<TokenAuthorizationMiddleware> logger)
@@ -28,15 +27,17 @@ internal class TokenAuthorizationMiddleware(
         if (actualToken != expectedToken)
         {
             context.Response.StatusCode = StatusCodes.Status401Unauthorized;
-            logger.LogWarning(
-                "Discarding data from {IPAddress} with incorrect auth token '{Token}'",
-                context.Connection.RemoteIpAddress,
-                actualToken);
-
+            LogDiscardedRequest(logger, context.Connection.RemoteIpAddress, actualToken);
             return;
         }
 
         context.Request.Body.Position = 0;
         await next(context);
     }
+
+    [LoggerMessage(
+        EventId = 4_01,
+        Level = LogLevel.Warning,
+        Message = "Discarding data from {IPAddress} with incorrect auth token '{Token}'")]
+    private static partial void LogDiscardedRequest(ILogger logger, IPAddress? ipAddress, string token);
 }
