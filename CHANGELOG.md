@@ -1,5 +1,22 @@
 # Changelog
 
+## [1.12.0](https://github.com/lupusbytes/cs2mqtt/compare/v1.11.2...v1.12.0) (2026-05-15)
+
+
+### New features
+
+* limit ingestion request body size to valid csgsi payloads (64kb). this change hardens the api against denial-of-service attacks. previously, an adversary could send up to 30mb of json, causing the server to spend excessive resources attempting to deserialize an oversized payload that could not have originated from a legitimate client. ([b287ecc](https://github.com/lupusbytes/cs2mqtt/commit/b287eccb8a87b4c4555b4ec19f612b5944a8fde5))
+
+
+### Upgrades
+
+* **deps:** update dotnet monorepo to 10.0.8 ([653a325](https://github.com/lupusbytes/cs2mqtt/commit/653a3251ae1e429ee41c6c6e1483482f77e551f5))
+
+
+### Performance improvements
+
+* use source generated logging in token authorization middleware ([1b1fc27](https://github.com/lupusbytes/cs2mqtt/commit/1b1fc273eb5d27f4bb5d156ce39e6663284c7af2))
+
 ## [1.11.2](https://github.com/lupusbytes/cs2mqtt/compare/v1.11.1...v1.11.2) (2026-04-27)
 
 
