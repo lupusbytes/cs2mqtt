@@ -3,6 +3,10 @@ using System.Text.Json;
 
 namespace LupusBytes.CS2.GameStateIntegration.Api.Endpoints;
 
+/// <summary>
+/// Validates the <c>auth.token</c> field of incoming Game State Integration payloads
+/// and short-circuits the request with <c>401 Unauthorized</c> when it does not match the expected token.
+/// </summary>
 [SuppressMessage("Performance", "CA1848:Use the LoggerMessage delegates", Justification = "TODO")]
 internal class TokenAuthorizationMiddleware(
     RequestDelegate next,
