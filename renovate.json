@@ -9,7 +9,6 @@
   "packageRules": [
     {
       "description": "Use fix commit message prefix for updates in src directory",
-      "packagePatterns": ["*"],
       "matchFileNames": ["src/**"],
       "semanticCommitType": "fix"
     },
