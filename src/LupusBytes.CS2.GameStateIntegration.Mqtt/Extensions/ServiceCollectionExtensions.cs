@@ -37,7 +37,7 @@ public static class ServiceCollectionExtensions
         return services;
     }
 
-    private static IServiceCollection AddMqttOptionsProvider(
+    private static void AddMqttOptionsProvider(
         this IServiceCollection services,
         IConfiguration configuration)
     {
@@ -67,7 +67,5 @@ public static class ServiceCollectionExtensions
         {
             services.AddSingleton<IMqttOptionsProvider>(_ => new ConfigOptionsProvider(configuration));
         }
-
-        return services;
     }
 }
