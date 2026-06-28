@@ -18,7 +18,7 @@ public class HealthCheckTest(TestWebApplicationFactory<Program> factory)
         var response = await httpClient.GetAsync("/alive");
 
         // Assert
-        response.Should().HaveStatusCode(HttpStatusCode.OK);
+        response.StatusCode.Should().Be(HttpStatusCode.OK);
 
         var body = await response.Content.ReadAsStringAsync();
         body.Should().Be("Healthy");
@@ -34,7 +34,7 @@ public class HealthCheckTest(TestWebApplicationFactory<Program> factory)
         var response = await httpClient.GetAsync("/health");
 
         // Assert
-        response.Should().HaveStatusCode(HttpStatusCode.OK);
+        response.StatusCode.Should().Be(HttpStatusCode.OK);
 
         var body = await response.Content.ReadAsStringAsync();
         body.Should().Be("Healthy");
@@ -50,7 +50,7 @@ public class HealthCheckTest(TestWebApplicationFactory<Program> factory)
         var response = await httpClient.GetAsync("/health");
 
         // Assert
-        response.Should().HaveStatusCode(HttpStatusCode.ServiceUnavailable);
+        response.StatusCode.Should().Be(HttpStatusCode.ServiceUnavailable);
 
         var body = await response.Content.ReadAsStringAsync();
         body.Should().Be("Unhealthy");

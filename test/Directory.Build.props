@@ -13,12 +13,12 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Atc.Test" Version="2.0.17" />
+    <PackageReference Include="Atc.Test" Version="3.0.0" />
     <PackageReference Include="AutoFixture" Version="4.18.1" />
     <PackageReference Include="AutoFixture.AutoNSubstitute" Version="4.18.1" />
     <PackageReference Include="AutoFixture.Xunit3" Version="4.19.0" />
+    <PackageReference Include="AwesomeAssertions" Version="9.4.0" />
     <PackageReference Include="coverlet.msbuild" Version="10.0.1" />
-    <PackageReference Include="FluentAssertions" Version="7.2.2" />
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="18.7.0" />
     <PackageReference Include="NSubstitute" Version="5.3.0" />
     <PackageReference Include="xunit.v3" Version="3.2.2" />
@@ -30,6 +30,11 @@
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
       <PrivateAssets>all</PrivateAssets>
     </PackageReference>
+  </ItemGroup>
+
+  <!-- Shared code analyzers used for all tests-->
+  <ItemGroup Label="Code Analyzers">
+    <PackageReference Include="AwesomeAssertions.Analyzers" Version="9.0.8" PrivateAssets="All" />
     <PackageReference Include="NSubstitute.Analyzers.CSharp" Version="1.0.17" PrivateAssets="All" />
   </ItemGroup>
 
@@ -37,7 +42,7 @@
     <Using Include="Atc.Test" />
     <Using Include="AutoFixture" />
     <Using Include="AutoFixture.Xunit3" />
-    <Using Include="FluentAssertions" />
+    <Using Include="AwesomeAssertions" />
     <Using Include="NSubstitute" />
     <Using Include="Xunit" />
   </ItemGroup>

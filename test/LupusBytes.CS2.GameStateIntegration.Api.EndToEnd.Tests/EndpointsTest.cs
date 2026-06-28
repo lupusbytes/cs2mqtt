@@ -22,7 +22,7 @@ public class EndpointsTest(TestWebApplicationFactory<Program> factory)
         var response = await httpClient.GetAsync("/76561197981496355/player");
 
         // Assert
-        response.Should().HaveStatusCode(HttpStatusCode.NotFound);
+        response.StatusCode.Should().Be(HttpStatusCode.NotFound);
     }
 
     [Fact, Priority(2)]
@@ -32,7 +32,7 @@ public class EndpointsTest(TestWebApplicationFactory<Program> factory)
         var response = await httpClient.GetAsync("/76561197981496355/map");
 
         // Assert
-        response.Should().HaveStatusCode(HttpStatusCode.NotFound);
+        response.StatusCode.Should().Be(HttpStatusCode.NotFound);
     }
 
     [Fact, Priority(3)]
@@ -42,7 +42,7 @@ public class EndpointsTest(TestWebApplicationFactory<Program> factory)
         var response = await httpClient.GetAsync("/76561197981496355/round");
 
         // Assert
-        response.Should().HaveStatusCode(HttpStatusCode.NotFound);
+        response.StatusCode.Should().Be(HttpStatusCode.NotFound);
     }
 
     [Fact, Priority(4)]
@@ -125,7 +125,7 @@ public class EndpointsTest(TestWebApplicationFactory<Program> factory)
         var response = await httpClient.GetAsync("/76561197981496355/player");
 
         // Assert
-        response.Should().HaveStatusCode(HttpStatusCode.OK);
+        response.StatusCode.Should().Be(HttpStatusCode.OK);
         var resource = await response.Content.ReadFromJsonAsync<PlayerData>();
         resource.Should().Be(
             new PlayerData(SteamId64: "247", "Bassey", Team.T, Activity.Playing)
@@ -157,7 +157,7 @@ public class EndpointsTest(TestWebApplicationFactory<Program> factory)
         var response = await httpClient.GetAsync("/76561197981496355/map");
 
         // Assert
-        response.Should().HaveStatusCode(HttpStatusCode.OK);
+        response.StatusCode.Should().Be(HttpStatusCode.OK);
         var resource = await response.Content.ReadFromJsonAsync<Map>();
         resource.Should().Be(
             new Map(
@@ -176,7 +176,7 @@ public class EndpointsTest(TestWebApplicationFactory<Program> factory)
         var response = await httpClient.GetAsync("/76561197981496355/round");
 
         // Assert
-        response.Should().HaveStatusCode(HttpStatusCode.OK);
+        response.StatusCode.Should().Be(HttpStatusCode.OK);
         var resource = await response.Content.ReadFromJsonAsync<Round>();
         resource.Should().Be(new Round(RoundPhase.Live, WinTeam: null, Bomb: null));
     }
