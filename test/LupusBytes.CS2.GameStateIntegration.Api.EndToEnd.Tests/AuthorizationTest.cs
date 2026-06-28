@@ -21,7 +21,7 @@ public class AuthorizationTest(AuthorizationTestWebApplicationFactory factory)
     private readonly HttpClient httpClient = factory.CreateClient();
 
     [Fact]
-    public async Task Post_with_valid_token_returns_successful()
+    public async Task Post_with_valid_token_returns_204()
     {
         // Arrange
         const string json = $$"""
@@ -39,7 +39,7 @@ public class AuthorizationTest(AuthorizationTestWebApplicationFactory factory)
         var response = await httpClient.PostAsync("/", payload);
 
         // Assert
-        response.Should().BeSuccessful();
+        response.StatusCode.Should().Be(HttpStatusCode.NoContent);
     }
 
     [Fact]
@@ -61,7 +61,7 @@ public class AuthorizationTest(AuthorizationTestWebApplicationFactory factory)
         var response = await httpClient.PostAsync("/", payload);
 
         // Assert
-        response.Should().HaveStatusCode(HttpStatusCode.Unauthorized);
+        response.StatusCode.Should().Be(HttpStatusCode.Unauthorized);
     }
 
     [Fact]
@@ -76,6 +76,6 @@ public class AuthorizationTest(AuthorizationTestWebApplicationFactory factory)
         var response = await httpClient.PostAsync("/", payload);
 
         // Assert
-        response.Should().HaveStatusCode(HttpStatusCode.Unauthorized);
+        response.StatusCode.Should().Be(HttpStatusCode.Unauthorized);
     }
 }
