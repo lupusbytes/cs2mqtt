@@ -1,5 +1,13 @@
 # Changelog
 
+## [1.12.1](https://github.com/lupusbytes/cs2mqtt/compare/v1.12.0...v1.12.1) (2026-07-14)
+
+
+### Upgrades
+
+* **deps:** update dotnet monorepo to 10.0.10 ([6c096d1](https://github.com/lupusbytes/cs2mqtt/commit/6c096d1ab95db96c4cc6a2da33a38f04cf9f83e7))
+* **deps:** update mqttnet to 5.2.0.1603 ([0c47a9f](https://github.com/lupusbytes/cs2mqtt/commit/0c47a9fe28073884bc20400fb829702c1e39434a))
+
 ## [1.12.0](https://github.com/lupusbytes/cs2mqtt/compare/v1.11.2...v1.12.0) (2026-05-15)
 
 
