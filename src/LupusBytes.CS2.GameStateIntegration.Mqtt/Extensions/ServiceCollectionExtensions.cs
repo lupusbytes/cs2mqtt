@@ -1,3 +1,4 @@
+using System.Diagnostics.CodeAnalysis;
 using System.Net.Http.Headers;
 using LupusBytes.CS2.GameStateIntegration.Mqtt.HomeAssistant;
 using Microsoft.Extensions.Configuration;
@@ -37,6 +38,7 @@ public static class ServiceCollectionExtensions
         return services;
     }
 
+    [SuppressMessage("Minor Vulnerability", "S5332:Clear-text protocols should not be used", Justification = "Supervisor REST API is not listening on HTTPS")]
     private static void AddMqttOptionsProvider(
         this IServiceCollection services,
         IConfiguration configuration)
