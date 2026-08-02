@@ -56,7 +56,7 @@ public class GameStateTest
         // Assert
         observer.Received(1).OnNext(Arg.Is<StateUpdate<Player>>(p =>
             p.SteamId == sut.SteamId &&
-            p.State!.SteamId64 == data.Player!.SteamId64 &&
+            p.State!.SteamId64 == data.Player.SteamId64 &&
             p.State.Name == data.Player.Name &&
             p.State.Team == data.Player.Team &&
             p.State.Activity == data.Player.Activity));
@@ -184,7 +184,7 @@ public class GameStateTest
         // Assert
         observer.Received(1).OnNext(Arg.Is<StateUpdate<PlayerState>>(ps =>
             ps.SteamId == sut.SteamId &&
-            ps.State!.Health == data.Player!.State!.Health &&
+            ps.State!.Health == data.Player.State!.Health &&
             ps.State.Armor == data.Player.State.Armor &&
             ps.State.Helmet == data.Player.State.Helmet &&
             ps.State.Flashed == data.Player.State.Flashed &&
@@ -205,7 +205,7 @@ public class GameStateTest
         var sut = new GameState(data.Provider!.SteamId64, ignoreSpectatedPlayers: true);
         data = data with { Player = data.Player! with { SteamId64 = data.Provider.SteamId64 } };
         sut.ProcessEvent(data); // Set initial properties with matching SteamId
-        data = data with { Player = data.Player! with { State = null } };
+        data = data with { Player = data.Player with { State = null } };
         sut.Subscribe(observer);
 
         // Act
@@ -293,7 +293,7 @@ public class GameStateTest
         // Assert
         observer.Received(1).OnNext(Arg.Is<StateUpdate<PlayerMatchStats>>(ps =>
             ps.SteamId == sut.SteamId &&
-            ps.State!.Kills == data.Player!.MatchStats!.Kills &&
+            ps.State!.Kills == data.Player.MatchStats!.Kills &&
             ps.State.Assists == data.Player.MatchStats.Assists &&
             ps.State.Deaths == data.Player.MatchStats.Deaths &&
             ps.State.Mvps == data.Player.MatchStats.Mvps &&
@@ -309,7 +309,7 @@ public class GameStateTest
         var sut = new GameState(data.Provider!.SteamId64, ignoreSpectatedPlayers: true);
         data = data with { Player = data.Player! with { SteamId64 = data.Provider.SteamId64 } };
         sut.ProcessEvent(data); // Set initial properties with matching SteamId
-        data = data with { Player = data.Player! with { MatchStats = null } };
+        data = data with { Player = data.Player with { MatchStats = null } };
         sut.Subscribe(observer);
 
         // Act
