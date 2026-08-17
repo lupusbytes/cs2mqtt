@@ -36,7 +36,7 @@ public class AuthorizationTest(AuthorizationTestWebApplicationFactory factory)
         using var payload = new StringContent(json, Encoding.UTF8, "application/json");
 
         // Act
-        var response = await httpClient.PostAsync("/", payload);
+        var response = await httpClient.PostAsync("/", payload, TestContext.Current.CancellationToken);
 
         // Assert
         response.StatusCode.Should().Be(HttpStatusCode.NoContent);
@@ -58,7 +58,7 @@ public class AuthorizationTest(AuthorizationTestWebApplicationFactory factory)
         using var payload = new StringContent(json, Encoding.UTF8, "application/json");
 
         // Act
-        var response = await httpClient.PostAsync("/", payload);
+        var response = await httpClient.PostAsync("/", payload, TestContext.Current.CancellationToken);
 
         // Assert
         response.StatusCode.Should().Be(HttpStatusCode.Unauthorized);
@@ -73,7 +73,7 @@ public class AuthorizationTest(AuthorizationTestWebApplicationFactory factory)
         using var payload = new StringContent(json, Encoding.UTF8, "application/json");
 
         // Act
-        var response = await httpClient.PostAsync("/", payload);
+        var response = await httpClient.PostAsync("/", payload, TestContext.Current.CancellationToken);
 
         // Assert
         response.StatusCode.Should().Be(HttpStatusCode.Unauthorized);

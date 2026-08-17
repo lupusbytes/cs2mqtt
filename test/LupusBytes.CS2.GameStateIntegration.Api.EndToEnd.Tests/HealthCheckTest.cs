@@ -15,12 +15,12 @@ public class HealthCheckTest(TestWebApplicationFactory<Program> factory)
         factory.MqttClient.IsConnected.Returns(false);
 
         // Act
-        var response = await httpClient.GetAsync("/alive");
+        var response = await httpClient.GetAsync("/alive", TestContext.Current.CancellationToken);
 
         // Assert
         response.StatusCode.Should().Be(HttpStatusCode.OK);
 
-        var body = await response.Content.ReadAsStringAsync();
+        var body = await response.Content.ReadAsStringAsync(TestContext.Current.CancellationToken);
         body.Should().Be("Healthy");
     }
 
@@ -31,12 +31,12 @@ public class HealthCheckTest(TestWebApplicationFactory<Program> factory)
         factory.MqttClient.IsConnected.Returns(true);
 
         // Act
-        var response = await httpClient.GetAsync("/health");
+        var response = await httpClient.GetAsync("/health", TestContext.Current.CancellationToken);
 
         // Assert
         response.StatusCode.Should().Be(HttpStatusCode.OK);
 
-        var body = await response.Content.ReadAsStringAsync();
+        var body = await response.Content.ReadAsStringAsync(TestContext.Current.CancellationToken);
         body.Should().Be("Healthy");
     }
 
@@ -47,12 +47,12 @@ public class HealthCheckTest(TestWebApplicationFactory<Program> factory)
         factory.MqttClient.IsConnected.Returns(false);
 
         // Act
-        var response = await httpClient.GetAsync("/health");
+        var response = await httpClient.GetAsync("/health", TestContext.Current.CancellationToken);
 
         // Assert
         response.StatusCode.Should().Be(HttpStatusCode.ServiceUnavailable);
 
-        var body = await response.Content.ReadAsStringAsync();
+        var body = await response.Content.ReadAsStringAsync(TestContext.Current.CancellationToken);
         body.Should().Be("Unhealthy");
     }
 }

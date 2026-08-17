@@ -14,7 +14,7 @@ public class MqttHealthCheckTest
         mqttClient.IsConnected.Returns(true);
 
         // Act
-        var result = await sut.CheckHealthAsync(context, CancellationToken.None);
+        var result = await sut.CheckHealthAsync(context, TestContext.Current.CancellationToken);
 
         // Assert
         result.Status.Should().Be(HealthStatus.Healthy);
@@ -30,7 +30,7 @@ public class MqttHealthCheckTest
         mqttClient.IsConnected.Returns(false);
 
         // Act
-        var result = await sut.CheckHealthAsync(context, CancellationToken.None);
+        var result = await sut.CheckHealthAsync(context, TestContext.Current.CancellationToken);
 
         // Assert
         result.Status.Should().Be(context.Registration.FailureStatus);

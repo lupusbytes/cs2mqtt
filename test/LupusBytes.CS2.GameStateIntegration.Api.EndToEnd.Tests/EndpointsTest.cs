@@ -19,7 +19,7 @@ public class EndpointsTest(TestWebApplicationFactory<Program> factory)
     public async Task Get_player_returns_404()
     {
         // Act
-        var response = await httpClient.GetAsync("/76561197981496355/player");
+        var response = await httpClient.GetAsync("/76561197981496355/player", TestContext.Current.CancellationToken);
 
         // Assert
         response.StatusCode.Should().Be(HttpStatusCode.NotFound);
@@ -29,7 +29,7 @@ public class EndpointsTest(TestWebApplicationFactory<Program> factory)
     public async Task Get_map_returns_404()
     {
         // Act
-        var response = await httpClient.GetAsync("/76561197981496355/map");
+        var response = await httpClient.GetAsync("/76561197981496355/map", TestContext.Current.CancellationToken);
 
         // Assert
         response.StatusCode.Should().Be(HttpStatusCode.NotFound);
@@ -39,7 +39,7 @@ public class EndpointsTest(TestWebApplicationFactory<Program> factory)
     public async Task Get_round_returns_404()
     {
         // Act
-        var response = await httpClient.GetAsync("/76561197981496355/round");
+        var response = await httpClient.GetAsync("/76561197981496355/round", TestContext.Current.CancellationToken);
 
         // Assert
         response.StatusCode.Should().Be(HttpStatusCode.NotFound);
@@ -112,7 +112,7 @@ public class EndpointsTest(TestWebApplicationFactory<Program> factory)
         using var payload = new StringContent(json, Encoding.UTF8, "application/json");
 
         // Act
-        var response = await httpClient.PostAsync("/", payload);
+        var response = await httpClient.PostAsync("/", payload, TestContext.Current.CancellationToken);
 
         // Assert
         response.StatusCode.Should().Be(HttpStatusCode.NoContent);
@@ -122,11 +122,11 @@ public class EndpointsTest(TestWebApplicationFactory<Program> factory)
     public async Task Get_player_returns_200_with_player()
     {
         // Act
-        var response = await httpClient.GetAsync("/76561197981496355/player");
+        var response = await httpClient.GetAsync("/76561197981496355/player", TestContext.Current.CancellationToken);
 
         // Assert
         response.StatusCode.Should().Be(HttpStatusCode.OK);
-        var resource = await response.Content.ReadFromJsonAsync<PlayerData>();
+        var resource = await response.Content.ReadFromJsonAsync<PlayerData>(TestContext.Current.CancellationToken);
         resource.Should().Be(
             new PlayerData(SteamId64: "247", "Bassey", Team.T, Activity.Playing)
             {
@@ -154,11 +154,11 @@ public class EndpointsTest(TestWebApplicationFactory<Program> factory)
     public async Task Get_map_returns_200_with_map()
     {
         // Act
-        var response = await httpClient.GetAsync("/76561197981496355/map");
+        var response = await httpClient.GetAsync("/76561197981496355/map", TestContext.Current.CancellationToken);
 
         // Assert
         response.StatusCode.Should().Be(HttpStatusCode.OK);
-        var resource = await response.Content.ReadFromJsonAsync<Map>();
+        var resource = await response.Content.ReadFromJsonAsync<Map>(TestContext.Current.CancellationToken);
         resource.Should().Be(
             new Map(
                 Mode.Competitive,
@@ -173,11 +173,11 @@ public class EndpointsTest(TestWebApplicationFactory<Program> factory)
     public async Task Get_round_returns_200_with_round()
     {
         // Act
-        var response = await httpClient.GetAsync("/76561197981496355/round");
+        var response = await httpClient.GetAsync("/76561197981496355/round", TestContext.Current.CancellationToken);
 
         // Assert
         response.StatusCode.Should().Be(HttpStatusCode.OK);
-        var resource = await response.Content.ReadFromJsonAsync<Round>();
+        var resource = await response.Content.ReadFromJsonAsync<Round>(TestContext.Current.CancellationToken);
         resource.Should().Be(new Round(RoundPhase.Live, WinTeam: null, Bomb: null));
     }
 }

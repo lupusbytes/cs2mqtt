@@ -47,7 +47,7 @@ public class MqttClientTest
             onFatalConnectionError: () => Task.CompletedTask,
             NullLogger<MqttClient>.Instance);
 
-        await sut.StartAsync(CancellationToken.None);
+        await sut.StartAsync(TestContext.Current.CancellationToken);
 
         // Act
         await testServer.DisconnectClientAsync(options.ClientId); // Kicks the sut
@@ -89,10 +89,10 @@ public class MqttClientTest
             onFatalConnectionError: () => Task.CompletedTask,
             NullLogger<MqttClient>.Instance);
 
-        await sut.StartAsync(CancellationToken.None);
+        await sut.StartAsync(TestContext.Current.CancellationToken);
 
         // Act
-        await sut.PublishAsync(new MqttMessage(topic, payload), CancellationToken.None);
+        await sut.PublishAsync(new MqttMessage(topic, payload), TestContext.Current.CancellationToken);
 
         // Assert
         await AssertPayload(payload, tcs);
@@ -131,7 +131,7 @@ public class MqttClientTest
             NullLogger<MqttClient>.Instance);
 
         // Act
-        await sut.StartAsync(CancellationToken.None);
+        await sut.StartAsync(TestContext.Current.CancellationToken);
 
         // Assert
         sut.IsConnected.Should().BeTrue();
@@ -140,16 +140,17 @@ public class MqttClientTest
 
     private static async Task AssertPayload(string expected, TaskCompletionSource<string> tcs)
     {
-        // Await which task completes first. Our task completion source or a timeout
-        var completedTask = await Task.WhenAny(tcs.Task, Task.Delay(TimeoutMilliseconds));
+        // Await the message, giving up once the timeout elapses or the test is cancelled.
+        var receiveMessage = () => tcs.Task.WaitAsync(
+            TimeSpan.FromMilliseconds(TimeoutMilliseconds),
+            TestContext.Current.CancellationToken);
 
-        // The start task completion source should have finished first.
-        completedTask.Should().Be(
-            tcs.Task,
-            $"Expected to receive a message within the timeout period ({TimeoutMilliseconds} miliseconds)");
+        var payload = await receiveMessage
+            .Should()
+            .NotThrowAsync($"a message should be received within {TimeoutMilliseconds} milliseconds");
 
         // Finally assert that the received message is equal to the expected message.
-        (await tcs.Task).Should().Be(expected);
+        payload.Which.Should().Be(expected);
     }
 
     private static async Task<IMqttNetClient> CreateTestClientAsync(MqttClientFactory factory)
@@ -159,7 +160,7 @@ public class MqttClientTest
             .WithTcpServer(ListenAddress, ListenPort)
             .Build();
 
-        await client.ConnectAsync(clientOptions);
+        await client.ConnectAsync(clientOptions, TestContext.Current.CancellationToken);
         return client;
     }
 
@@ -210,6 +211,6 @@ public class MqttClientTest
             return Task.CompletedTask;
         };
 
-        return client.SubscribeAsync(subscribeOptions);
+        return client.SubscribeAsync(subscribeOptions, TestContext.Current.CancellationToken);
     }
 }

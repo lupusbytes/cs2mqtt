@@ -14,10 +14,11 @@ public class MqttClientTest
     public async Task PublishAsync_invokes_MQTTnet_PublishAsync(
         [Frozen] IMqttNetClient mqttNetClient,
         MqttMessage message,
-        CancellationToken cancellationToken,
         MqttClient sut)
     {
         // Arrange
+        var cancellationToken = TestContext.Current.CancellationToken;
+
         mqttNetClient.IsConnected.Returns(true);
 
         // Act
@@ -39,10 +40,11 @@ public class MqttClientTest
     public Task StartAsync_throws_on_invalid_MQTT_protocol(
         string protocolVersion,
         [Frozen] IMqttOptionsProvider optionsProvider,
-        CancellationToken cancellationToken,
         MqttClient sut)
     {
         // Arrange
+        var cancellationToken = TestContext.Current.CancellationToken;
+
         optionsProvider.GetOptionsAsync(cancellationToken).Returns(new MqttOptions
         {
             ProtocolVersion = protocolVersion,
@@ -58,10 +60,11 @@ public class MqttClientTest
     public async Task StartAsync_invokes_MQTTnet_ConnectAsync(
         [Frozen] IMqttNetClient mqttNetClient,
         [Frozen] MqttOptions options,
-        CancellationToken cancellationToken,
         MqttClient sut)
     {
         // Arrange
+        var cancellationToken = TestContext.Current.CancellationToken;
+
         ArrangeConnectResultCode(mqttNetClient, MqttClientConnectResultCode.Success);
 
         // Act
@@ -93,7 +96,7 @@ public class MqttClientTest
         options.RetryDelayProvider = _ => TimeSpan.Zero;
 
         // Act
-        await sut.StartAsync(CancellationToken.None);
+        await sut.StartAsync(TestContext.Current.CancellationToken);
 
         // Assert
         await mqttNetClient.Received(options.ConnectRetryCount + 1).ConnectAsync(
@@ -116,7 +119,7 @@ public class MqttClientTest
         options.ConnectRetryCount = 3;
 
         // Act
-        await sut.StartAsync(CancellationToken.None);
+        await sut.StartAsync(TestContext.Current.CancellationToken);
 
         // Assert
         await mqttNetClient.Received(options.ConnectRetryCount + 1).ConnectAsync(
@@ -129,25 +132,32 @@ public class MqttClientTest
     [Theory, AutoNSubstituteData]
     public async Task StopAsync_invokes_MQTTnet_DisconnectAsync(
         [Frozen] IMqttNetClient mqttNetClient,
-        CancellationToken cancellationToken,
         MqttClient sut)
     {
+        // Arrange
+        var cancellationToken = TestContext.Current.CancellationToken;
+
         // Act
         await sut.StopAsync(cancellationToken);
 
         // Assert
-        await mqttNetClient.Received(1).DisconnectAsync(Arg.Any<MqttClientDisconnectOptions>(), Arg.Is(cancellationToken));
+        await mqttNetClient.Received(1).DisconnectAsync(
+            Arg.Any<MqttClientDisconnectOptions>(),
+            Arg.Is(cancellationToken));
     }
 
     [Theory, AutoNSubstituteData]
     public async Task StopAsync_does_not_trigger_reconnect_attempt(
         [Frozen] IMqttNetClient mqttNetClient,
-        CancellationToken cancellationToken,
         MqttClient sut)
     {
         // Arrange
+        var cancellationToken = TestContext.Current.CancellationToken;
+
         ArrangeConnectResultCode(mqttNetClient, MqttClientConnectResultCode.Success);
+
         await sut.StartAsync(cancellationToken);
+
         mqttNetClient.IsConnected.Returns(false);
 
         // Act
@@ -162,7 +172,7 @@ public class MqttClientTest
                 new SocketException()));
 
         // Assert that the MQTTnet client only received 1 connect call - when it was starting.
-        await mqttNetClient.Received(1).ConnectAsync(Arg.Any<MqttClientOptions>(), Arg.Any<CancellationToken>());
+        await mqttNetClient.Received(1).ConnectAsync(Arg.Any<MqttClientOptions>(), Arg.Is(cancellationToken));
     }
 
     [Theory, AutoNSubstituteData]
@@ -184,20 +194,23 @@ public class MqttClientTest
         MqttClient sut)
     {
         // Arrange
+        var cancellationToken = TestContext.Current.CancellationToken;
+
         ArrangeConnectResultCode(mqttNetClient, MqttClientConnectResultCode.Success);
-        await sut.StartAsync(CancellationToken.None);
+
+        await sut.StartAsync(cancellationToken);
 
         mqttNetClient.IsConnected.Returns(false);
         foreach (var message in messages)
         {
             // Publish messages
-            await sut.PublishAsync(message, CancellationToken.None);
+            await sut.PublishAsync(message, cancellationToken);
         }
 
         foreach (var message in messages.Select(message => message with { Payload = "Hello World" }))
         {
             // Publish messages on the same topics, but with Hello World as payload
-            await sut.PublishAsync(message, CancellationToken.None);
+            await sut.PublishAsync(message, cancellationToken);
         }
 
         // Act
@@ -225,7 +238,7 @@ public class MqttClientTest
         mqttOptions.RetryDelayProvider = _ => TimeSpan.Zero;
 
         ArrangeConnectResultCode(mqttNetClient, MqttClientConnectResultCode.Success);
-        await sut.StartAsync(CancellationToken.None);
+        await sut.StartAsync(TestContext.Current.CancellationToken);
 
         mqttNetClient.IsConnected.Returns(false);
         mqttNetClient
@@ -275,7 +288,7 @@ public class MqttClientTest
         mqttNetClient.IsConnected.Returns(false);
 
         ArrangeConnectResultCode(mqttNetClient, resultCodes);
-        await sut.StartAsync(CancellationToken.None);
+        await sut.StartAsync(TestContext.Current.CancellationToken);
 
         // Act
         mqttNetClient.DisconnectedAsync += Raise.Event<Func<MqttClientDisconnectedEventArgs, Task>>(
@@ -303,7 +316,7 @@ public class MqttClientTest
     {
         // Arrange
         ArrangeConnectResultCode(mqttNetClient, MqttClientConnectResultCode.Success);
-        await sut.StartAsync(CancellationToken.None);
+        await sut.StartAsync(TestContext.Current.CancellationToken);
 
         mqttOptions.ReconnectRetryCount = 0;
         mqttOptions.RetryDelayProvider = _ => TimeSpan.Zero;
