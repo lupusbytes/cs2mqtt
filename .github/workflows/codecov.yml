@@ -10,6 +10,8 @@ on:
       - '!src/**/*.cs'
       - '!test/**/*.csproj'
       - '!test/**/*.cs'
+      - '!Directory.Build.props'
+      - '!test/Directory.Build.props'
     branches:
       - '*'
   pull_request:
@@ -20,6 +22,8 @@ on:
       - '!src/**/*.cs'
       - '!test/**/*.csproj'
       - '!test/**/*.cs'
+      - '!Directory.Build.props'
+      - '!test/Directory.Build.props'
     branches:
       - '*'
 
