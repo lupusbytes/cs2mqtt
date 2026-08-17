@@ -118,7 +118,7 @@ public class EndpointsTest(TestWebApplicationFactory<Program> factory)
         response.StatusCode.Should().Be(HttpStatusCode.NoContent);
     }
 
-    [Fact, Priority(6)]
+    [Fact, Priority(5)]
     public async Task Get_player_returns_200_with_player()
     {
         // Act
