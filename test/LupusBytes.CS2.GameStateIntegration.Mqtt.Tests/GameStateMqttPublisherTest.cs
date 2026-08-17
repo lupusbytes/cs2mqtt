@@ -15,14 +15,13 @@ public class GameStateMqttPublisherTest
         // Arrange
         var topic = $"{MqttConstants.BaseTopic}/{steamId}/player";
         var tcs = TaskHelper.CompletionSourceFromTopicPublishment(mqttClient, topic);
-        using var cts = TaskHelper.EnableCompletionSourceTimeout(tcs);
         await sut.StartAsync(TestContext.Current.CancellationToken);
 
         // Act
         sut.OnNext(new StateUpdate<Player>(steamId, player));
 
         // Assert
-        await tcs.Task;
+        await TaskHelper.WaitForCompletionAsync(tcs);
         var expectedPayload = JsonSerializer.Serialize(player);
         await AssertPayloadPublishedOnTopic(mqttClient, topic, expectedPayload);
     }
@@ -37,14 +36,13 @@ public class GameStateMqttPublisherTest
         // Arrange
         var topic = $"{MqttConstants.BaseTopic}/{steamId}/player-state";
         var tcs = TaskHelper.CompletionSourceFromTopicPublishment(mqttClient, topic);
-        using var cts = TaskHelper.EnableCompletionSourceTimeout(tcs);
         await sut.StartAsync(TestContext.Current.CancellationToken);
 
         // Act
         sut.OnNext(new StateUpdate<PlayerState>(steamId, playerState));
 
         // Assert
-        await tcs.Task;
+        await TaskHelper.WaitForCompletionAsync(tcs);
         var expectedPayload = JsonSerializer.Serialize(playerState);
         await AssertPayloadPublishedOnTopic(mqttClient, topic, expectedPayload);
     }
@@ -59,14 +57,13 @@ public class GameStateMqttPublisherTest
         // Arrange
         var topic = $"{MqttConstants.BaseTopic}/{steamId}/player-match-stats";
         var tcs = TaskHelper.CompletionSourceFromTopicPublishment(mqttClient, topic);
-        using var cts = TaskHelper.EnableCompletionSourceTimeout(tcs);
         await sut.StartAsync(TestContext.Current.CancellationToken);
 
         // Act
         sut.OnNext(new StateUpdate<PlayerMatchStats>(steamId, playerMatchStats));
 
         // Assert
-        await tcs.Task;
+        await TaskHelper.WaitForCompletionAsync(tcs);
         var expectedPayload = JsonSerializer.Serialize(playerMatchStats);
         await AssertPayloadPublishedOnTopic(mqttClient, topic, expectedPayload);
     }
@@ -81,14 +78,13 @@ public class GameStateMqttPublisherTest
         // Arrange
         var topic = $"{MqttConstants.BaseTopic}/{steamId}/map";
         var tcs = TaskHelper.CompletionSourceFromTopicPublishment(mqttClient, topic);
-        using var cts = TaskHelper.EnableCompletionSourceTimeout(tcs);
         await sut.StartAsync(TestContext.Current.CancellationToken);
 
         // Act
         sut.OnNext(new StateUpdate<Map>(steamId, map));
 
         // Assert
-        await tcs.Task;
+        await TaskHelper.WaitForCompletionAsync(tcs);
         var expectedPayload = JsonSerializer.Serialize(map);
         await AssertPayloadPublishedOnTopic(mqttClient, topic, expectedPayload);
     }
@@ -103,14 +99,13 @@ public class GameStateMqttPublisherTest
         // Arrange
         var topic = $"{MqttConstants.BaseTopic}/{steamId}/round";
         var tcs = TaskHelper.CompletionSourceFromTopicPublishment(mqttClient, topic);
-        using var cts = TaskHelper.EnableCompletionSourceTimeout(tcs);
         await sut.StartAsync(TestContext.Current.CancellationToken);
 
         // Act
         sut.OnNext(new StateUpdate<Round>(steamId, round));
 
         // Assert
-        await tcs.Task;
+        await TaskHelper.WaitForCompletionAsync(tcs);
         var expectedPayload = JsonSerializer.Serialize(round);
         await AssertPayloadPublishedOnTopic(mqttClient, topic, expectedPayload);
     }
