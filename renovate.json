@@ -15,10 +15,6 @@
     {
       "matchSourceUrls": ["https://github.com/dotnet/MQTTnet"],
       "groupName": "mqttnet"
-    },
-    {
-      "matchSourceUrls": ["https://github.com/coverlet-coverage/coverlet"],
-      "groupName": "coverlet"
     }
   ]
 }

@@ -4,12 +4,11 @@ using System.Text;
 using LupusBytes.CS2.GameStateIntegration.Api.EndToEnd.Tests.Helpers;
 using LupusBytes.CS2.GameStateIntegration.Contracts;
 using LupusBytes.CS2.GameStateIntegration.Contracts.Enums;
-using Xunit.v3.Priority;
 
 namespace LupusBytes.CS2.GameStateIntegration.Api.EndToEnd.Tests;
 
 [Collection("REST API")]
-[TestCaseOrderer(typeof(PriorityOrderer))]
+[TestMethodOrderer<PriorityOrderer>]
 public class EndpointsTest(TestWebApplicationFactory<Program> factory)
     : IClassFixture<TestWebApplicationFactory<Program>>
 {
