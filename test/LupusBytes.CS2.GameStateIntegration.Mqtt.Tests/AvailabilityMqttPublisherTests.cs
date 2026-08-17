@@ -11,7 +11,7 @@ public class AvailabilityMqttPublisherTests
         AvailabilityMqttPublisher sut)
     {
         // Act
-        await sut.StartAsync(CancellationToken.None);
+        await sut.StartAsync(TestContext.Current.CancellationToken);
 
         // Assert
         await AssertAvailabilityPublishedOnTopic(
@@ -26,7 +26,7 @@ public class AvailabilityMqttPublisherTests
         AvailabilityMqttPublisher sut)
     {
         // Act
-        await sut.StopAsync(CancellationToken.None);
+        await sut.StopAsync(TestContext.Current.CancellationToken);
 
         // Assert
         await AssertAvailabilityPublishedOnTopic(
@@ -46,7 +46,7 @@ public class AvailabilityMqttPublisherTests
         var topic = $"{MqttConstants.BaseTopic}/{steamId}/player/status";
         var tcs = TaskHelper.CompletionSourceFromTopicPublishment(mqttClient, topic);
         using var cts = TaskHelper.EnableCompletionSourceTimeout(tcs);
-        await sut.StartAsync(CancellationToken.None);
+        await sut.StartAsync(TestContext.Current.CancellationToken);
 
         // Act
         sut.OnNext(new StateUpdate<Player>(steamId, player));
@@ -73,7 +73,7 @@ public class AvailabilityMqttPublisherTests
             .Do(_ => tcs.SetResult(true));
 
         using var cts = TaskHelper.EnableCompletionSourceTimeout(tcs);
-        await sut.StartAsync(CancellationToken.None);
+        await sut.StartAsync(TestContext.Current.CancellationToken);
 
         // Act
         sut.OnNext(new StateUpdate<Player>(steamId, State: null));
@@ -95,7 +95,7 @@ public class AvailabilityMqttPublisherTests
         var topic = $"{MqttConstants.BaseTopic}/{steamId}/player-state/status";
         var tcs = TaskHelper.CompletionSourceFromTopicPublishment(mqttClient, topic);
         using var cts = TaskHelper.EnableCompletionSourceTimeout(tcs);
-        await sut.StartAsync(CancellationToken.None);
+        await sut.StartAsync(TestContext.Current.CancellationToken);
 
         // Act
         sut.OnNext(new StateUpdate<PlayerState>(steamId, playerState));
@@ -116,7 +116,7 @@ public class AvailabilityMqttPublisherTests
         var topic = $"{MqttConstants.BaseTopic}/{steamId}/player-match-stats/status";
         var tcs = TaskHelper.CompletionSourceFromTopicPublishment(mqttClient, topic);
         using var cts = TaskHelper.EnableCompletionSourceTimeout(tcs);
-        await sut.StartAsync(CancellationToken.None);
+        await sut.StartAsync(TestContext.Current.CancellationToken);
 
         // Act
         sut.OnNext(new StateUpdate<PlayerMatchStats>(steamId, playerMatchStats));
@@ -137,7 +137,7 @@ public class AvailabilityMqttPublisherTests
         var topic = $"{MqttConstants.BaseTopic}/{steamId}/map/status";
         var tcs = TaskHelper.CompletionSourceFromTopicPublishment(mqttClient, topic);
         using var cts = TaskHelper.EnableCompletionSourceTimeout(tcs);
-        await sut.StartAsync(CancellationToken.None);
+        await sut.StartAsync(TestContext.Current.CancellationToken);
 
         // Act
         sut.OnNext(new StateUpdate<Map>(steamId, map));
@@ -158,7 +158,7 @@ public class AvailabilityMqttPublisherTests
         var topic = $"{MqttConstants.BaseTopic}/{steamId}/round/status";
         var tcs = TaskHelper.CompletionSourceFromTopicPublishment(mqttClient, topic);
         using var cts = TaskHelper.EnableCompletionSourceTimeout(tcs);
-        await sut.StartAsync(CancellationToken.None);
+        await sut.StartAsync(TestContext.Current.CancellationToken);
 
         // Act
         sut.OnNext(new StateUpdate<Round>(steamId, round));
@@ -198,7 +198,7 @@ public class AvailabilityMqttPublisherTests
             });
 
         using var cts = TaskHelper.EnableCompletionSourceTimeout(tcs);
-        await sut.StartAsync(CancellationToken.None);
+        await sut.StartAsync(TestContext.Current.CancellationToken);
 
         // Act
         sut.OnNext(new StateUpdate<Player>(steamId, player));
@@ -233,7 +233,7 @@ public class AvailabilityMqttPublisherTests
         var topic = $"{MqttConstants.BaseTopic}/{steamId}/round/status";
         var tcs = TaskHelper.CompletionSourceFromTopicPublishment(mqttClient, topic);
         using var cts = TaskHelper.EnableCompletionSourceTimeout(tcs);
-        await sut.StartAsync(CancellationToken.None);
+        await sut.StartAsync(TestContext.Current.CancellationToken);
 
         // Act
         sut.OnNext(new StateUpdate<Round>(steamId, round1));
@@ -254,7 +254,7 @@ public class AvailabilityMqttPublisherTests
         AvailabilityMqttPublisher sut)
     {
         // Arrange
-        await sut.StartAsync(CancellationToken.None);
+        await sut.StartAsync(TestContext.Current.CancellationToken);
 
         var topics = gameStates
             .Select(x => x.Provider!.SteamId64)
@@ -284,7 +284,7 @@ public class AvailabilityMqttPublisherTests
         await tcs.Task;
 
         // Act
-        await sut.StopAsync(CancellationToken.None);
+        await sut.StopAsync(TestContext.Current.CancellationToken);
 
         // Assert
         foreach (var topic in topics)
