@@ -2,7 +2,10 @@ using LupusBytes.CS2.GameStateIntegration.Contracts;
 
 namespace LupusBytes.CS2.GameStateIntegration;
 
-internal sealed class GameState(SteamId64 steamId, bool ignoreSpectatedPlayers) : ObservableGameState, IGameState
+internal sealed class GameState(
+    SteamId64 steamId,
+    bool ignoreSpectatedPlayers,
+    IGameStateUpdateListener listener) : IGameState
 {
     private Map? map;
     private Player? player;
@@ -23,7 +26,7 @@ internal sealed class GameState(SteamId64 steamId, bool ignoreSpectatedPlayers) 
             }
 
             round = value;
-            PushStateUpdate(RoundObservers, new StateUpdate<Round>(SteamId, round));
+            listener.OnRoundUpdated(new StateUpdateEventArgs<Round>(SteamId, round));
         }
     }
 
@@ -50,13 +53,13 @@ internal sealed class GameState(SteamId64 steamId, bool ignoreSpectatedPlayers) 
             if (player != valuePlayer)
             {
                 player = valuePlayer;
-                PushStateUpdate(PlayerObservers, new StateUpdate<Player>(SteamId, valuePlayer));
+                listener.OnPlayerUpdated(new StateUpdateEventArgs<Player>(SteamId, valuePlayer));
             }
 
             if (playerState != value?.State)
             {
                 playerState = value?.State;
-                PushStateUpdate(PlayerStateObservers, new StateUpdate<PlayerState>(SteamId, playerState));
+                listener.OnPlayerStateUpdated(new StateUpdateEventArgs<PlayerState>(SteamId, playerState));
             }
 
             if (playerMatchStats == value?.MatchStats)
@@ -65,7 +68,7 @@ internal sealed class GameState(SteamId64 steamId, bool ignoreSpectatedPlayers) 
             }
 
             playerMatchStats = value?.MatchStats;
-            PushStateUpdate(PlayerMatchStatsObservers, new StateUpdate<PlayerMatchStats>(SteamId, playerMatchStats));
+            listener.OnPlayerMatchStatsUpdated(new StateUpdateEventArgs<PlayerMatchStats>(SteamId, playerMatchStats));
         }
     }
 
@@ -80,13 +83,13 @@ internal sealed class GameState(SteamId64 steamId, bool ignoreSpectatedPlayers) 
             }
 
             map = value;
-            PushStateUpdate(MapObservers, new StateUpdate<Map>(SteamId, map));
+            listener.OnMapUpdated(new StateUpdateEventArgs<Map>(SteamId, map));
         }
     }
 
     public void ProcessEvent(GameStateData data)
     {
-        PushStateUpdate(ProviderObservers, new StateUpdate<Provider>(SteamId, data.Provider));
+        listener.OnProviderUpdated(new StateUpdateEventArgs<Provider>(SteamId, data.Provider));
         Player = data.Player;
         Map = data.Map;
         Round = data.Round;

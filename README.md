@@ -133,9 +133,9 @@ flowchart LR;
 
     Endpoint -- Game state data --> GameStateService
 
-    GameStateService -- Push new data to observer --> AvailabilityMqttPublisher
-    GameStateService -- Push new data to observer --> GameStateMqttPublisher
-    GameStateService -- Push new data to observer --> HomeAssistantDevicePublisher
+    GameStateService -- Raise state update event --> AvailabilityMqttPublisher
+    GameStateService -- Raise state update event --> GameStateMqttPublisher
+    GameStateService -- Raise state update event --> HomeAssistantDevicePublisher
 
     AvailabilityMqttPublisher -- Maintain availability (online/offline) for every sensor ---> MqttClient
     GameStateMqttPublisher -- Send game state data on distinct sensor topics ---> MqttClient

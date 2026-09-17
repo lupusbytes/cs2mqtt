@@ -38,6 +38,7 @@ public class AvailabilityMqttPublisherTests
     [Theory, AutoNSubstituteData]
     public async Task Publishes_player_availability(
         [Frozen] IMqttClient mqttClient,
+        [Frozen] IGameStateService gameStateService,
         SteamId64 steamId,
         Player player,
         AvailabilityMqttPublisher sut)
@@ -48,7 +49,7 @@ public class AvailabilityMqttPublisherTests
         await sut.StartAsync(TestContext.Current.CancellationToken);
 
         // Act
-        sut.OnNext(new StateUpdate<Player>(steamId, player));
+        gameStateService.PlayerUpdated += Raise.EventWith(new StateUpdateEventArgs<Player>(steamId, player));
 
         // Assert
         await TaskHelper.WaitForCompletionAsync(tcs);
@@ -58,6 +59,7 @@ public class AvailabilityMqttPublisherTests
     [Theory, AutoNSubstituteData]
     public async Task Publishes_player_as_online_after_player_was_initially_offline(
         [Frozen] IMqttClient mqttClient,
+        [Frozen] IGameStateService gameStateService,
         SteamId64 steamId,
         Player player,
         AvailabilityMqttPublisher sut)
@@ -74,8 +76,8 @@ public class AvailabilityMqttPublisherTests
         await sut.StartAsync(TestContext.Current.CancellationToken);
 
         // Act
-        sut.OnNext(new StateUpdate<Player>(steamId, State: null));
-        sut.OnNext(new StateUpdate<Player>(steamId, player));
+        gameStateService.PlayerUpdated += Raise.EventWith(new StateUpdateEventArgs<Player>(steamId, state: null));
+        gameStateService.PlayerUpdated += Raise.EventWith(new StateUpdateEventArgs<Player>(steamId, player));
 
         // Assert
         await TaskHelper.WaitForCompletionAsync(tcs);
@@ -85,6 +87,7 @@ public class AvailabilityMqttPublisherTests
     [Theory, AutoNSubstituteData]
     public async Task Publishes_player_state_availability(
         [Frozen] IMqttClient mqttClient,
+        [Frozen] IGameStateService gameStateService,
         SteamId64 steamId,
         PlayerState playerState,
         AvailabilityMqttPublisher sut)
@@ -95,7 +98,7 @@ public class AvailabilityMqttPublisherTests
         await sut.StartAsync(TestContext.Current.CancellationToken);
 
         // Act
-        sut.OnNext(new StateUpdate<PlayerState>(steamId, playerState));
+        gameStateService.PlayerStateUpdated += Raise.EventWith(new StateUpdateEventArgs<PlayerState>(steamId, playerState));
 
         // Assert
         await TaskHelper.WaitForCompletionAsync(tcs);
@@ -105,6 +108,7 @@ public class AvailabilityMqttPublisherTests
     [Theory, AutoNSubstituteData]
     public async Task Publishes_player_match_stats_availability(
         [Frozen] IMqttClient mqttClient,
+        [Frozen] IGameStateService gameStateService,
         SteamId64 steamId,
         PlayerMatchStats playerMatchStats,
         AvailabilityMqttPublisher sut)
@@ -115,7 +119,7 @@ public class AvailabilityMqttPublisherTests
         await sut.StartAsync(TestContext.Current.CancellationToken);
 
         // Act
-        sut.OnNext(new StateUpdate<PlayerMatchStats>(steamId, playerMatchStats));
+        gameStateService.PlayerMatchStatsUpdated += Raise.EventWith(new StateUpdateEventArgs<PlayerMatchStats>(steamId, playerMatchStats));
 
         // Assert
         await TaskHelper.WaitForCompletionAsync(tcs);
@@ -125,6 +129,7 @@ public class AvailabilityMqttPublisherTests
     [Theory, AutoNSubstituteData]
     public async Task Publishes_map_availability(
         [Frozen] IMqttClient mqttClient,
+        [Frozen] IGameStateService gameStateService,
         SteamId64 steamId,
         Map map,
         AvailabilityMqttPublisher sut)
@@ -135,7 +140,7 @@ public class AvailabilityMqttPublisherTests
         await sut.StartAsync(TestContext.Current.CancellationToken);
 
         // Act
-        sut.OnNext(new StateUpdate<Map>(steamId, map));
+        gameStateService.MapUpdated += Raise.EventWith(new StateUpdateEventArgs<Map>(steamId, map));
 
         // Assert
         await TaskHelper.WaitForCompletionAsync(tcs);
@@ -145,6 +150,7 @@ public class AvailabilityMqttPublisherTests
     [Theory, AutoNSubstituteData]
     public async Task Publishes_round_availability(
         [Frozen] IMqttClient mqttClient,
+        [Frozen] IGameStateService gameStateService,
         SteamId64 steamId,
         Round round,
         AvailabilityMqttPublisher sut)
@@ -155,7 +161,7 @@ public class AvailabilityMqttPublisherTests
         await sut.StartAsync(TestContext.Current.CancellationToken);
 
         // Act
-        sut.OnNext(new StateUpdate<Round>(steamId, round));
+        gameStateService.RoundUpdated += Raise.EventWith(new StateUpdateEventArgs<Round>(steamId, round));
 
         // Assert
         await TaskHelper.WaitForCompletionAsync(tcs);
@@ -165,6 +171,7 @@ public class AvailabilityMqttPublisherTests
     [Theory, AutoNSubstituteData]
     public async Task Publishes_and_updates_availability_on_changes(
         [Frozen] IMqttClient mqttClient,
+        [Frozen] IGameStateService gameStateService,
         SteamId64 steamId,
         Player player,
         AvailabilityMqttPublisher sut)
@@ -194,9 +201,9 @@ public class AvailabilityMqttPublisherTests
         await sut.StartAsync(TestContext.Current.CancellationToken);
 
         // Act
-        sut.OnNext(new StateUpdate<Player>(steamId, player));
-        sut.OnNext(new StateUpdate<Player>(steamId, State: null));
-        sut.OnNext(new StateUpdate<Player>(steamId, player));
+        gameStateService.PlayerUpdated += Raise.EventWith(new StateUpdateEventArgs<Player>(steamId, player));
+        gameStateService.PlayerUpdated += Raise.EventWith(new StateUpdateEventArgs<Player>(steamId, state: null));
+        gameStateService.PlayerUpdated += Raise.EventWith(new StateUpdateEventArgs<Player>(steamId, player));
 
         // Assert
         await TaskHelper.WaitForCompletionAsync(tcs);
@@ -217,6 +224,7 @@ public class AvailabilityMqttPublisherTests
     [Theory, AutoNSubstituteData]
     public async Task Should_not_publish_same_availability_twice(
         [Frozen] IMqttClient mqttClient,
+        [Frozen] IGameStateService gameStateService,
         SteamId64 steamId,
         Round round1,
         Round round2,
@@ -228,8 +236,8 @@ public class AvailabilityMqttPublisherTests
         await sut.StartAsync(TestContext.Current.CancellationToken);
 
         // Act
-        sut.OnNext(new StateUpdate<Round>(steamId, round1));
-        sut.OnNext(new StateUpdate<Round>(steamId, round2));
+        gameStateService.RoundUpdated += Raise.EventWith(new StateUpdateEventArgs<Round>(steamId, round1));
+        gameStateService.RoundUpdated += Raise.EventWith(new StateUpdateEventArgs<Round>(steamId, round2));
 
         // Assert
         await TaskHelper.WaitForCompletionAsync(tcs);
@@ -242,6 +250,7 @@ public class AvailabilityMqttPublisherTests
     [Theory, AutoNSubstituteData]
     public async Task Publishes_availability_on_all_provider_topics_on_shutdown(
         [Frozen] IMqttClient mqttClient,
+        [Frozen] IGameStateService gameStateService,
         ReadOnlyCollection<GameStateData> gameStates,
         AvailabilityMqttPublisher sut)
     {
@@ -265,11 +274,11 @@ public class AvailabilityMqttPublisherTests
         foreach (var gameState in gameStates)
         {
             var steamId = gameState.Provider!.SteamId64;
-            sut.OnNext(new StateUpdate<Player>(steamId, gameState.Player));
-            sut.OnNext(new StateUpdate<PlayerState>(steamId, gameState.Player!.State));
-            sut.OnNext(new StateUpdate<PlayerMatchStats>(steamId, gameState.Player.MatchStats));
-            sut.OnNext(new StateUpdate<Map>(steamId, gameState.Map));
-            sut.OnNext(new StateUpdate<Round>(steamId, gameState.Round));
+            gameStateService.PlayerUpdated += Raise.EventWith(new StateUpdateEventArgs<Player>(steamId, gameState.Player));
+            gameStateService.PlayerStateUpdated += Raise.EventWith(new StateUpdateEventArgs<PlayerState>(steamId, gameState.Player!.State));
+            gameStateService.PlayerMatchStatsUpdated += Raise.EventWith(new StateUpdateEventArgs<PlayerMatchStats>(steamId, gameState.Player.MatchStats));
+            gameStateService.MapUpdated += Raise.EventWith(new StateUpdateEventArgs<Map>(steamId, gameState.Map));
+            gameStateService.RoundUpdated += Raise.EventWith(new StateUpdateEventArgs<Round>(steamId, gameState.Round));
         }
 
         await TaskHelper.WaitForCompletionAsync(tcs);

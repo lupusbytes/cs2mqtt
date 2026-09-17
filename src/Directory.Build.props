@@ -11,5 +11,8 @@
     <InternalsVisibleTo Include="$(AssemblyName).Tests" />
     <InternalsVisibleTo Include="$(AssemblyName).EndToEnd.Tests" />
     <InternalsVisibleTo Include="$(AssemblyName).Integration.Tests" />
+
+    <!-- Makes internal types in libraries visible to their benchmark projects -->
+    <InternalsVisibleTo Include="$(AssemblyName).Benchmarks" />
   </ItemGroup>
 </Project>

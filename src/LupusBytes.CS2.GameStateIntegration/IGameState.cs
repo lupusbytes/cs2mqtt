@@ -2,13 +2,7 @@ using LupusBytes.CS2.GameStateIntegration.Contracts;
 
 namespace LupusBytes.CS2.GameStateIntegration;
 
-public interface IGameState :
-    IObservable<StateUpdate<Provider>>,
-    IObservable<StateUpdate<Map>>,
-    IObservable<StateUpdate<Round>>,
-    IObservable<StateUpdate<Player>>,
-    IObservable<StateUpdate<PlayerState>>,
-    IObservable<StateUpdate<PlayerMatchStats>>
+public interface IGameState
 {
     /// <summary>
     /// The SteamID of the game state provider.

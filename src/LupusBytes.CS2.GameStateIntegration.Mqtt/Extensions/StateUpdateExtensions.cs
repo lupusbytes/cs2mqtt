@@ -16,7 +16,7 @@ public static class StateUpdateExtensions
         KeyValuePair.Create(typeof(PlayerMatchStats), "player-match-stats"),
     }.ToFrozenDictionary();
 
-    public static MqttMessage ToMqttMessage<TState>(this StateUpdate<TState> stateUpdate)
+    public static MqttMessage ToMqttMessage<TState>(this StateUpdateEventArgs<TState> stateUpdate)
         where TState : class
     {
         var topic = $"{MqttConstants.BaseTopic}/{stateUpdate.SteamId}/{TypeLevel[typeof(TState)]}";

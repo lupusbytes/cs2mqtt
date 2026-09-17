@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+
+  <!--
+    Benchmark projects deliberately do not import the repository wide Directory.Build.props.
+    The solution wide analyzer set (and TreatWarningsAsErrors in Release) fights the
+    "do nothing clever" style that benchmark code requires.
+  -->
+  <PropertyGroup Label="Compile settings">
+    <TargetFramework>net10.0</TargetFramework>
+    <LangVersion>14.0</LangVersion>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <IsPackable>false</IsPackable>
+    <OutputType>Exe</OutputType>
+  </PropertyGroup>
+
+</Project>

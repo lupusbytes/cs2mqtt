@@ -15,7 +15,7 @@ public class StateUpdateExtensionsTest
     public void ToMqttMessage_Map(
         string expectedTopic,
         string expectedPayload,
-        StateUpdate<Map> mapUpdate)
+        StateUpdateEventArgs<Map> mapUpdate)
         => Assert(mapUpdate.ToMqttMessage(), expectedTopic, expectedPayload);
 
     [Theory]
@@ -23,7 +23,7 @@ public class StateUpdateExtensionsTest
     public void ToMqttMessage_Round(
         string expectedTopic,
         string expectedPayload,
-        StateUpdate<Round> roundUpdate)
+        StateUpdateEventArgs<Round> roundUpdate)
         => Assert(roundUpdate.ToMqttMessage(), expectedTopic, expectedPayload);
 
     [Theory]
@@ -31,7 +31,7 @@ public class StateUpdateExtensionsTest
     public void ToMqttMessage_Player(
         string expectedTopic,
         string expectedPayload,
-        StateUpdate<Player> playerUpdate)
+        StateUpdateEventArgs<Player> playerUpdate)
         => Assert(playerUpdate.ToMqttMessage(), expectedTopic, expectedPayload);
 
     [Theory]
@@ -39,7 +39,7 @@ public class StateUpdateExtensionsTest
     public void ToMqttMessage_PlayerState(
         string expectedTopic,
         string expectedPayload,
-        StateUpdate<PlayerState> playerStateUpdate)
+        StateUpdateEventArgs<PlayerState> playerStateUpdate)
         => Assert(playerStateUpdate.ToMqttMessage(), expectedTopic, expectedPayload);
 
     [Theory]
@@ -47,20 +47,20 @@ public class StateUpdateExtensionsTest
     public void ToMqttMessage_PlayerMatchStats(
         string expectedTopic,
         string expectedPayload,
-        StateUpdate<PlayerMatchStats> playerMatchStatsUpdate)
+        StateUpdateEventArgs<PlayerMatchStats> playerMatchStatsUpdate)
         => Assert(playerMatchStatsUpdate.ToMqttMessage(), expectedTopic, expectedPayload);
 
-    public static TheoryData<string, string, StateUpdate<Player>> PlayerCases => new()
+    public static TheoryData<string, string, StateUpdateEventArgs<Player>> PlayerCases => new()
     {
         {
             $"{MqttConstants.BaseTopic}/{SteamId}/player",
             string.Empty,
-            new StateUpdate<Player>(SteamId, State: null)
+            new StateUpdateEventArgs<Player>(SteamId, state: null)
         },
         {
             $"{MqttConstants.BaseTopic}/{SteamId}/player",
             """{"steamid":"76561197981496355","name":"lupus","team":"T","activity":"Menu"}""",
-            new StateUpdate<Player>(SteamId, new Player(
+            new StateUpdateEventArgs<Player>(SteamId, new Player(
                 SteamId.ToString(),
                 "lupus",
                 Team.T,
@@ -68,17 +68,17 @@ public class StateUpdateExtensionsTest
         },
     };
 
-    public static TheoryData<string, string, StateUpdate<PlayerState>> PlayerStateCases => new()
+    public static TheoryData<string, string, StateUpdateEventArgs<PlayerState>> PlayerStateCases => new()
     {
         {
             $"{MqttConstants.BaseTopic}/{SteamId}/player-state",
             string.Empty,
-            new StateUpdate<PlayerState>(SteamId, State: null)
+            new StateUpdateEventArgs<PlayerState>(SteamId, state: null)
         },
         {
             $"{MqttConstants.BaseTopic}/{SteamId}/player-state",
             """{"health":100,"armor":53,"helmet":true,"flashed":0,"smoked":255,"burning":0,"money":16000,"round_kills":1,"round_killhs":1,"equip_value":5350}""",
-            new StateUpdate<PlayerState>(SteamId, new PlayerState(
+            new StateUpdateEventArgs<PlayerState>(SteamId, new PlayerState(
                 Health: 100,
                 Armor: 53,
                 Helmet: true,
@@ -92,17 +92,17 @@ public class StateUpdateExtensionsTest
         },
     };
 
-    public static TheoryData<string, string, StateUpdate<Map>> MapCases => new()
+    public static TheoryData<string, string, StateUpdateEventArgs<Map>> MapCases => new()
     {
         {
             $"{MqttConstants.BaseTopic}/{SteamId}/map",
             string.Empty,
-            new StateUpdate<Map>(SteamId, State: null)
+            new StateUpdateEventArgs<Map>(SteamId, state: null)
         },
         {
             $"{MqttConstants.BaseTopic}/{SteamId}/map",
             """{"mode":"Casual","name":"fy_iceworld","phase":"Live","round":44,"team_t":{"score":23,"consecutive_round_losses":0,"timeouts_remaining":0,"matches_won_this_series":0},"team_ct":{"score":20,"consecutive_round_losses":3,"timeouts_remaining":0,"matches_won_this_series":0}}""",
-            new StateUpdate<Map>(SteamId, new Map(
+            new StateUpdateEventArgs<Map>(SteamId, new Map(
                 Mode.Casual,
                 "fy_iceworld",
                 MapPhase.Live,
@@ -112,17 +112,17 @@ public class StateUpdateExtensionsTest
         },
     };
 
-    public static TheoryData<string, string, StateUpdate<PlayerMatchStats>> PlayerMatchStatsCases => new()
+    public static TheoryData<string, string, StateUpdateEventArgs<PlayerMatchStats>> PlayerMatchStatsCases => new()
     {
         {
             $"{MqttConstants.BaseTopic}/{SteamId}/player-match-stats",
             string.Empty,
-            new StateUpdate<PlayerMatchStats>(SteamId, State: null)
+            new StateUpdateEventArgs<PlayerMatchStats>(SteamId, state: null)
         },
         {
             $"{MqttConstants.BaseTopic}/{SteamId}/player-match-stats",
             """{"kills":15,"assists":3,"deaths":7,"mvps":2,"score":34}""",
-            new StateUpdate<PlayerMatchStats>(SteamId, new PlayerMatchStats(
+            new StateUpdateEventArgs<PlayerMatchStats>(SteamId, new PlayerMatchStats(
                 Kills: 15,
                 Assists: 3,
                 Deaths: 7,
@@ -131,17 +131,17 @@ public class StateUpdateExtensionsTest
         },
     };
 
-    public static TheoryData<string, string, StateUpdate<Round>> RoundCases => new()
+    public static TheoryData<string, string, StateUpdateEventArgs<Round>> RoundCases => new()
     {
         {
             $"{MqttConstants.BaseTopic}/{SteamId}/round",
             string.Empty,
-            new StateUpdate<Round>(SteamId, State: null)
+            new StateUpdateEventArgs<Round>(SteamId, state: null)
         },
         {
             $"{MqttConstants.BaseTopic}/{SteamId}/round",
             """{"phase":"Over","win_team":"CT","bomb":"Defused"}""",
-            new StateUpdate<Round>(SteamId, new Round(
+            new StateUpdateEventArgs<Round>(SteamId, new Round(
                 RoundPhase.Over,
                 WinTeam: Team.CT,
                 BombState.Defused))

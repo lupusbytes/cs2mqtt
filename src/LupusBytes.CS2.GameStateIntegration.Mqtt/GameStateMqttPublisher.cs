@@ -1,28 +1,26 @@
-using System.Threading.Channels;
 using LupusBytes.CS2.GameStateIntegration.Mqtt.Extensions;
 
 namespace LupusBytes.CS2.GameStateIntegration.Mqtt;
 
-public sealed class GameStateMqttPublisher(
-    IGameStateService gameStateService,
-    IMqttClient mqttClient) : GameStateWithoutProviderObserverService(gameStateService)
+public sealed class GameStateMqttPublisher : GameStateSubscriberService
 {
-    protected override Task ExecuteAsync(CancellationToken stoppingToken)
-        => Task.WhenAll(
-            ProcessChannelAsync(PlayerChannelReader, stoppingToken),
-            ProcessChannelAsync(PlayerStateChannelReader, stoppingToken),
-            ProcessChannelAsync(PlayerMatchStatsChannelReader, stoppingToken),
-            ProcessChannelAsync(MapChannelReader, stoppingToken),
-            ProcessChannelAsync(RoundChannelReader, stoppingToken));
+    private readonly IMqttClient mqttClient;
 
-    private async Task ProcessChannelAsync<TState>(
-        ChannelReader<StateUpdate<TState>> channelReader,
+    public GameStateMqttPublisher(IGameStateService gameStateService, IMqttClient mqttClient)
+        : base(gameStateService)
+    {
+        this.mqttClient = mqttClient;
+
+        SubscribeToPlayer(PublishAsync);
+        SubscribeToPlayerState(PublishAsync);
+        SubscribeToPlayerMatchStats(PublishAsync);
+        SubscribeToMap(PublishAsync);
+        SubscribeToRound(PublishAsync);
+    }
+
+    private Task PublishAsync<TState>(
+        StateUpdateEventArgs<TState> stateUpdate,
         CancellationToken cancellationToken)
         where TState : class
-    {
-        await foreach (var @event in channelReader.ReadAllAsync(cancellationToken))
-        {
-            await mqttClient.PublishAsync(@event.ToMqttMessage(), cancellationToken);
-        }
-    }
+        => mqttClient.PublishAsync(stateUpdate.ToMqttMessage(), cancellationToken);
 }

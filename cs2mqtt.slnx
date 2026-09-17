@@ -1,4 +1,7 @@
 <Solution>
+  <Folder Name="/benchmark/">
+    <Project Path="benchmark/LupusBytes.CS2.GameStateIntegration.Benchmarks/LupusBytes.CS2.GameStateIntegration.Benchmarks.csproj" />
+  </Folder>
   <Folder Name="/src/">
     <Project Path="src/LupusBytes.CS2.GameStateIntegration.Api.Endpoints/LupusBytes.CS2.GameStateIntegration.Api.Endpoints.csproj" />
     <Project Path="src/LupusBytes.CS2.GameStateIntegration.Api/LupusBytes.CS2.GameStateIntegration.Api.csproj" />

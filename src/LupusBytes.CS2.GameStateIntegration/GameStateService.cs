@@ -3,32 +3,44 @@ using LupusBytes.CS2.GameStateIntegration.Contracts;
 
 namespace LupusBytes.CS2.GameStateIntegration;
 
-internal sealed class GameStateService : ObservableGameState, IGameStateService
+internal sealed class GameStateService : IGameStateService, IGameStateUpdateListener
 {
-    private readonly ConcurrentDictionary<SteamId64, Subscription> gameStateSubscriptions = new();
+    private readonly ConcurrentDictionary<SteamId64, Connection> connections = new();
     private readonly GameStateOptions options;
 
     public GameStateService(GameStateOptions options)
     {
         this.options = options;
 
-        // Start a periodic background task that will remove subscriptions that have stopped receiving events.
+        // Start a periodic background task that will remove connections that have stopped receiving events.
         // We do not receive any explicit events from Counter-Strike that we can use to determine that a provider has been disconnected.
         // When the player quits the game, we just stop receiving events.
-        // The subscription timeout should be a tiny bit longer than the heartbeat defined in the gamestate_integration.cfg
-        _ = CleanupDeadSubscriptionsAsync(
+        // The connection timeout should be a tiny bit longer than the heartbeat defined in the gamestate_integration.cfg
+        _ = CleanupDeadConnectionsAsync(
             checkInterval: TimeSpan.FromSeconds(options.TimeoutCleanupIntervalInSeconds),
-            subscriptionTimeout: TimeSpan.FromSeconds(options.TimeoutInSeconds));
+            connectionTimeout: TimeSpan.FromSeconds(options.TimeoutInSeconds));
     }
 
+    public event EventHandler<StateUpdateEventArgs<Provider>>? ProviderUpdated;
+
+    public event EventHandler<StateUpdateEventArgs<Map>>? MapUpdated;
+
+    public event EventHandler<StateUpdateEventArgs<Round>>? RoundUpdated;
+
+    public event EventHandler<StateUpdateEventArgs<Player>>? PlayerUpdated;
+
+    public event EventHandler<StateUpdateEventArgs<PlayerState>>? PlayerStateUpdated;
+
+    public event EventHandler<StateUpdateEventArgs<PlayerMatchStats>>? PlayerMatchStatsUpdated;
+
     public Map? GetMap(SteamId64 steamId)
-        => gameStateSubscriptions.GetValueOrDefault(steamId)?.GameState.Map;
+        => connections.GetValueOrDefault(steamId)?.GameState.Map;
 
     public PlayerData? GetPlayer(SteamId64 steamId)
-        => gameStateSubscriptions.GetValueOrDefault(steamId)?.GameState.Player;
+        => connections.GetValueOrDefault(steamId)?.GameState.Player;
 
     public Round? GetRound(SteamId64 steamId)
-        => gameStateSubscriptions.GetValueOrDefault(steamId)?.GameState.Round;
+        => connections.GetValueOrDefault(steamId)?.GameState.Round;
 
     public void ProcessEvent(GameStateData data)
     {
@@ -42,41 +54,41 @@ internal sealed class GameStateService : ObservableGameState, IGameStateService
 
         var steamId64 = SteamId64.FromString(data.Provider.SteamId64);
 
-        var gameStateSubscription = gameStateSubscriptions.GetOrAdd(
+        var connection = connections.GetOrAdd(
             steamId64,
-            static (key, arg) => new Subscription(arg, new GameState(key, arg.options.IgnoreSpectatedPlayers)),
+            static (key, arg) => new Connection(new GameState(key, arg.options.IgnoreSpectatedPlayers, arg)),
             this);
 
-        gameStateSubscription.GameState.ProcessEvent(data);
-        gameStateSubscription.LastActivity = DateTimeOffset.UtcNow;
+        connection.GameState.ProcessEvent(data);
+        connection.LastActivity = DateTimeOffset.UtcNow;
     }
 
-    private void OnStateUpdate(StateUpdate<Provider> stateUpdate) => PushStateUpdate(ProviderObservers, stateUpdate);
+    public void OnProviderUpdated(StateUpdateEventArgs<Provider> e) => ProviderUpdated?.Invoke(this, e);
 
-    private void OnStateUpdate(StateUpdate<Map> value) => PushStateUpdate(MapObservers, value);
+    public void OnMapUpdated(StateUpdateEventArgs<Map> e) => MapUpdated?.Invoke(this, e);
 
-    private void OnStateUpdate(StateUpdate<Player> value) => PushStateUpdate(PlayerObservers, value);
+    public void OnRoundUpdated(StateUpdateEventArgs<Round> e) => RoundUpdated?.Invoke(this, e);
 
-    private void OnStateUpdate(StateUpdate<PlayerState> value) => PushStateUpdate(PlayerStateObservers, value);
+    public void OnPlayerUpdated(StateUpdateEventArgs<Player> e) => PlayerUpdated?.Invoke(this, e);
 
-    private void OnStateUpdate(StateUpdate<PlayerMatchStats> value) => PushStateUpdate(PlayerMatchStatsObservers, value);
+    public void OnPlayerStateUpdated(StateUpdateEventArgs<PlayerState> e) => PlayerStateUpdated?.Invoke(this, e);
 
-    private void OnStateUpdate(StateUpdate<Round> value) => PushStateUpdate(RoundObservers, value);
+    public void OnPlayerMatchStatsUpdated(StateUpdateEventArgs<PlayerMatchStats> e) => PlayerMatchStatsUpdated?.Invoke(this, e);
 
-    private async Task CleanupDeadSubscriptionsAsync(
+    private async Task CleanupDeadConnectionsAsync(
         TimeSpan checkInterval,
-        TimeSpan subscriptionTimeout)
+        TimeSpan connectionTimeout)
     {
         using var timer = new PeriodicTimer(checkInterval);
         while (await timer.WaitForNextTickAsync())
         {
-            var deadSubscriptions = gameStateSubscriptions.Values
-                .Where(x => DateTimeOffset.UtcNow - x.LastActivity > subscriptionTimeout)
+            var deadConnections = connections.Values
+                .Where(x => DateTimeOffset.UtcNow - x.LastActivity > connectionTimeout)
                 .ToList();
 
-            foreach (var deadSubscription in deadSubscriptions)
+            foreach (var deadConnection in deadConnections)
             {
-                deadSubscription.OnCompleted();
+                Disconnect(deadConnection.GameState.SteamId);
             }
         }
     }
@@ -85,71 +97,27 @@ internal sealed class GameStateService : ObservableGameState, IGameStateService
     /// The provider has been disconnected.
     /// </summary>
     /// <param name="steamId">The SteamID of the disconnected provider.</param>
-    private void OnDisconnectEvent(SteamId64 steamId)
+    private void Disconnect(SteamId64 steamId)
     {
-        // Remove the local subscription
-        gameStateSubscriptions.Remove(steamId, out _);
+        // Remove the local connection
+        connections.Remove(steamId, out _);
 
-        // Send null states to all observers for this SteamID to overwrite their last buffer.
-        PushStateUpdate(ProviderObservers, new StateUpdate<Provider>(steamId, State: null));
-        PushStateUpdate(MapObservers, new StateUpdate<Map>(steamId, State: null));
-        PushStateUpdate(RoundObservers, new StateUpdate<Round>(steamId, State: null));
-        PushStateUpdate(PlayerObservers, new StateUpdate<Player>(steamId, State: null));
-        PushStateUpdate(PlayerStateObservers, new StateUpdate<PlayerState>(steamId, State: null));
-        PushStateUpdate(PlayerMatchStatsObservers, new StateUpdate<PlayerMatchStats>(steamId, State: null));
+        // Send null states to all subscribers for this SteamID to overwrite their last buffer.
+        OnProviderUpdated(new StateUpdateEventArgs<Provider>(steamId, state: null));
+        OnMapUpdated(new StateUpdateEventArgs<Map>(steamId, state: null));
+        OnRoundUpdated(new StateUpdateEventArgs<Round>(steamId, state: null));
+        OnPlayerUpdated(new StateUpdateEventArgs<Player>(steamId, state: null));
+        OnPlayerStateUpdated(new StateUpdateEventArgs<PlayerState>(steamId, state: null));
+        OnPlayerMatchStatsUpdated(new StateUpdateEventArgs<PlayerMatchStats>(steamId, state: null));
     }
 
-    private sealed class Subscription :
-        IObserver<StateUpdate<Provider>>,
-        IObserver<StateUpdate<Map>>,
-        IObserver<StateUpdate<Round>>,
-        IObserver<StateUpdate<Player>>,
-        IObserver<StateUpdate<PlayerState>>,
-        IObserver<StateUpdate<PlayerMatchStats>>
+    /// <summary>
+    /// A single connected Counter-Strike instance and the time we last heard from it.
+    /// </summary>
+    private sealed class Connection(IGameState gameState)
     {
-        private readonly GameStateService service;
-        private readonly IDisposable[] subscriptions;
+        public IGameState GameState { get; } = gameState;
 
-        public IGameState GameState { get; }
         public DateTimeOffset LastActivity { get; set; }
-
-        public Subscription(GameStateService service, IGameState gameState)
-        {
-            this.service = service;
-            GameState = gameState;
-            subscriptions =
-            [
-                GameState.Subscribe(this as IObserver<StateUpdate<Provider>>),
-                GameState.Subscribe(this as IObserver<StateUpdate<Map>>),
-                GameState.Subscribe(this as IObserver<StateUpdate<Round>>),
-                GameState.Subscribe(this as IObserver<StateUpdate<Player>>),
-                GameState.Subscribe(this as IObserver<StateUpdate<PlayerState>>),
-                GameState.Subscribe(this as IObserver<StateUpdate<PlayerMatchStats>>),
-            ];
-        }
-
-        public void OnNext(StateUpdate<Provider> value) => service.OnStateUpdate(value);
-
-        public void OnNext(StateUpdate<Map> value) => service.OnStateUpdate(value);
-
-        public void OnNext(StateUpdate<Round> value) => service.OnStateUpdate(value);
-
-        public void OnNext(StateUpdate<Player> value) => service.OnStateUpdate(value);
-
-        public void OnNext(StateUpdate<PlayerState> value) => service.OnStateUpdate(value);
-
-        public void OnNext(StateUpdate<PlayerMatchStats> value) => service.OnStateUpdate(value);
-
-        public void OnCompleted()
-        {
-            foreach (var subscription in subscriptions)
-            {
-                subscription.Dispose();
-            }
-
-            service.OnDisconnectEvent(GameState.SteamId);
-        }
-
-        public void OnError(Exception error) => throw error;
     }
 }

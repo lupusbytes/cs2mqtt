@@ -31,7 +31,7 @@ public class GameStateServiceTest
         // Arrange
         options.IgnoreSpectatedPlayers = false;
 
-        var observers = new Observers(sut);
+        var subscriber = new Subscriber(sut);
 
         var data = new List<GameStateData>
         {
@@ -47,27 +47,27 @@ public class GameStateServiceTest
         }
 
         // Assert
-        observers.AssertAllReceivedDataForSteamId(2, provider1.SteamId64);
-        observers.AssertAllReceivedDataForSteamId(1, provider2.SteamId64);
+        subscriber.AssertAllReceivedDataForSteamId(2, provider1.SteamId64);
+        subscriber.AssertAllReceivedDataForSteamId(1, provider2.SteamId64);
     }
 
     [Theory, AutoNSubstituteData]
-    internal void ProcessEvent_sends_events_to_multiple_observers(
+    internal void ProcessEvent_sends_events_to_multiple_subscribers(
         [Frozen] GameStateOptions options,
         GameStateData data,
         GameStateService sut)
     {
         // Arrange
         options.IgnoreSpectatedPlayers = false;
-        var observer1 = new Observers(sut);
-        var observer2 = new Observers(sut);
+        var subscriber1 = new Subscriber(sut);
+        var subscriber2 = new Subscriber(sut);
 
         // Act
         sut.ProcessEvent(data);
 
         // Assert
-        observer1.AssertAllReceivedData(1);
-        observer2.AssertAllReceivedData(1);
+        subscriber1.AssertAllReceivedData(1);
+        subscriber2.AssertAllReceivedData(1);
     }
 
     [Theory, AutoNSubstituteData]
@@ -81,17 +81,17 @@ public class GameStateServiceTest
 
         sut.ProcessEvent(data); // Set initial properties
 
-        var observers = new Observers(sut);
+        var subscriber = new Subscriber(sut);
 
         // Act
         sut.ProcessEvent(data); // Send same data again
 
         // Assert
-        observers.AssertAllReceivedData(0);
+        subscriber.AssertAllReceivedData(0);
     }
 
     [Theory, AutoNSubstituteData]
-    internal void ProcessEvent_does_not_send_events_to_unsubscribed_observers(
+    internal void ProcessEvent_does_not_send_events_to_unsubscribed_handlers(
         [Frozen] GameStateOptions options,
         GameStateData data1,
         GameStateData data2,
@@ -100,15 +100,15 @@ public class GameStateServiceTest
         // Arrange
         options.IgnoreSpectatedPlayers = false;
 
-        var observers = new Observers(sut);
+        var subscriber = new Subscriber(sut);
 
         // Act
         sut.ProcessEvent(data1);
-        observers.DisposeAll();
+        subscriber.UnsubscribeAll();
         sut.ProcessEvent(data2);
 
         // Assert
-        observers.AssertAllReceivedData(1);
+        subscriber.AssertAllReceivedData(1);
     }
 
     [Theory, AutoData]
@@ -240,7 +240,7 @@ public class GameStateServiceTest
 
         var sut = new GameStateService(options);
 
-        var observers = new Observers(sut);
+        var subscriber = new Subscriber(sut);
 
         // Act
         sut.ProcessEvent(data);
@@ -255,79 +255,66 @@ public class GameStateServiceTest
         // After the wait, the background cleanup task should have removed the provider.
         sut.GetPlayer(data.Provider.SteamId64).Should().BeNull();
 
-        // All the observers should have received null events for the corresponding SteamID.
-        observers.AssertAllReceivedNullForSteamId(data.Provider.SteamId64);
+        // All the subscribers should have received null events for the corresponding SteamID.
+        subscriber.AssertAllReceivedNullForSteamId(data.Provider.SteamId64);
     }
 
-    private sealed class Observers
+    /// <summary>
+    /// Attaches a substituted handler to every state update event of a <see cref="GameStateService"/>.
+    /// </summary>
+    private sealed class Subscriber
     {
-        private readonly IObserver<StateUpdate<Player>> playerObserver;
-        private readonly IDisposable playerSubscription;
+        private readonly GameStateService gameStateService;
+        private readonly EventHandler<StateUpdateEventArgs<Player>> playerHandler = Substitute.For<EventHandler<StateUpdateEventArgs<Player>>>();
+        private readonly EventHandler<StateUpdateEventArgs<PlayerState>> playerStateHandler = Substitute.For<EventHandler<StateUpdateEventArgs<PlayerState>>>();
+        private readonly EventHandler<StateUpdateEventArgs<PlayerMatchStats>> playerMatchStatsHandler = Substitute.For<EventHandler<StateUpdateEventArgs<PlayerMatchStats>>>();
+        private readonly EventHandler<StateUpdateEventArgs<Round>> roundHandler = Substitute.For<EventHandler<StateUpdateEventArgs<Round>>>();
+        private readonly EventHandler<StateUpdateEventArgs<Map>> mapHandler = Substitute.For<EventHandler<StateUpdateEventArgs<Map>>>();
 
-        private readonly IObserver<StateUpdate<PlayerState>> playerStateObserver;
-        private readonly IDisposable playerStateSubscription;
-
-        private readonly IObserver<StateUpdate<PlayerMatchStats>> playerMatchStatsObserver;
-        private readonly IDisposable playerMatchStatsSubscription;
-
-        private readonly IObserver<StateUpdate<Round>> roundObserver;
-        private readonly IDisposable roundSubscription;
-
-        private readonly IObserver<StateUpdate<Map>> mapObserver;
-        private readonly IDisposable mapSubscription;
-
-        public Observers(GameStateService sut)
+        public Subscriber(GameStateService gameStateService)
         {
-            playerObserver = Substitute.For<IObserver<StateUpdate<Player>>>();
-            playerSubscription = sut.Subscribe(playerObserver);
-
-            playerStateObserver = Substitute.For<IObserver<StateUpdate<PlayerState>>>();
-            playerStateSubscription = sut.Subscribe(playerStateObserver);
-
-            playerMatchStatsObserver = Substitute.For<IObserver<StateUpdate<PlayerMatchStats>>>();
-            playerMatchStatsSubscription = sut.Subscribe(playerMatchStatsObserver);
-
-            roundObserver = Substitute.For<IObserver<StateUpdate<Round>>>();
-            roundSubscription = sut.Subscribe(roundObserver);
-
-            mapObserver = Substitute.For<IObserver<StateUpdate<Map>>>();
-            mapSubscription = sut.Subscribe(mapObserver);
+            this.gameStateService = gameStateService;
+            gameStateService.PlayerUpdated += playerHandler;
+            gameStateService.PlayerStateUpdated += playerStateHandler;
+            gameStateService.PlayerMatchStatsUpdated += playerMatchStatsHandler;
+            gameStateService.RoundUpdated += roundHandler;
+            gameStateService.MapUpdated += mapHandler;
         }
 
         public void AssertAllReceivedData(int receivedCount)
         {
-            playerObserver.Received(receivedCount).OnNext(Arg.Any<StateUpdate<Player>>());
-            playerStateObserver.Received(receivedCount).OnNext(Arg.Any<StateUpdate<PlayerState>>());
-            playerMatchStatsObserver.Received(receivedCount).OnNext(Arg.Any<StateUpdate<PlayerMatchStats>>());
-            mapObserver.Received(receivedCount).OnNext(Arg.Any<StateUpdate<Map>>());
-            roundObserver.Received(receivedCount).OnNext(Arg.Any<StateUpdate<Round>>());
+            playerHandler.Received(receivedCount).Invoke(Arg.Any<object>(), Arg.Any<StateUpdateEventArgs<Player>>());
+            playerStateHandler.Received(receivedCount).Invoke(Arg.Any<object>(), Arg.Any<StateUpdateEventArgs<PlayerState>>());
+            playerMatchStatsHandler.Received(receivedCount).Invoke(Arg.Any<object>(), Arg.Any<StateUpdateEventArgs<PlayerMatchStats>>());
+            mapHandler.Received(receivedCount).Invoke(Arg.Any<object>(), Arg.Any<StateUpdateEventArgs<Map>>());
+            roundHandler.Received(receivedCount).Invoke(Arg.Any<object>(), Arg.Any<StateUpdateEventArgs<Round>>());
         }
 
         public void AssertAllReceivedDataForSteamId(int receivedCount, SteamId64 steamId)
         {
-            playerObserver.Received(receivedCount).OnNext(Arg.Is<StateUpdate<Player>>(r => r.SteamId == steamId));
-            playerStateObserver.Received(receivedCount).OnNext(Arg.Is<StateUpdate<PlayerState>>(r => r.SteamId == steamId));
-            playerMatchStatsObserver.Received(receivedCount).OnNext(Arg.Is<StateUpdate<PlayerMatchStats>>(r => r.SteamId == steamId));
-            mapObserver.Received(receivedCount).OnNext(Arg.Is<StateUpdate<Map>>(r => r.SteamId == steamId));
-            roundObserver.Received(receivedCount).OnNext(Arg.Is<StateUpdate<Round>>(r => r.SteamId == steamId));
+            playerHandler.Received(receivedCount).Invoke(Arg.Any<object>(), Arg.Is<StateUpdateEventArgs<Player>>(r => r.SteamId == steamId));
+            playerStateHandler.Received(receivedCount).Invoke(Arg.Any<object>(), Arg.Is<StateUpdateEventArgs<PlayerState>>(r => r.SteamId == steamId));
+            playerMatchStatsHandler.Received(receivedCount).Invoke(Arg.Any<object>(), Arg.Is<StateUpdateEventArgs<PlayerMatchStats>>(r => r.SteamId == steamId));
+            mapHandler.Received(receivedCount).Invoke(Arg.Any<object>(), Arg.Is<StateUpdateEventArgs<Map>>(r => r.SteamId == steamId));
+            roundHandler.Received(receivedCount).Invoke(Arg.Any<object>(), Arg.Is<StateUpdateEventArgs<Round>>(r => r.SteamId == steamId));
         }
 
         public void AssertAllReceivedNullForSteamId(SteamId64 steamId)
         {
-            playerObserver.Received(1).OnNext(Arg.Is<StateUpdate<Player>>(p => p.SteamId == steamId && p.State == null));
-            playerStateObserver.Received(1).OnNext(Arg.Is<StateUpdate<PlayerState>>(ps => ps.SteamId == steamId && ps.State == null));
-            playerMatchStatsObserver.Received(1).OnNext(Arg.Is<StateUpdate<PlayerMatchStats>>(pms => pms.SteamId == steamId && pms.State == null));
-            mapObserver.Received(1).OnNext(Arg.Is<StateUpdate<Map>>(m => m.SteamId == steamId && m.State == null));
-            roundObserver.Received(1).OnNext(Arg.Is<StateUpdate<Round>>(r => r.SteamId == steamId && r.State == null));
+            playerHandler.Received(1).Invoke(Arg.Any<object>(), Arg.Is<StateUpdateEventArgs<Player>>(p => p.SteamId == steamId && p.State == null));
+            playerStateHandler.Received(1).Invoke(Arg.Any<object>(), Arg.Is<StateUpdateEventArgs<PlayerState>>(ps => ps.SteamId == steamId && ps.State == null));
+            playerMatchStatsHandler.Received(1).Invoke(Arg.Any<object>(), Arg.Is<StateUpdateEventArgs<PlayerMatchStats>>(pms => pms.SteamId == steamId && pms.State == null));
+            mapHandler.Received(1).Invoke(Arg.Any<object>(), Arg.Is<StateUpdateEventArgs<Map>>(m => m.SteamId == steamId && m.State == null));
+            roundHandler.Received(1).Invoke(Arg.Any<object>(), Arg.Is<StateUpdateEventArgs<Round>>(r => r.SteamId == steamId && r.State == null));
         }
 
-        public void DisposeAll()
+        public void UnsubscribeAll()
         {
-            playerSubscription.Dispose();
-            playerStateSubscription.Dispose();
-            playerMatchStatsSubscription.Dispose();
-            mapSubscription.Dispose();
-            roundSubscription.Dispose();
+            gameStateService.PlayerUpdated -= playerHandler;
+            gameStateService.PlayerStateUpdated -= playerStateHandler;
+            gameStateService.PlayerMatchStatsUpdated -= playerMatchStatsHandler;
+            gameStateService.MapUpdated -= mapHandler;
+            gameStateService.RoundUpdated -= roundHandler;
         }
     }
 }

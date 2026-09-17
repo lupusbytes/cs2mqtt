@@ -1,12 +1,9 @@
-using System.Threading.Channels;
 using System.Threading.Tasks.Dataflow;
 using LupusBytes.CS2.GameStateIntegration.Contracts;
 
 namespace LupusBytes.CS2.GameStateIntegration.Mqtt;
 
-public sealed class AvailabilityMqttPublisher(
-    IGameStateService gameStateService,
-    IMqttClient mqttClient) : GameStateObserverService(gameStateService)
+public sealed class AvailabilityMqttPublisher : GameStateSubscriberService
 {
     private const string ProviderAvailabilityTopicSuffix = "status";
     private const string PlayerAvailabilityTopicSuffix = "player/status";
@@ -21,6 +18,21 @@ public sealed class AvailabilityMqttPublisher(
     private readonly HashSet<SteamId64> onlinePlayerMatchStats = [];
     private readonly HashSet<SteamId64> onlineMaps = [];
     private readonly HashSet<SteamId64> onlineRounds = [];
+
+    private readonly IMqttClient mqttClient;
+
+    public AvailabilityMqttPublisher(IGameStateService gameStateService, IMqttClient mqttClient)
+        : base(gameStateService)
+    {
+        this.mqttClient = mqttClient;
+
+        SubscribeToProvider((e, ct) => SetAvailabilityAsync(e, onlineProviders, ProviderAvailabilityTopicSuffix, ct));
+        SubscribeToPlayer((e, ct) => SetAvailabilityAsync(e, onlinePlayers, PlayerAvailabilityTopicSuffix, ct));
+        SubscribeToPlayerState((e, ct) => SetAvailabilityAsync(e, onlinePlayerStates, PlayerStateAvailabilityTopicSuffix, ct));
+        SubscribeToPlayerMatchStats((e, ct) => SetAvailabilityAsync(e, onlinePlayerMatchStats, PlayerMatchStatsAvailabilityTopicSuffix, ct));
+        SubscribeToMap((e, ct) => SetAvailabilityAsync(e, onlineMaps, MapAvailabilityTopicSuffix, ct));
+        SubscribeToRound((e, ct) => SetAvailabilityAsync(e, onlineRounds, RoundAvailabilityTopicSuffix, ct));
+    }
 
     public override async Task StartAsync(CancellationToken cancellationToken)
     {
@@ -38,15 +50,6 @@ public sealed class AvailabilityMqttPublisher(
         await SetAllOffline(cancellationToken);
         await SetSystemAvailability(online: false, cancellationToken);
     }
-
-    protected override Task ExecuteAsync(CancellationToken stoppingToken)
-        => Task.WhenAll(
-            ProcessChannelAsync(ProviderChannelReader, onlineProviders, ProviderAvailabilityTopicSuffix, stoppingToken),
-            ProcessChannelAsync(PlayerChannelReader, onlinePlayers, PlayerAvailabilityTopicSuffix, stoppingToken),
-            ProcessChannelAsync(PlayerStateChannelReader, onlinePlayerStates, PlayerStateAvailabilityTopicSuffix, stoppingToken),
-            ProcessChannelAsync(PlayerMatchStatsChannelReader, onlinePlayerMatchStats, PlayerMatchStatsAvailabilityTopicSuffix, stoppingToken),
-            ProcessChannelAsync(MapChannelReader, onlineMaps, MapAvailabilityTopicSuffix, stoppingToken),
-            ProcessChannelAsync(RoundChannelReader, onlineRounds, RoundAvailabilityTopicSuffix, stoppingToken));
 
     private Task SetSystemAvailability(bool online, CancellationToken cancellationToken)
         => mqttClient.PublishAsync(
@@ -72,33 +75,30 @@ public sealed class AvailabilityMqttPublisher(
             },
             cancellationToken);
 
-    private async Task ProcessChannelAsync<TState>(
-        ChannelReader<StateUpdate<TState>> channelReader,
+    private async Task SetAvailabilityAsync<TState>(
+        StateUpdateEventArgs<TState> stateUpdate,
         HashSet<SteamId64> onlineSet,
         string topicSuffix,
         CancellationToken cancellationToken)
         where TState : class
     {
-        await foreach (var stateUpdate in channelReader.ReadAllAsync(cancellationToken))
+        var isOnline = onlineSet.Contains(stateUpdate.SteamId);
+        var shouldBeOnline = stateUpdate.HasState;
+
+        if (shouldBeOnline == isOnline)
         {
-            var isOnline = onlineSet.Contains(stateUpdate.SteamId);
-            var shouldBeOnline = stateUpdate.HasState;
+            return;
+        }
 
-            if (shouldBeOnline == isOnline)
-            {
-                continue;
-            }
+        await SetAvailability(stateUpdate.SteamId, topicSuffix, shouldBeOnline, cancellationToken);
 
-            await SetAvailability(stateUpdate.SteamId, topicSuffix, shouldBeOnline, cancellationToken);
-
-            if (shouldBeOnline)
-            {
-                onlineSet.Add(stateUpdate.SteamId);
-            }
-            else
-            {
-                onlineSet.Remove(stateUpdate.SteamId);
-            }
+        if (shouldBeOnline)
+        {
+            onlineSet.Add(stateUpdate.SteamId);
+        }
+        else
+        {
+            onlineSet.Remove(stateUpdate.SteamId);
         }
     }
 

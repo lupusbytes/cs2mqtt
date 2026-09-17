@@ -8,6 +8,7 @@ public class GameStateMqttPublisherTest
     [Theory, AutoNSubstituteData]
     public async Task Publishes_Player_data(
         [Frozen] IMqttClient mqttClient,
+        [Frozen] IGameStateService gameStateService,
         SteamId64 steamId,
         Player player,
         GameStateMqttPublisher sut)
@@ -18,7 +19,7 @@ public class GameStateMqttPublisherTest
         await sut.StartAsync(TestContext.Current.CancellationToken);
 
         // Act
-        sut.OnNext(new StateUpdate<Player>(steamId, player));
+        gameStateService.PlayerUpdated += Raise.EventWith(new StateUpdateEventArgs<Player>(steamId, player));
 
         // Assert
         await TaskHelper.WaitForCompletionAsync(tcs);
@@ -29,6 +30,7 @@ public class GameStateMqttPublisherTest
     [Theory, AutoNSubstituteData]
     public async Task Publishes_PlayerState_data(
         [Frozen] IMqttClient mqttClient,
+        [Frozen] IGameStateService gameStateService,
         SteamId64 steamId,
         PlayerState playerState,
         GameStateMqttPublisher sut)
@@ -39,7 +41,7 @@ public class GameStateMqttPublisherTest
         await sut.StartAsync(TestContext.Current.CancellationToken);
 
         // Act
-        sut.OnNext(new StateUpdate<PlayerState>(steamId, playerState));
+        gameStateService.PlayerStateUpdated += Raise.EventWith(new StateUpdateEventArgs<PlayerState>(steamId, playerState));
 
         // Assert
         await TaskHelper.WaitForCompletionAsync(tcs);
@@ -50,6 +52,7 @@ public class GameStateMqttPublisherTest
     [Theory, AutoNSubstituteData]
     public async Task Publishes_PlayerMatchStats_data(
         [Frozen] IMqttClient mqttClient,
+        [Frozen] IGameStateService gameStateService,
         SteamId64 steamId,
         PlayerMatchStats playerMatchStats,
         GameStateMqttPublisher sut)
@@ -60,7 +63,7 @@ public class GameStateMqttPublisherTest
         await sut.StartAsync(TestContext.Current.CancellationToken);
 
         // Act
-        sut.OnNext(new StateUpdate<PlayerMatchStats>(steamId, playerMatchStats));
+        gameStateService.PlayerMatchStatsUpdated += Raise.EventWith(new StateUpdateEventArgs<PlayerMatchStats>(steamId, playerMatchStats));
 
         // Assert
         await TaskHelper.WaitForCompletionAsync(tcs);
@@ -71,6 +74,7 @@ public class GameStateMqttPublisherTest
     [Theory, AutoNSubstituteData]
     public async Task Publishes_Map_data(
         [Frozen] IMqttClient mqttClient,
+        [Frozen] IGameStateService gameStateService,
         SteamId64 steamId,
         Map map,
         GameStateMqttPublisher sut)
@@ -81,7 +85,7 @@ public class GameStateMqttPublisherTest
         await sut.StartAsync(TestContext.Current.CancellationToken);
 
         // Act
-        sut.OnNext(new StateUpdate<Map>(steamId, map));
+        gameStateService.MapUpdated += Raise.EventWith(new StateUpdateEventArgs<Map>(steamId, map));
 
         // Assert
         await TaskHelper.WaitForCompletionAsync(tcs);
@@ -92,6 +96,7 @@ public class GameStateMqttPublisherTest
     [Theory, AutoNSubstituteData]
     public async Task Publishes_Round_data(
         [Frozen] IMqttClient mqttClient,
+        [Frozen] IGameStateService gameStateService,
         SteamId64 steamId,
         Round round,
         GameStateMqttPublisher sut)
@@ -102,7 +107,7 @@ public class GameStateMqttPublisherTest
         await sut.StartAsync(TestContext.Current.CancellationToken);
 
         // Act
-        sut.OnNext(new StateUpdate<Round>(steamId, round));
+        gameStateService.RoundUpdated += Raise.EventWith(new StateUpdateEventArgs<Round>(steamId, round));
 
         // Assert
         await TaskHelper.WaitForCompletionAsync(tcs);

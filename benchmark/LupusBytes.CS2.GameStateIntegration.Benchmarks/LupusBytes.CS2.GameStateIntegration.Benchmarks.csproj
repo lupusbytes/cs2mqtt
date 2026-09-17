@@ -1,0 +1,17 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <RootNamespace>LupusBytes.CS2.GameStateIntegration.Benchmarks</RootNamespace>
+        <AssemblyName>LupusBytes.CS2.GameStateIntegration.Benchmarks</AssemblyName>
+        <ServerGarbageCollection>false</ServerGarbageCollection>
+    </PropertyGroup>
+
+    <ItemGroup>
+      <PackageReference Include="BenchmarkDotNet" Version="0.15.8" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <ProjectReference Include="..\..\src\LupusBytes.CS2.GameStateIntegration\LupusBytes.CS2.GameStateIntegration.csproj" />
+    </ItemGroup>
+
+</Project>

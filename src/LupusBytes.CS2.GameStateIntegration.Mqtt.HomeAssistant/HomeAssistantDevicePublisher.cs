@@ -1,13 +1,10 @@
 using System.Collections.Concurrent;
 using System.Diagnostics.CodeAnalysis;
-using System.Threading.Channels;
 using LupusBytes.CS2.GameStateIntegration.Contracts;
 
 namespace LupusBytes.CS2.GameStateIntegration.Mqtt.HomeAssistant;
 
-public sealed class HomeAssistantDevicePublisher(
-    IGameStateService gameStateService,
-    IMqttClient mqttClient) : GameStateObserverService(gameStateService)
+public sealed class HomeAssistantDevicePublisher : GameStateSubscriberService
 {
     private const string BridgeDeviceId = $"{Constants.ProjectName}_bridge";
     private const string Manufacturer = "lupusbytes";
@@ -20,70 +17,25 @@ public sealed class HomeAssistantDevicePublisher(
     private readonly HashSet<SteamId64> publishedMapConfigs = [];
     private readonly HashSet<SteamId64> publishedRoundConfigs = [];
 
+    private readonly IMqttClient mqttClient;
+
+    public HomeAssistantDevicePublisher(IGameStateService gameStateService, IMqttClient mqttClient)
+        : base(gameStateService)
+    {
+        this.mqttClient = mqttClient;
+
+        SubscribeToProvider((e, ct) => PublishDiscoveryMessagesAsync(e, publishedProviderConfigs, device => new ProviderDiscoveryMessages(device), ct));
+        SubscribeToPlayer((e, ct) => PublishDiscoveryMessagesAsync(e, publishedPlayerConfigs, device => new PlayerDiscoveryMessages(device), ct));
+        SubscribeToPlayerState((e, ct) => PublishDiscoveryMessagesAsync(e, publishedPlayerStateConfigs, device => new PlayerStateDiscoveryMessages(device), ct));
+        SubscribeToPlayerMatchStats((e, ct) => PublishDiscoveryMessagesAsync(e, publishedPlayerMatchStatsConfigs, device => new PlayerMatchStatsDiscoveryMessages(device), ct));
+        SubscribeToMap((e, ct) => PublishDiscoveryMessagesAsync(e, publishedMapConfigs, device => new MapDiscoveryMessages(device), ct));
+        SubscribeToRound((e, ct) => PublishDiscoveryMessagesAsync(e, publishedRoundConfigs, device => new RoundDiscoveryMessages(device), ct));
+    }
+
     protected override async Task ExecuteAsync(CancellationToken stoppingToken)
     {
         await PublishBridgeDeviceAsync(stoppingToken);
-        await ProcessChannelsAsync(stoppingToken);
-    }
-
-    private Task ProcessChannelsAsync(CancellationToken stoppingToken)
-        => Task.WhenAll(
-            ProcessChannelAsync(
-                ProviderChannelReader,
-                publishedProviderConfigs,
-                device => new ProviderDiscoveryMessages(device),
-                stoppingToken),
-            ProcessChannelAsync(
-                PlayerChannelReader,
-                publishedPlayerConfigs,
-                device => new PlayerDiscoveryMessages(device),
-                stoppingToken),
-            ProcessChannelAsync(
-                PlayerStateChannelReader,
-                publishedPlayerStateConfigs,
-                device => new PlayerStateDiscoveryMessages(device),
-                stoppingToken),
-            ProcessChannelAsync(
-                PlayerMatchStatsChannelReader,
-                publishedPlayerMatchStatsConfigs,
-                device => new PlayerMatchStatsDiscoveryMessages(device),
-                stoppingToken),
-            ProcessChannelAsync(
-                MapChannelReader,
-                publishedMapConfigs,
-                device => new MapDiscoveryMessages(device),
-                stoppingToken),
-            ProcessChannelAsync(
-                RoundChannelReader,
-                publishedRoundConfigs,
-                device => new RoundDiscoveryMessages(device),
-                stoppingToken));
-
-    [SuppressMessage(
-        "Minor Code Smell",
-        "S3267:Loops should be simplified with \"LINQ\" expressions",
-        Justification = "Reads worse and is less performant")]
-    private async Task ProcessChannelAsync<TState>(
-        ChannelReader<StateUpdate<TState>> channelReader,
-        HashSet<SteamId64> publishedConfigSet,
-        Func<Device, MqttDiscoveryMessages> discoveryMessages,
-        CancellationToken cancellationToken)
-        where TState : class
-    {
-        await foreach (var stateUpdate in channelReader.ReadAllAsync(cancellationToken))
-        {
-            var device = devices.GetOrAdd(stateUpdate.SteamId, CreateDevice);
-
-            if (!publishedConfigSet.Add(stateUpdate.SteamId))
-            {
-                continue;
-            }
-
-            foreach (var discoveryMessage in discoveryMessages(device))
-            {
-                await mqttClient.PublishAsync(discoveryMessage, cancellationToken);
-            }
-        }
+        await base.ExecuteAsync(stoppingToken);
     }
 
     private static Device CreateDevice(SteamId64 steamId) => new(
@@ -93,6 +45,30 @@ public sealed class HomeAssistantDevicePublisher(
         Model: Constants.ProjectName,
         SoftwareVersion: Constants.Version,
         ViaDevice: BridgeDeviceId);
+
+    [SuppressMessage(
+        "Minor Code Smell",
+        "S3267:Loops should be simplified with \"LINQ\" expressions",
+        Justification = "Reads worse and is less performant")]
+    private async Task PublishDiscoveryMessagesAsync<TState>(
+        StateUpdateEventArgs<TState> stateUpdate,
+        HashSet<SteamId64> publishedConfigSet,
+        Func<Device, MqttDiscoveryMessages> discoveryMessages,
+        CancellationToken cancellationToken)
+        where TState : class
+    {
+        var device = devices.GetOrAdd(stateUpdate.SteamId, CreateDevice);
+
+        if (!publishedConfigSet.Add(stateUpdate.SteamId))
+        {
+            return;
+        }
+
+        foreach (var discoveryMessage in discoveryMessages(device))
+        {
+            await mqttClient.PublishAsync(discoveryMessage, cancellationToken);
+        }
+    }
 
     private async Task PublishBridgeDeviceAsync(CancellationToken cancellationToken)
     {

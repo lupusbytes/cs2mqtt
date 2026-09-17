@@ -8,6 +8,11 @@
     </PropertyGroup>
 
     <ItemGroup>
+      <!-- Allows NSubstitute (Castle DynamicProxy) to create substitutes for internal interfaces in unit tests -->
+      <InternalsVisibleTo Include="DynamicProxyGenAssembly2" />
+    </ItemGroup>
+
+    <ItemGroup>
       <ProjectReference Include="..\LupusBytes.CS2.GameStateIntegration.Contracts\LupusBytes.CS2.GameStateIntegration.Contracts.csproj" />
     </ItemGroup>
 
