@@ -109,4 +109,11 @@ public enum Mode
     /// </remarks>
     NEW_USER_TRAINING,
 #pragma warning restore CA1707
+
+    /// <summary>
+    /// Rush mode.
+    /// A fast-paced 3v3 mode with no bomb objective, played on small purpose-built arenas.
+    /// A round is won by eliminating the enemy team or by controlling the central tower when time expires.
+    /// </summary>
+    Rush,
 }
