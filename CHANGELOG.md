@@ -1,5 +1,17 @@
 # Changelog
 
+## [1.13.0](https://github.com/lupusbytes/cs2mqtt/compare/v1.12.3...v1.13.0) (2026-10-15)
+
+
+### New features
+
+* add compatibility with rush mode ([01aa007](https://github.com/lupusbytes/cs2mqtt/commit/01aa0076708482eb5485dc94d51af71433fd94c8))
+
+
+### Upgrades
+
+* **deps:** update dotnet monorepo to 10.0.13 ([4a86cbe](https://github.com/lupusbytes/cs2mqtt/commit/4a86cbe38a302b3e9b6454b30453e015adbceeb5))
+
 ## [1.12.3](https://github.com/lupusbytes/cs2mqtt/compare/v1.12.2...v1.12.3) (2026-09-10)
 
 
