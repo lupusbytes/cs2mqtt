@@ -1,0 +1,5 @@
+##########################################
+# Code Analyzers Rules
+##########################################
+[GameState.cs]
+dotnet_diagnostic.SA1504.severity = none     # All accessors should be single-line or multi-line
