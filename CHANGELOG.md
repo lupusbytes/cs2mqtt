@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.13.1](https://github.com/lupusbytes/cs2mqtt/compare/v1.13.0...v1.13.1) (2026-11-17)
+
+
+### Upgrades
+
+* **deps:** update dotnet monorepo to 10.0.15 ([85b7a0a](https://github.com/lupusbytes/cs2mqtt/commit/85b7a0ab795e4d1d278f86c2c1df48668e9f2f62))
+
 ## [1.13.0](https://github.com/lupusbytes/cs2mqtt/compare/v1.12.3...v1.13.0) (2026-10-15)
 
 
