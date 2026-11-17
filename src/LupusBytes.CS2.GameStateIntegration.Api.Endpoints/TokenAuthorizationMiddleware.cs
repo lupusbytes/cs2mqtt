@@ -7,6 +7,9 @@ namespace LupusBytes.CS2.GameStateIntegration.Api.Endpoints;
 /// Validates the <c>auth.token</c> field of incoming Game State Integration payloads
 /// and short-circuits the request with <c>401 Unauthorized</c> when it does not match the expected token.
 /// </summary>
+/// <param name="next">The next middleware in the request pipeline.</param>
+/// <param name="expectedToken">The auth token that incoming payloads must contain to be accepted.</param>
+/// <param name="logger">The logger.</param>
 internal partial class TokenAuthorizationMiddleware(
     RequestDelegate next,
     string expectedToken,
